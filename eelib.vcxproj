@@ -128,7 +128,9 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ee_dict.h" />
     <ClInclude Include="include\ee_arena.h" />
+    <ClInclude Include="include\ee_string.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

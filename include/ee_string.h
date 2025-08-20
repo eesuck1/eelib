@@ -33,8 +33,14 @@
 
 #define EE_SS_LEN           (16)
 #define EE_LS_PREFIX_LEN    (4)
+
+#ifndef EE_TRUE
 #define EE_TRUE             (1)
+#endif // EE_TRUE
+
+#ifndef EE_FALSE
 #define EE_FALSE            (0)
+#endif // EE_FALSE
 
 typedef uint8_t str_dt;
 

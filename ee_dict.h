@@ -1,6 +1,7 @@
 #pragma once
 
 #ifndef EE_DICT_H
+#define EE_DICT_H
 
 #include "stdlib.h"
 #include "string.h"
@@ -159,22 +160,12 @@ EE_INLINE uint64_t ee_hash(Key key, uint64_t seed)
 
 EE_INLINE int ee_key_eq(Key first, Key second)
 {
-    EE_ASSERT(EE_KEY_SIZE == 16, "Keys comparator expects 16-byte buffer, (%d) given", EE_KEY_SIZE);
-
-    const uint64_t* f_data = (uint64_t*)first.bytes;
-    const uint64_t* s_data = (uint64_t*)second.bytes;
-
-    return !((f_data[0] ^ s_data[0]) && (f_data[1] ^ s_data[1]));
+    return memcmp(first.bytes, second.bytes, EE_KEY_SIZE) == 0;
 }
 
 EE_INLINE int ee_val_eq(Value first, Value second)
 {
-    EE_ASSERT(EE_VALUE_SIZE == 24, "Values comparator expects 24-byte buffer, (%d) given", EE_VALUE_SIZE);
-
-    const uint64_t* f_data = (uint64_t*)first.bytes;
-    const uint64_t* s_data = (uint64_t*)second.bytes;
-
-    return !((f_data[0] ^ s_data[0]) && (f_data[1] ^ s_data[1]) && (f_data[2] ^ s_data[2]));
+    return memcmp(first.bytes, second.bytes, EE_VALUE_SIZE) == 0;
 }
 
 EE_INLINE void ee_dict_insert(Dict* dict, Key key, Value val)
@@ -227,7 +218,7 @@ EE_INLINE void ee_dict_expand(Dict* dict)
     *dict = new_dict;
 }
 
-EE_INLINE void ee_dict_set(Dict* dict, Key key, Value val)
+EE_INLINE void ee_dict_add(Dict* dict, Key key, Value val)
 {
     ee_dict_insert(dict, key, val);
 
@@ -459,4 +450,3 @@ EE_INLINE void ee_value_to_data(Value value, void* data, size_t size)
 
 
 #endif // EE_DICT_H
-

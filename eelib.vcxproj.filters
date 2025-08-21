@@ -20,13 +20,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ee_arena.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ee_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ee_dict.h">
+    <ClInclude Include="include\ee_arena.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ee_dict.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ee_format.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

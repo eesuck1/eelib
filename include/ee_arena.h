@@ -53,6 +53,8 @@ EE_INLINE Arena ee_arena_new(size_t size)
 	out.offset = 0;
 	out.mark = 0;
 
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Arena.buffer", size);
+
 	memset(out.marks, 0, sizeof(out.marks));
 
 	return out;
@@ -63,7 +65,12 @@ EE_INLINE void* ee_arena_alloc(Arena* arena, size_t count, size_t size, size_t a
 	const size_t total = size * count;
 	const size_t offset = (arena->offset + align - 1) & ~(align - 1);
 
-	EE_ASSERT(offset + total < arena->size,
+	if (offset + total > arena->size)
+	{
+		return NULL;
+	}
+
+	EE_ASSERT(offset + total <= arena->size,
 		"Arena overflow. Asked (%zu) bytes but current capacity is (%zu)", total, arena->size - offset);
 
 	void* out = (void*)(arena->buffer + offset);

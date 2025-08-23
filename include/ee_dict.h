@@ -102,6 +102,15 @@ EE_INLINE void ee_alloc_kvo(DictKey** keys, DictValue** vals, int** ocup, size_t
 
     EE_ASSERT(memory != NULL, "Unable to allocate %zu bytes for buffer", (sizeof(DictKey) + sizeof(DictValue) + sizeof(int)) * cap);
 
+    if (memory == NULL)
+    {
+        *keys = NULL;
+        *vals = NULL;
+        *ocup = NULL;
+
+        return;
+    }
+
     *keys = (DictKey*)memory;
     *vals = (DictValue*)(memory + sizeof(DictKey) * cap);
     *ocup = (int*)(memory + (sizeof(DictKey) + sizeof(DictValue)) * cap);
@@ -110,6 +119,11 @@ EE_INLINE void ee_alloc_kvo(DictKey** keys, DictValue** vals, int** ocup, size_t
 EE_INLINE void ee_free_kvo(Dict* dict)
 {
     EE_ASSERT(dict->keys != NULL, "Base of buffer is NULL");
+
+    if (dict->keys == NULL)
+    {
+        return;
+    }
 
     free(dict->keys);
 }
@@ -172,6 +186,11 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 {
     EE_ASSERT(dict != NULL, "Dict pointer is NULL");
 
+    if (dict == NULL)
+    {
+        return;
+    }
+
     uint64_t h = ee_hash(key, EE_DEFAULT_SEED);
     uint64_t h_i = h & dict->mask;
 
@@ -232,6 +251,11 @@ EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 {
     EE_ASSERT(dict != NULL, "Dict pointer is NULL");
 
+    if (dict == NULL)
+    {
+        return;
+    }
+
     uint64_t h = ee_hash(key, EE_DEFAULT_SEED);
     uint64_t h_i = h & dict->mask;
 
@@ -271,7 +295,14 @@ EE_INLINE DictKey ee_key_str_view(const char* str, int len)
 
     DictKey out = { 0 };
 
-    memcpy(out.bytes, str, len);
+    if (len <= EE_KEY_SIZE)
+    {
+        memcpy(out.bytes, str, len);
+    }
+    else
+    {
+        memcpy(out.bytes, str, EE_KEY_SIZE);
+    }
 
     return out;
 }
@@ -445,7 +476,15 @@ EE_INLINE void ee_value_to_data(DictValue value, void* data, size_t size)
 {
     EE_ASSERT(size <= EE_VALUE_SIZE, "Data size (%zu) exceeds DictValue size (%d)", size, EE_VALUE_SIZE);
 
-    memcpy(data, value.bytes, size);
+
+    if (size <= EE_VALUE_SIZE)
+    {
+        memcpy(data, value.bytes, size);
+    }
+    else
+    {
+        memcpy(data, value.bytes, EE_VALUE_SIZE);
+    }
 }
 
 

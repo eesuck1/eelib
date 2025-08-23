@@ -29,7 +29,7 @@
     <ClInclude Include="include\ee_dict.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_format.h">
+    <ClInclude Include="include\ee_istack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

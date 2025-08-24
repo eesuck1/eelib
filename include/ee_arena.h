@@ -83,12 +83,22 @@ EE_INLINE void ee_arena_mark(Arena* arena)
 {
 	EE_ASSERT(arena->mark < EE_ARENA_MARKS_DEPTH, "Arena marks stack overflow.");
 
+	if (arena->mark >= EE_ARENA_MARKS_DEPTH)
+	{
+		return;
+	}
+
 	arena->marks[arena->mark++] = arena->offset;
 }
 
 EE_INLINE void ee_arena_rewind(Arena* arena)
 {
 	EE_ASSERT(arena->mark > 0, "Arena marks stack underflow.");
+
+	if (arena->mark <= 0)
+	{
+		return;
+	}
 
 	arena->offset = arena->marks[--arena->mark];
 }
@@ -103,7 +113,14 @@ EE_INLINE void ee_arena_free(Arena* arena)
 {
 	EE_ASSERT(arena->buffer != NULL, "Invalid arena buffer value (NULL).");
 
+	if (arena->buffer == NULL)
+	{
+		return;
+	}
+
 	free(arena->buffer);
+
+	memset(arena, 0, sizeof(Arena));
 }
 
 

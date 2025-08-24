@@ -42,6 +42,8 @@
 #define EE_FALSE            (0)
 #endif // EE_FALSE
 
+#define EE_START_STR_SIZE    (16)
+
 typedef uint8_t str_dt;
 
 typedef struct Str
@@ -70,6 +72,27 @@ typedef struct StrView
 	const str_dt* buffer;
 } StrView;
 
+EE_INLINE uint64_t ee_str_next_pow_2(uint64_t x)
+{
+	if (x == 0)
+	{
+		return 1;
+	}
+
+	x--;
+
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+
+	x++;
+
+	return x;
+}
+
 EE_INLINE ShortStr ee_short_str_new(const str_dt* buffer, int32_t len)
 {
 	EE_ASSERT(len <= EE_SS_LEN, "Given buffer length (%d) should not be grater than (%d)", len, EE_SS_LEN);
@@ -90,6 +113,135 @@ EE_INLINE int ee_short_str_cmp(ShortStr first, ShortStr second)
 	const uint64_t* s_data = (uint64_t*)second.buffer;
 
 	return (first.len == second.len) && !((f_data[0] ^ s_data[0]) && (f_data[1] ^ s_data[1]));
+}
+
+EE_INLINE Str ee_str_new()
+{
+	Str out = { 0 };
+
+	out.len = 0;
+	out.cap = EE_START_STR_SIZE;
+	out.buffer = (str_dt*)malloc(sizeof(str_dt) * EE_START_STR_SIZE);
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%d) bytes for Str.buffer", EE_START_STR_SIZE);
+
+	return out;
+}
+
+EE_INLINE Str ee_str_from(const char* cstr)
+{
+	Str out = { 0 };
+
+	size_t len = strlen(cstr);
+
+	out.len = len;
+	out.cap = ee_str_next_pow_2(len + 1);
+	out.buffer = (str_dt*)malloc(sizeof(str_dt) * out.cap);
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", sizeof(str_dt) * out.cap);
+
+	if (out.buffer != NULL)
+	{
+		memcpy(out.buffer, cstr, len + 1);
+	}
+
+	return out;
+}
+
+EE_INLINE void ee_str_free(Str* str)
+{
+	EE_ASSERT(str != NULL, "Unable to free NULL Str pointer");
+	EE_ASSERT(str->buffer != NULL, "Unable to free NULL Str.buffer pointer");
+
+	if (str == NULL || str->buffer == NULL)
+	{
+		return;
+	}
+
+	free(str->buffer);
+}
+
+EE_INLINE Str ee_str_copy(const Str* src)
+{
+	EE_ASSERT(src != NULL, "NULL Str pointer");
+	EE_ASSERT(src->buffer != NULL, "NULL Str.buffer pointer");
+
+	if (src == NULL || src->buffer == NULL)
+	{
+		return;
+	}
+
+	Str out = { 0 };
+
+	out.len = src->len;
+	out.cap = src->cap;
+	out.buffer = (str_dt*)malloc(sizeof(str_dt) * src->len);
+	
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", sizeof(str_dt) * src->len);
+
+	if (out.buffer == NULL)
+	{
+		return out;
+	}
+
+	memcpy(out.buffer, src->buffer, out.len);
+
+	return out;
+}
+
+EE_INLINE void ee_str_assign(Str* dest, const Str* src)
+{
+	EE_ASSERT(dest != NULL, "NULL dest Str pointer");
+	EE_ASSERT(dest->buffer != NULL, "NULL dest Str.buffer pointer");
+	EE_ASSERT(src != NULL, "NULL src Str pointer");
+	EE_ASSERT(src->buffer != NULL, "NULL src Str.buffer pointer");
+
+	if (src == NULL || src->buffer == NULL || dest == NULL || dest->buffer == NULL)
+	{
+		return;
+	}
+
+	if (src->len >= dest->cap)
+	{
+		dest->cap = src->cap;
+		str_dt* new_buffer = (str_dt*)realloc(dest->buffer, sizeof(str_dt) * dest->cap);
+
+		EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", sizeof(str_dt) * dest->cap);
+
+		if (new_buffer == NULL)
+		{
+			return;
+		}
+
+		dest->buffer = new_buffer;
+	}
+
+	memcpy(dest->buffer, src->buffer, src->len + 1);
+}
+
+EE_INLINE char* ee_str_cstr(const Str* str)
+{
+	EE_ASSERT(str != NULL, "NULL Str pointer");
+	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
+
+	if (str == NULL || str->buffer == NULL)
+	{
+		return NULL;
+	}
+
+	char* out = (char*)malloc(sizeof(str_dt) * (str->len + 1));
+
+	EE_ASSERT(out != NULL, "Unable to allocate (%zu) bytes for out buffer", sizeof(str_dt) * (str->len + 1));
+
+	if (out == NULL)
+	{
+		return NULL;
+	}
+
+	memcpy(out, str->buffer, str->len);
+	out[str->len] = '\0';
+
+	return out;
 }
 
 #endif // EE_STRING_H

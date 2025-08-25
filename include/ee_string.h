@@ -189,6 +189,11 @@ EE_INLINE Str ee_str_copy(const Str* src)
 	return out;
 }
 
+EE_INLINE void ee_str_expand(Str* str)
+{
+	// TODO
+}
+
 EE_INLINE void ee_str_assign(Str* dest, const Str* src)
 {
 	EE_ASSERT(dest != NULL, "NULL dest Str pointer");
@@ -242,6 +247,44 @@ EE_INLINE char* ee_str_cstr(const Str* str)
 	out[str->len] = '\0';
 
 	return out;
+}
+
+EE_INLINE void ee_str_clear(Str* str)
+{
+	EE_ASSERT(str != NULL, "NULL Str pointer");
+	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
+
+	if (str == NULL || str->buffer == NULL)
+	{
+		return NULL;
+	}
+
+	str->len = 0;
+	str->buffer[0] = '\0';
+}
+
+EE_INLINE void ee_str_reset(Str* str)
+{
+	EE_ASSERT(str != NULL, "NULL Str pointer");
+	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
+
+	if (str == NULL || str->buffer == NULL)
+	{
+		return NULL;
+	}
+
+	str_dt* new_buffer = (str_dt*)realloc(str->buffer, sizeof(str_dt) * EE_START_STR_SIZE);
+
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", sizeof(str_dt) * EE_START_STR_SIZE);
+
+	if (new_buffer == NULL)
+	{
+		return;
+	}
+
+	str->len = 0;
+	str->cap = EE_START_STR_SIZE;
+	str->buffer = new_buffer;
 }
 
 #endif // EE_STRING_H

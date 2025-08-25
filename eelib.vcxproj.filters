@@ -26,10 +26,13 @@
     <ClInclude Include="include\ee_arena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_dict.h">
+    <ClInclude Include="include\ee_dict__.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ee_istack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ee_dict_.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

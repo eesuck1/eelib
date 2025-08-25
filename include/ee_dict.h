@@ -82,9 +82,6 @@ EE_INLINE uint64_t ee_hash64(uint64_t key)
 {
 	key ^= key >> 33;
 	key *= 0xff51afd7ed558ccdULL;
-	key ^= key >> 33;
-	key *= 0xc4ceb9fe1a85ec53ULL;
-	key ^= key >> 33;
 
 	return key;
 }
@@ -312,7 +309,7 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
-		__m128i group = _mm_loadu_si128((__m128i*) & dict->ctrls[group_index]);
+		__m128i group = _mm_loadu_si128((__m128i*)& dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
 
 		int32_t match_mask = _mm_movemask_epi8(match);

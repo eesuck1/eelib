@@ -32,7 +32,6 @@
 #define EE_INLINE    static inline
 #endif // EE_INLINE
 
-#define EE_VALUE_SIZE           (24)
 #define EE_GROUP_SIZE           (16)
 #define EE_DICT_START_SIZE      (32)
 
@@ -49,11 +48,7 @@
 #endif // EE_FALSE
 
 typedef uint64_t DictKey;
-
-typedef struct DictValue
-{
-	uint8_t bytes[EE_VALUE_SIZE];
-} DictValue;
+typedef uint64_t DictValue;
 
 typedef struct Slot
 {
@@ -191,7 +186,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 
 				if (dict->slots[group_index + i].key == key)
 				{
-					memcpy(dict->slots[group_index + i].val.bytes, val.bytes, EE_VALUE_SIZE);
+					dict->slots[group_index + i].val = val;
 
 					return;
 				}
@@ -208,10 +203,10 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 			int32_t slot_index = group_index + ee_first_bit_u32(free_mask);
 
 			dict->slots[slot_index].key = key;
+			dict->slots[slot_index].val = val;
 			dict->ctrls[slot_index] = hash_sign;
 			dict->count++;
 			
-			memcpy(dict->slots[slot_index].val.bytes, val.bytes, EE_VALUE_SIZE);
 
 			return;
 		}
@@ -360,9 +355,7 @@ EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 
 	if (val == NULL)
 	{
-		DictValue out = { 0 };
-
-		return out;
+		return 0;
 	}
 
 	return *val;

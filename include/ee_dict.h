@@ -367,17 +367,4 @@ EE_INLINE int ee_dict_contains(Dict* dict, DictKey key)
 	return val != NULL;
 }
 
-EE_INLINE DictValue ee_val_from_3u64(uint64_t x_0, uint64_t x_1, uint64_t x_2)
-{
-	DictValue out = { 0 };
-
-	uint64_t* data = (uint64_t*)out.bytes;
-
-	data[0] = x_0;
-	data[1] = x_1;
-	data[2] = x_2;
-
-	return out;
-}
-
 #endif // EE_DICT_H

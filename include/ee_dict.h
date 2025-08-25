@@ -72,6 +72,12 @@ typedef struct Dict
 	size_t th;
 } Dict;
 
+typedef struct DictIter
+{
+	Dict* dict;
+	size_t index;
+} DictIter;
+
 EE_INLINE uint64_t ee_dict_th(uint64_t x)
 {
 	return (x * 896) >> 10;
@@ -235,7 +241,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 	*dict = out;
 }
 
-EE_INLINE void ee_dict_add(Dict* dict, DictKey key, DictValue val)
+EE_INLINE void ee_dict_set(Dict* dict, DictKey key, DictValue val)
 {
 	ee_dict_insert(dict, key, val);
 
@@ -348,6 +354,8 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 
 EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 {
+	EE_ASSERT(dict != NULL, "Trying to get from NULL Dict");
+
 	DictValue* val = ee_dict_at(dict, key);
 
 	if (val == NULL)
@@ -362,9 +370,52 @@ EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 
 EE_INLINE int ee_dict_contains(Dict* dict, DictKey key)
 {
+	EE_ASSERT(dict != NULL, "Trying to check NULL Dict");
+
 	DictValue* val = ee_dict_at(dict, key);
 
 	return val != NULL;
+}
+
+EE_INLINE DictIter ee_dict_iter_new(Dict* dict)
+{
+	EE_ASSERT(dict != NULL, "Trying to create iterator over NULL Dict");
+
+	DictIter out = { 0 };
+
+	out.dict = dict;
+	out.index = 0;
+
+	return out;
+}
+
+EE_INLINE void ee_dict_iter_reset(DictIter* it)
+{
+	EE_ASSERT(it != NULL, "Trying to reset NULL DictIter");
+
+	it->index = 0;
+}
+
+EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
+{
+	EE_ASSERT(dict != NULL, "Trying to iterate over NULL Dict");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL DictKey");
+	EE_ASSERT(val != NULL, "Trying to dereference NULL DictValue");
+
+	while (it->index < it->dict->cap)
+	{
+		if (it->dict->ctrls[it->index] == EE_SLOT_EMPTY || it->dict->ctrls[it->index] == EE_SLOT_DELETED)
+		{
+			it->index++;
+		}
+
+		*key = it->dict->slots[it->index++].key;
+		*val = it->dict->slots[it->index++].val;
+
+		return EE_TRUE;
+	}
+
+	return EE_FALSE;
 }
 
 #endif // EE_DICT_H

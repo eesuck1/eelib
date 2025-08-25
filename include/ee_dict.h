@@ -245,6 +245,58 @@ EE_INLINE void ee_dict_add(Dict* dict, DictKey key, DictValue val)
 	}
 }
 
+EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
+{
+	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
+
+	uint64_t hash = ee_hash64(key);
+	uint64_t base_index = (hash >> 7) & dict->mask;
+	uint8_t  hash_sign = hash & 0x7F;
+
+	size_t probe_step = 0;
+
+	while (probe_step < dict->cap)
+	{
+		size_t group_index = base_index & EE_GROUP_MASK;
+
+		__m128i group = _mm_loadu_si128((__m128i*) & dict->ctrls[group_index]);
+		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
+
+		int32_t match_mask = _mm_movemask_epi8(match);
+
+		if (match_mask)
+		{
+			for (int i = 0; i < EE_GROUP_SIZE; ++i)
+			{
+				if (!(match_mask & (1 << i)))
+				{
+					continue;
+				}
+
+				if (dict->slots[group_index + i].key == key)
+				{
+					dict->ctrls[group_index + i] = EE_SLOT_DELETED;
+					dict->count--;
+					
+					return;
+				}
+			}
+		}
+
+		__m128i empty = _mm_cmpeq_epi8(group, _mm_set1_epi8(EE_SLOT_EMPTY));
+
+		int32_t empty_mask = _mm_movemask_epi8(empty);
+
+		if (empty_mask)
+		{
+			return;
+		}
+
+		probe_step++;
+		base_index = (base_index + probe_step * EE_GROUP_SIZE) & dict->mask;
+	}
+}
+
 EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
@@ -306,6 +358,13 @@ EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 	}
 
 	return *val;
+}
+
+EE_INLINE int ee_dict_contains(Dict* dict, DictKey key)
+{
+	DictValue* val = ee_dict_at(dict, key);
+
+	return val != NULL;
 }
 
 EE_INLINE DictValue ee_val_from_3u64(uint64_t x_0, uint64_t x_1, uint64_t x_2)

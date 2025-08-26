@@ -153,11 +153,6 @@ EE_INLINE void ee_str_free(Str* str)
 	EE_ASSERT(str != NULL, "Unable to free NULL Str pointer");
 	EE_ASSERT(str->buffer != NULL, "Unable to free NULL Str.buffer pointer");
 
-	if (str == NULL || str->buffer == NULL)
-	{
-		return;
-	}
-
 	free(str->buffer);
 }
 
@@ -165,11 +160,6 @@ EE_INLINE Str ee_str_copy(const Str* src)
 {
 	EE_ASSERT(src != NULL, "NULL Str pointer");
 	EE_ASSERT(src->buffer != NULL, "NULL Str.buffer pointer");
-
-	if (src == NULL || src->buffer == NULL)
-	{
-		return;
-	}
 
 	Str out = { 0 };
 
@@ -201,11 +191,6 @@ EE_INLINE void ee_str_assign(Str* dest, const Str* src)
 	EE_ASSERT(src != NULL, "NULL src Str pointer");
 	EE_ASSERT(src->buffer != NULL, "NULL src Str.buffer pointer");
 
-	if (src == NULL || src->buffer == NULL || dest == NULL || dest->buffer == NULL)
-	{
-		return;
-	}
-
 	if (src->len >= dest->cap)
 	{
 		dest->cap = src->cap;
@@ -229,11 +214,6 @@ EE_INLINE char* ee_str_cstr(const Str* str)
 	EE_ASSERT(str != NULL, "NULL Str pointer");
 	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
 
-	if (str == NULL || str->buffer == NULL)
-	{
-		return NULL;
-	}
-
 	char* out = (char*)malloc(sizeof(str_dt) * (str->len + 1));
 
 	EE_ASSERT(out != NULL, "Unable to allocate (%zu) bytes for out buffer", sizeof(str_dt) * (str->len + 1));
@@ -254,11 +234,6 @@ EE_INLINE void ee_str_clear(Str* str)
 	EE_ASSERT(str != NULL, "NULL Str pointer");
 	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
 
-	if (str == NULL || str->buffer == NULL)
-	{
-		return NULL;
-	}
-
 	str->len = 0;
 	str->buffer[0] = '\0';
 }
@@ -267,11 +242,6 @@ EE_INLINE void ee_str_reset(Str* str)
 {
 	EE_ASSERT(str != NULL, "NULL Str pointer");
 	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
-
-	if (str == NULL || str->buffer == NULL)
-	{
-		return NULL;
-	}
 
 	str_dt* new_buffer = (str_dt*)realloc(str->buffer, sizeof(str_dt) * EE_START_STR_SIZE);
 

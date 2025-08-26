@@ -32,5 +32,8 @@
     <ClInclude Include="include\ee_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ee_vec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,6 +8,10 @@
 #include "stdint.h"
 #include "immintrin.h"
 
+#if defined(_MSC_VER)
+	#include "intrin.h"
+#endif
+
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
 
@@ -32,12 +36,16 @@
 #define EE_INLINE    static inline
 #endif // EE_INLINE
 
-#define EE_GROUP_SIZE           (16)
-#define EE_DICT_START_SIZE      (32)
+#define EE_GROUP_SIZE                (16)
+#define EE_DICT_START_SIZE           (32)
+#define EE_KEY_SIZE                  (8)
+#define EE_VAL_SIZE                  (8)
 
-#define EE_SLOT_EMPTY           (0x80)
-#define EE_SLOT_DELETED         (0xFE)
-#define EE_GROUP_MASK           (~(EE_GROUP_SIZE - 1))
+#define EE_SLOT_EMPTY                (0x80)
+#define EE_SLOT_DELETED              (0xFE)
+#define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
+
+#define EE_FIND_FIRST_BIT_INVALID    (32)
 
 #ifndef EE_TRUE
 #define EE_TRUE            (1)
@@ -47,8 +55,15 @@
 #define EE_FALSE           (0)
 #endif // EE_FALSE
 
-typedef uint64_t DictKey;
-typedef uint64_t DictValue;
+typedef struct DictKey
+{
+	uint8_t bytes[EE_KEY_SIZE];
+} DictKey;
+
+typedef struct DictValue
+{
+	uint8_t bytes[EE_VAL_SIZE];
+} DictValue;
 
 typedef struct Slot
 {
@@ -73,20 +88,55 @@ typedef struct DictIter
 	size_t index;
 } DictIter;
 
+EE_INLINE int32_t ee_first_bit_u32(uint32_t x)
+{
+#if defined(__BMI__)
+	return _tzcnt_u32(x);
+#elif defined(__GNUC__) || defined(__clang__)
+	return x ? __builtin_ctz(x) : EE_FIND_FIRST_BIT_INVALID;
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	if (_BitScanForward(&i, x))
+	{
+		return (int32_t)i;
+	}
+	else
+	{
+		return EE_FIND_FIRST_BIT_INVALID;
+	}
+#else
+	for (int32_t i = 0; i < 32; ++i)
+	{
+		if (x & (1u << i))
+		{
+			return i;
+		}
+	}
+
+	return EE_FIND_FIRST_BIT_INVALID;
+#endif
+}
+
 EE_INLINE uint64_t ee_dict_th(uint64_t x)
 {
 	return (x * 896) >> 10;
 }
 
-EE_INLINE uint64_t ee_hash64(uint64_t key) 
+EE_INLINE uint64_t ee_hash64(DictKey key) 
 {
-	key ^= key >> 33;
-	key *= 0xff51afd7ed558ccdULL;
+	uint64_t hash = ((uint64_t*)key.bytes)[0];
 
-	return key;
+	hash ^= hash >> 30;
+	hash *= 0xbf58476d1ce4e5b9ULL;
+	hash ^= hash >> 27;
+	hash *= 0x94d049bb133111ebULL;
+	hash ^= hash >> 31;
+
+	return hash;
 }
 
-EE_INLINE uint64_t ee_next_pow_2(DictKey x)
+EE_INLINE uint64_t ee_next_pow_2(uint64_t x)
 {
 	if (x == 0)
 	{
@@ -107,17 +157,9 @@ EE_INLINE uint64_t ee_next_pow_2(DictKey x)
 	return x;
 }
 
-EE_INLINE int32_t ee_first_bit_u32(uint32_t x)
+EE_INLINE int ee_key_cmp(DictKey first, DictKey second)
 {
-	for (int32_t i = 0; i < 32; ++i)
-	{
-		if (x & (1 << i))
-		{
-			return i;
-		}
-	}
-
-	return -1;
+	return memcmp(first.bytes, second.bytes, EE_KEY_SIZE) == 0;
 }
 
 EE_INLINE Dict ee_dict_new(size_t size)
@@ -155,7 +197,6 @@ EE_INLINE Dict ee_dict_new(size_t size)
 EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
-	EE_ASSERT(val.bytes != NULL, "Trying to insert NULL value to Dict");
 
 	uint64_t hash = ee_hash64(key);
 	uint64_t base_index = (hash >> 7) & dict->mask;
@@ -181,7 +222,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 					continue;
 				}
 
-				if (dict->slots[group_index + i].key == key)
+				if (ee_key_cmp(dict->slots[group_index + i].key, key))
 				{
 					dict->slots[group_index + i].val = val;
 
@@ -203,7 +244,6 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 			dict->slots[slot_index].val = val;
 			dict->ctrls[slot_index] = hash_sign;
 			dict->count++;
-			
 
 			return;
 		}
@@ -271,7 +311,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 					continue;
 				}
 
-				if (dict->slots[group_index + i].key == key)
+				if (ee_key_cmp(dict->slots[group_index + i].key, key))
 				{
 					dict->ctrls[group_index + i] = EE_SLOT_DELETED;
 					dict->count--;
@@ -323,7 +363,7 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 					continue;
 				}
 
-				if (dict->slots[group_index + i].key == key)
+				if (ee_key_cmp(dict->slots[group_index + i].key, key))
 				{
 					return &dict->slots[group_index + i].val;
 				}
@@ -342,6 +382,8 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 		probe_step++;
 		base_index = (base_index + probe_step * EE_GROUP_SIZE) & dict->mask;
 	}
+
+	return NULL;
 }
 
 EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
@@ -352,7 +394,9 @@ EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
 
 	if (val == NULL)
 	{
-		return 0;
+		DictValue out = { 0 };
+
+		return out;
 	}
 
 	return *val;
@@ -388,7 +432,7 @@ EE_INLINE void ee_dict_iter_reset(DictIter* it)
 
 EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
 {
-	EE_ASSERT(dict != NULL, "Trying to iterate over NULL Dict");
+	EE_ASSERT(it != NULL && it->dict != NULL, "Trying to iterate over NULL Dict");
 	EE_ASSERT(key != NULL, "Trying to dereference NULL DictKey");
 	EE_ASSERT(val != NULL, "Trying to dereference NULL DictValue");
 
@@ -399,8 +443,9 @@ EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
 			it->index++;
 		}
 
-		*key = it->dict->slots[it->index++].key;
-		*val = it->dict->slots[it->index++].val;
+		*key = it->dict->slots[it->index].key;
+		*val = it->dict->slots[it->index].val;
+		it->index++;
 
 		return EE_TRUE;
 	}

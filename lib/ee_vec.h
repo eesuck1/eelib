@@ -6,6 +6,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
+#include "immintrin.h"
 
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
@@ -35,7 +36,12 @@
 	#define EE_FALSE    (0)
 #endif // EE_FALSE
 
-#define EE_VEC_DT(x)    ((uint8_t*)(&(x)))
+#ifndef EE_FIND_FIRST_BIT_INVALID
+	#define EE_FIND_FIRST_BIT_INVALID    (32)
+#endif // EE_FIND_FIRST_BIT_INVALID
+
+#define EE_VEC_DT(x)      ((uint8_t*)(&(x)))
+#define EE_VEC_INVALID    (0xffffffffffffffffull)
 
 typedef struct Vec
 {
@@ -44,6 +50,41 @@ typedef struct Vec
 	size_t elem_size;
 	uint8_t* buffer;
 } Vec;
+
+EE_INLINE int ee_is_pow2(uint64_t x)
+{
+	return (x != 0) && ((x & (x - 1)) == 0);
+}
+
+EE_INLINE int32_t ee_vec_first_bit_u32(uint32_t x)
+{
+#if defined(__BMI__)
+	return _tzcnt_u32(x);
+#elif defined(__GNUC__) || defined(__clang__)
+	return x ? __builtin_ctz(x) : EE_FIND_FIRST_BIT_INVALID;
+#elif defined(_MSC_VER)
+	unsigned long i;
+
+	if (_BitScanForward(&i, x))
+	{
+		return (int32_t)i;
+	}
+	else
+	{
+		return EE_FIND_FIRST_BIT_INVALID;
+	}
+#else
+	for (int32_t i = 0; i < 32; ++i)
+	{
+		if (x & (1u << i))
+		{
+			return i;
+		}
+	}
+
+	return EE_FIND_FIRST_BIT_INVALID;
+#endif
+}
 
 EE_INLINE Vec ee_vec_new(size_t size, size_t elem_size)
 {
@@ -176,6 +217,114 @@ EE_INLINE void ee_vec_set(Vec* vec, size_t i, uint8_t* val)
 	EE_ASSERT(vec->top >= i * vec->elem_size, "Invalid setting index (%zu) Vec.top at position (%zu)", i, vec->top / vec->elem_size);
 
 	memcpy(&vec->buffer[i * vec->elem_size], val, vec->elem_size);
+}
+
+EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
+{
+	EE_ASSERT(vec != NULL, "Trying to find into NULL Vec");
+	EE_ASSERT(target != NULL, "Trying to find a NULL value");
+
+	size_t out;
+
+	if (vec->elem_size <= 16 && ee_is_pow2(vec->elem_size))
+	{
+		__m128i key;
+
+		switch (vec->elem_size)
+		{
+		case 1:
+		{
+			key = _mm_set1_epi8(*target);
+		} break;
+		case 2:
+		{
+			key = _mm_set1_epi16(*(uint16_t*)target);
+		} break;
+		case 4:
+		{
+			key = _mm_set1_epi32(*(uint32_t*)target);
+		} break;
+		case 8:
+		{
+			key = _mm_set1_epi64x(*(uint64_t*)target);
+		} break;
+		case 16:
+		{
+			key = _mm_loadu_si128((__m128i*)target);
+		} break;
+		default:
+		{
+			EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size);
+			return EE_VEC_INVALID;
+		}
+		}
+
+		for (size_t i = 0; i < vec->top; i += vec->elem_size)
+		{
+			__m128i val = _mm_loadu_si128((__m128i*)&vec->buffer[i]);
+			__m128i cmp;
+
+			switch (vec->elem_size)
+			{
+			case 1:
+			{
+				cmp = _mm_cmpeq_epi8(key, val);
+			} break;
+			case 2:
+			{
+				cmp = _mm_cmpeq_epi16(key, val);
+			} break;
+			case 4:
+			{
+				cmp = _mm_cmpeq_epi32(key, val);
+			} break;
+			case 8:
+			{
+				cmp = _mm_cmpeq_epi64(key, val);
+			} break;
+			case 16:
+			{
+				cmp = _mm_cmpeq_epi8(key, val);
+			} break;
+			default:
+			{
+				EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size);
+				return EE_VEC_INVALID;
+			}
+			}
+			
+			int result = _mm_movemask_epi8(cmp);
+
+			if (!result)
+			{
+				continue;
+			}
+
+			if (vec->elem_size == 16 && result == 0xFFFF)
+			{
+				out = i;
+			}
+
+			out = (i + (size_t)ee_vec_first_bit_u32(result));
+
+			if (out < vec->top)
+			{
+				return out / vec->elem_size;
+			}
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < vec->top; i += vec->elem_size)
+		{
+			if (memcmp(target, &vec->buffer[i], vec->elem_size) == 0)
+			{
+				return i / vec->elem_size;
+			}
+		}
+	}
+
+	return EE_VEC_INVALID;
 }
 
 #endif // EE_VEC_H

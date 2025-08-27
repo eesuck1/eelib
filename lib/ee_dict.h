@@ -33,7 +33,7 @@
 #endif // EE_NO_ASSERT
 
 #ifndef EE_INLINE
-#define EE_INLINE    static inline
+	#define EE_INLINE    static inline
 #endif // EE_INLINE
 
 #define EE_GROUP_SIZE                (16)
@@ -45,14 +45,16 @@
 #define EE_SLOT_DELETED              (0xFE)
 #define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
 
-#define EE_FIND_FIRST_BIT_INVALID    (32)
+#ifndef EE_FIND_FIRST_BIT_INVALID
+	#define EE_FIND_FIRST_BIT_INVALID    (32)
+#endif // EE_FIND_FIRST_BIT_INVALID
 
 #ifndef EE_TRUE
-#define EE_TRUE            (1)
+	#define EE_TRUE            (1)
 #endif // EE_TRUE
 
 #ifndef EE_FALSE
-#define EE_FALSE           (0)
+	#define EE_FALSE           (0)
 #endif // EE_FALSE
 
 typedef struct DictKey
@@ -208,7 +210,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
-		__m128i group = _mm_loadu_si128((__m128i*) & dict->ctrls[group_index]);
+		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
 		
 		int32_t match_mask = _mm_movemask_epi8(match);
@@ -297,7 +299,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
-		__m128i group = _mm_loadu_si128((__m128i*) & dict->ctrls[group_index]);
+		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
 
 		int32_t match_mask = _mm_movemask_epi8(match);
@@ -349,7 +351,7 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
-		__m128i group = _mm_loadu_si128((__m128i*)& dict->ctrls[group_index]);
+		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
 
 		int32_t match_mask = _mm_movemask_epi8(match);

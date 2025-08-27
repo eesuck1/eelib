@@ -20,19 +20,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ee_dict.h">
+    <ClInclude Include="lib\ee_vec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_arena.h">
+    <ClInclude Include="lib\ee_arena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_istack.h">
+    <ClInclude Include="lib\ee_dict.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_string.h">
+    <ClInclude Include="lib\ee_istack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ee_vec.h">
+    <ClInclude Include="lib\ee_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

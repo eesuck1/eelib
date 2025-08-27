@@ -224,58 +224,11 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 	EE_ASSERT(vec != NULL, "Trying to find into NULL Vec");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
 
-	size_t out;
-
-	if (vec->elem_size < 16 && ee_is_pow2(vec->elem_size))
+	for (size_t i = 0; i < vec->top; i += vec->elem_size)
 	{
-		__m128i key;
-
-		switch (vec->elem_size)
+		if (memcmp(target, &vec->buffer[i], vec->elem_size) == 0)
 		{
-		case 1: { key = _mm_set1_epi8(*target); } break;
-		case 2: { key = _mm_set1_epi16(*(uint16_t*)target); } break;
-		case 4: { key = _mm_set1_epi32(*(uint32_t*)target); } break;
-		case 8: { key = _mm_set1_epi64x(*(uint64_t*)target); } break;
-		default: { EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size); } return EE_VEC_INVALID;
-		}
-
-		for (size_t i = 0; i < vec->top; i += vec->elem_size)
-		{
-			__m128i val = _mm_loadu_si128((__m128i*)&vec->buffer[i]);
-			__m128i cmp;
-
-			switch (vec->elem_size)
-			{
-			case 1: { cmp = _mm_cmpeq_epi8(key, val); } break;
-			case 2: { cmp = _mm_cmpeq_epi16(key, val); } break;
-			case 4: { cmp = _mm_cmpeq_epi32(key, val); } break;
-			case 8: { cmp = _mm_cmpeq_epi64(key, val); } break;
-			default: { return EE_VEC_INVALID; }
-			}
-			
-			int result = _mm_movemask_epi8(cmp);
-
-			if (!result)
-			{
-				continue;
-			}
-
-			out = (i + (size_t)ee_vec_first_bit_u32(result));
-
-			if (out < vec->top)
-			{
-				return out / vec->elem_size;
-			}
-		}
-	}
-	else
-	{
-		for (size_t i = 0; i < vec->top; i += vec->elem_size)
-		{
-			if (memcmp(target, &vec->buffer[i], vec->elem_size) == 0)
-			{
-				return i / vec->elem_size;
-			}
+			return i / vec->elem_size;
 		}
 	}
 

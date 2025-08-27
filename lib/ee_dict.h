@@ -196,6 +196,18 @@ EE_INLINE Dict ee_dict_new(size_t size)
 	return out;
 }
 
+EE_INLINE void ee_dict_free(Dict* dict)
+{
+	EE_ASSERT(dict != NULL, "Trying to free NULL Dict");
+	EE_ASSERT(dict->ctrls != NULL, "Trying to free NULL Dict.ctrls");
+	EE_ASSERT(dict->slots != NULL, "Trying to free NULL Dict.slots");
+
+	free(dict->ctrls);
+	free(dict->slots);
+
+	memset(dict, 0, sizeof(Dict));
+}
+
 EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
@@ -204,37 +216,43 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 	uint64_t base_index = (hash >> 7) & dict->mask;
 	uint8_t  hash_sign = hash & 0x7F;
 
+	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
+	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
+	__m128i deleted128 = _mm_set1_epi8(EE_SLOT_DELETED);
+
 	size_t probe_step = 0;
 
 	while (probe_step < dict->cap)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
+		size_t next_probe_step = probe_step + 1;
+		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
+		size_t next_group_index = next_base_index & EE_GROUP_MASK;
+
+		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
+		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 		
 		int32_t match_mask = _mm_movemask_epi8(match);
 
-		if (match_mask)
+		while (match_mask)
 		{
-			for (int i = 0; i < EE_GROUP_SIZE; ++i)
+			int32_t first = ee_first_bit_u32(match_mask);
+
+			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
-				if (!(match_mask & (1 << i))) 
-				{
-					continue;
-				}
-
-				if (ee_key_cmp(dict->slots[group_index + i].key, key))
-				{
-					dict->slots[group_index + i].val = val;
-
-					return;
-				}
+				dict->slots[group_index + first].val = val;
+				return;
 			}
+
+			match_mask = match_mask & (~(1 << first));
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, _mm_set1_epi8(EE_SLOT_EMPTY));
-		__m128i deleted = _mm_cmpeq_epi8(group, _mm_set1_epi8(EE_SLOT_DELETED));
+		__m128i empty = _mm_cmpeq_epi8(group, empty128);
+		__m128i deleted = _mm_cmpeq_epi8(group, deleted128);
 
 		int32_t free_mask = _mm_movemask_epi8(_mm_or_si128(empty, deleted));
 
@@ -250,8 +268,8 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 			return;
 		}
 
-		probe_step++;
-		base_index = (base_index + probe_step * EE_GROUP_SIZE) & dict->mask;
+		probe_step = next_probe_step;
+		base_index = next_base_index;
 	}
 }
 
@@ -293,37 +311,43 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 	uint64_t base_index = (hash >> 7) & dict->mask;
 	uint8_t  hash_sign = hash & 0x7F;
 
+	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
+	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
+
 	size_t probe_step = 0;
 
 	while (probe_step < dict->cap)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
+		size_t next_probe_step = probe_step + 1;
+		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
+		size_t next_group_index = next_base_index & EE_GROUP_MASK;
+
+		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
+		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 
 		int32_t match_mask = _mm_movemask_epi8(match);
 
-		if (match_mask)
+		while (match_mask)
 		{
-			for (int i = 0; i < EE_GROUP_SIZE; ++i)
-			{
-				if (!(match_mask & (1 << i)))
-				{
-					continue;
-				}
+			int32_t first = ee_first_bit_u32(match_mask);
 
-				if (ee_key_cmp(dict->slots[group_index + i].key, key))
-				{
-					dict->ctrls[group_index + i] = EE_SLOT_DELETED;
-					dict->count--;
-					
-					return;
-				}
+			if (ee_key_cmp(dict->slots[group_index + first].key, key))
+			{
+				dict->ctrls[group_index + first] = EE_SLOT_DELETED;
+				dict->count--;
+
+				return;
 			}
+
+			match_mask = match_mask & (~(1 << first));
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, _mm_set1_epi8(EE_SLOT_EMPTY));
+		__m128i empty = _mm_cmpeq_epi8(group, empty128);
 
 		int32_t empty_mask = _mm_movemask_epi8(empty);
 
@@ -332,8 +356,8 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 			return;
 		}
 
-		probe_step++;
-		base_index = (base_index + probe_step * EE_GROUP_SIZE) & dict->mask;
+		probe_step = next_probe_step;
+		base_index = next_base_index;
 	}
 }
 
@@ -345,34 +369,40 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 	uint64_t base_index = (hash >> 7) & dict->mask;
 	uint8_t  hash_sign = hash & 0x7F;
 
+	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
+	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
+
 	size_t probe_step = 0;
 
 	while (probe_step < dict->cap)
 	{
 		size_t group_index = base_index & EE_GROUP_MASK;
 
+		size_t next_probe_step = probe_step + 1;
+		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
+		size_t next_group_index = next_base_index & EE_GROUP_MASK;
+
+		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, _mm_set1_epi8(hash_sign));
+		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 
 		int32_t match_mask = _mm_movemask_epi8(match);
-
-		if (match_mask)
+		
+		while (match_mask)
 		{
-			for (int i = 0; i < EE_GROUP_SIZE; ++i)
-			{
-				if (!(match_mask & (1 << i)))
-				{
-					continue;
-				}
+			int32_t first = ee_first_bit_u32(match_mask);
 
-				if (ee_key_cmp(dict->slots[group_index + i].key, key))
-				{
-					return &dict->slots[group_index + i].val;
-				}
+			if (ee_key_cmp(dict->slots[group_index + first].key, key))
+			{
+				return &dict->slots[group_index + first].val;
 			}
+
+			match_mask = match_mask & (~(1 << first));
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, _mm_set1_epi8(EE_SLOT_EMPTY));
+		__m128i empty = _mm_cmpeq_epi8(group, empty128);
 
 		int32_t empty_mask = _mm_movemask_epi8(empty);
 
@@ -381,8 +411,8 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 			return NULL;
 		}
 
-		probe_step++;
-		base_index = (base_index + probe_step * EE_GROUP_SIZE) & dict->mask;
+		probe_step = next_probe_step;
+		base_index = next_base_index;
 	}
 
 	return NULL;
@@ -443,6 +473,7 @@ EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
 		if (it->dict->ctrls[it->index] == EE_SLOT_EMPTY || it->dict->ctrls[it->index] == EE_SLOT_DELETED)
 		{
 			it->index++;
+			continue;
 		}
 
 		*key = it->dict->slots[it->index].key;

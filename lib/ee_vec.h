@@ -232,27 +232,11 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 
 		switch (vec->elem_size)
 		{
-		case 1:
-		{
-			key = _mm_set1_epi8(*target);
-		} break;
-		case 2:
-		{
-			key = _mm_set1_epi16(*(uint16_t*)target);
-		} break;
-		case 4:
-		{
-			key = _mm_set1_epi32(*(uint32_t*)target);
-		} break;
-		case 8:
-		{
-			key = _mm_set1_epi64x(*(uint64_t*)target);
-		} break;
-		default:
-		{
-			EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size);
-			return EE_VEC_INVALID;
-		}
+		case 1: { key = _mm_set1_epi8(*target); } break;
+		case 2: { key = _mm_set1_epi16(*(uint16_t*)target); } break;
+		case 4: { key = _mm_set1_epi32(*(uint32_t*)target); } break;
+		case 8: { key = _mm_set1_epi64x(*(uint64_t*)target); } break;
+		default: { EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size); } return EE_VEC_INVALID;
 		}
 
 		for (size_t i = 0; i < vec->top; i += vec->elem_size)
@@ -262,27 +246,11 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 
 			switch (vec->elem_size)
 			{
-			case 1:
-			{
-				cmp = _mm_cmpeq_epi8(key, val);
-			} break;
-			case 2:
-			{
-				cmp = _mm_cmpeq_epi16(key, val);
-			} break;
-			case 4:
-			{
-				cmp = _mm_cmpeq_epi32(key, val);
-			} break;
-			case 8:
-			{
-				cmp = _mm_cmpeq_epi64(key, val);
-			} break;
-			default:
-			{
-				EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size);
-				return EE_VEC_INVALID;
-			}
+			case 1: { cmp = _mm_cmpeq_epi8(key, val); } break;
+			case 2: { cmp = _mm_cmpeq_epi16(key, val); } break;
+			case 4: { cmp = _mm_cmpeq_epi32(key, val); } break;
+			case 8: { cmp = _mm_cmpeq_epi64(key, val); } break;
+			default: { return EE_VEC_INVALID; }
 			}
 			
 			int result = _mm_movemask_epi8(cmp);

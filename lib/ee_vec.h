@@ -226,7 +226,7 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 
 	size_t out;
 
-	if (vec->elem_size <= 16 && ee_is_pow2(vec->elem_size))
+	if (vec->elem_size < 16 && ee_is_pow2(vec->elem_size))
 	{
 		__m128i key;
 
@@ -247,10 +247,6 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 		case 8:
 		{
 			key = _mm_set1_epi64x(*(uint64_t*)target);
-		} break;
-		case 16:
-		{
-			key = _mm_loadu_si128((__m128i*)target);
 		} break;
 		default:
 		{
@@ -282,10 +278,6 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 			{
 				cmp = _mm_cmpeq_epi64(key, val);
 			} break;
-			case 16:
-			{
-				cmp = _mm_cmpeq_epi8(key, val);
-			} break;
 			default:
 			{
 				EE_ASSERT(0, "Invalid element size for SIMD operation (%zu)", vec->elem_size);
@@ -298,11 +290,6 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 			if (!result)
 			{
 				continue;
-			}
-
-			if (vec->elem_size == 16 && result == 0xFFFF)
-			{
-				out = i;
 			}
 
 			out = (i + (size_t)ee_vec_first_bit_u32(result));

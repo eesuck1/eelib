@@ -37,7 +37,7 @@ It uses SIMD-accelerated group probing for fast insertion and lookup
 
 ### Example Usage
 
-'''c
+```c
 
 #include "stdio.h"
 #include "ee_dict.h"
@@ -82,7 +82,7 @@ int main()
     return 0;
 }
 
-'''
+```
 
 ## Vector (Vec)
 
@@ -99,7 +99,7 @@ Supports growing capacity automatically when needed
 
 ### Example Usage
 
-'''c
+```c
 
 #include "stdio.h"
 #include "stdint.h"
@@ -152,7 +152,7 @@ int main()
     return 0;
 }
 
-'''
+```
 
 ## Strings (Str, ShortStr, LongStr)
 
@@ -175,7 +175,7 @@ small fixed-size strings, and string views.
 
 ### Example Usage
 
-'''c
+```c
 
 #include "stdio.h"
 #include "ee_string.h"
@@ -212,7 +212,7 @@ int main()
     return 0;
 }
 
-'''
+```
 
 ## Arena (Memory Arena)
 
@@ -229,7 +229,7 @@ and supports efficient mark/rewind semantics for temporary allocations.
 
 ### Example Usage
 
-'''c
+```c
 
 #include "stdio.h"
 #include "ee_arena.h"
@@ -275,7 +275,7 @@ int main()
     return 0;
 }
 
-'''
+```
 
 ### Notes
 

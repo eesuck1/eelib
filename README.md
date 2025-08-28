@@ -37,6 +37,8 @@ It uses SIMD-accelerated group probing for fast insertion and lookup
 
 ### Example Usage
 
+'''c
+
 #include "stdio.h"
 #include "ee_dict.h"
 
@@ -80,6 +82,8 @@ int main()
     return 0;
 }
 
+'''
+
 ## Vector (Vec)
 
 Vec is a dynamic, contiguous array for arbitrary element sizes
@@ -94,6 +98,8 @@ Supports growing capacity automatically when needed
   takes ~0.7ns per element (~1.4 billion elements per second)
 
 ### Example Usage
+
+'''c
 
 #include "stdio.h"
 #include "stdint.h"
@@ -146,6 +152,8 @@ int main()
     return 0;
 }
 
+'''
+
 ## Strings (Str, ShortStr, LongStr)
 
 This library provides flexible string types for C, supporting dynamic allocation,
@@ -166,6 +174,8 @@ small fixed-size strings, and string views.
 - Fast comparison for `ShortStr` using 128-bit operations
 
 ### Example Usage
+
+'''c
 
 #include "stdio.h"
 #include "ee_string.h"
@@ -202,6 +212,8 @@ int main()
     return 0;
 }
 
+'''
+
 ## Arena (Memory Arena)
 
 The `Arena` provides a fast, linear memory allocator. It allows
@@ -216,6 +228,8 @@ and supports efficient mark/rewind semantics for temporary allocations.
 - Useful for temporary allocations in performance-critical code
 
 ### Example Usage
+
+'''c
 
 #include "stdio.h"
 #include "ee_arena.h"
@@ -260,6 +274,8 @@ int main()
 
     return 0;
 }
+
+'''
 
 ### Notes
 

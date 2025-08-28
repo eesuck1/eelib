@@ -232,6 +232,7 @@ and supports efficient mark/rewind semantics for temporary allocations.
 ```c
 
 #include "stdio.h"
+#include "stdalign.h"
 #include "ee_arena.h"
 
 int main() 

@@ -132,7 +132,6 @@
   <ItemGroup>
     <ClInclude Include="lib\ee_arena.h" />
     <ClInclude Include="lib\ee_dict.h" />
-    <ClInclude Include="lib\ee_istack.h" />
     <ClInclude Include="lib\ee_string.h" />
     <ClInclude Include="lib\ee_vec.h" />
   </ItemGroup>

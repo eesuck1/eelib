@@ -235,4 +235,34 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 	return EE_VEC_INVALID;
 }
 
+EE_INLINE void ee_vec_insert(Vec* vec, size_t i, uint8_t* val)
+{
+	EE_ASSERT(vec != NULL, "Trying to set into NULL Vec");
+	EE_ASSERT(i <= vec->top / vec->elem_size, "Index out of bounds");
+
+	if (ee_vec_full(vec))
+	{
+		ee_vec_grow(vec);
+	}
+
+	size_t offset = i * vec->elem_size;
+
+	memmove(&vec->buffer[offset + vec->elem_size], &vec->buffer[offset], vec->top - offset);
+	memcpy(&vec->buffer[i * vec->elem_size], val, vec->elem_size);
+
+	vec->top += vec->elem_size;
+}
+
+EE_INLINE void ee_vec_erase(Vec* vec, size_t i)
+{
+	EE_ASSERT(vec != NULL, "Trying to set into NULL Vec");
+	EE_ASSERT(i < vec->top / vec->elem_size, "Index out of bounds");
+
+	size_t offset = i * vec->elem_size;
+
+	memmove(&vec->buffer[offset], &vec->buffer[offset + vec->elem_size], vec->top - offset - vec->elem_size);
+
+	vec->top -= vec->elem_size;
+}
+
 #endif // EE_VEC_H

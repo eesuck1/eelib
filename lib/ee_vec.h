@@ -42,6 +42,7 @@
 
 #define EE_VEC_DT(x)      ((uint8_t*)(&(x)))
 #define EE_VEC_INVALID    (0xffffffffffffffffull)
+#define EE_VEC_SORT_TH    (16)
 
 typedef struct Vec
 {
@@ -314,9 +315,78 @@ EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp)
 	}
 }
 
+EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, size_t low, size_t high)
+{
+	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+
+	if (low < high)
+	{
+		uint8_t* temp = NULL;
+		int32_t alloc = EE_FALSE;
+
+		if (ee_vec_full(vec))
+		{
+			temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
+			alloc = EE_TRUE;
+		}
+		else
+		{
+			temp = &vec->buffer[vec->top];
+		}
+
+		EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
+
+		size_t low_id = low / vec->elem_size;
+		size_t high_id = high / vec->elem_size;
+		size_t mid_id = (low_id + high_id) / 2;
+
+		uint8_t* pivot = &vec->buffer[mid_id * vec->elem_size];
+
+		int64_t i = low;
+		int64_t j = high;
+
+		while (EE_TRUE)
+		{
+			while (cmp(&vec->buffer[i], pivot) < 0)
+			{
+				i += vec->elem_size;
+			}
+
+			while (cmp(&vec->buffer[j], pivot) > 0)
+			{
+				j -= vec->elem_size;
+			}
+
+			if (i >= j)
+			{
+				break;
+			}
+
+			memcpy(temp, &vec->buffer[i], vec->elem_size);
+			memcpy(&vec->buffer[i], &vec->buffer[j], vec->elem_size);
+			memcpy(&vec->buffer[j], temp, vec->elem_size);
+		
+			i += vec->elem_size;
+			j -= vec->elem_size;
+		}
+
+		if (alloc)
+		{
+			free(temp);
+		}
+
+		ee_vec_quicksort(vec, cmp, low, j);
+		ee_vec_quicksort(vec, cmp, j + vec->elem_size, high);
+	}
+}
+
 EE_INLINE void ee_vec_introsort(Vec* vec, VecCmp cmp)
 {
-
+	if (vec->top < vec->elem_size * EE_VEC_SORT_TH)
+	{
+		ee_vec_insertsort(vec, cmp);
+	}
 }
 
 #endif // EE_VEC_H

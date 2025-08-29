@@ -51,6 +51,8 @@ typedef struct Vec
 	uint8_t* buffer;
 } Vec;
 
+typedef int (*VecCmp)(const void* a, const void* b);
+
 EE_INLINE int ee_is_pow2(uint64_t x)
 {
 	return (x != 0) && ((x & (x - 1)) == 0);
@@ -221,7 +223,7 @@ EE_INLINE void ee_vec_set(Vec* vec, size_t i, uint8_t* val)
 
 EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 {
-	EE_ASSERT(vec != NULL, "Trying to find into NULL Vec");
+	EE_ASSERT(vec != NULL, "Trying to find in NULL Vec");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
 
 	for (size_t i = 0; i < vec->top; i += vec->elem_size)
@@ -237,7 +239,7 @@ EE_INLINE size_t ee_vec_find(Vec* vec, uint8_t* target)
 
 EE_INLINE void ee_vec_insert(Vec* vec, size_t i, uint8_t* val)
 {
-	EE_ASSERT(vec != NULL, "Trying to set into NULL Vec");
+	EE_ASSERT(vec != NULL, "Trying to insert into NULL Vec");
 	EE_ASSERT(i <= vec->top / vec->elem_size, "Index out of bounds");
 
 	if (ee_vec_full(vec))
@@ -255,7 +257,7 @@ EE_INLINE void ee_vec_insert(Vec* vec, size_t i, uint8_t* val)
 
 EE_INLINE void ee_vec_erase(Vec* vec, size_t i)
 {
-	EE_ASSERT(vec != NULL, "Trying to set into NULL Vec");
+	EE_ASSERT(vec != NULL, "Trying to erase from NULL Vec");
 	EE_ASSERT(i < vec->top / vec->elem_size, "Index out of bounds");
 
 	size_t offset = i * vec->elem_size;
@@ -263,6 +265,58 @@ EE_INLINE void ee_vec_erase(Vec* vec, size_t i)
 	memmove(&vec->buffer[offset], &vec->buffer[offset + vec->elem_size], vec->top - offset - vec->elem_size);
 
 	vec->top -= vec->elem_size;
+}
+
+EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp)
+{
+	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+
+	if (ee_vec_empty(vec))
+	{
+		return;
+	}
+
+	uint8_t* temp = NULL;
+	int32_t alloc = EE_FALSE;
+
+	if (ee_vec_full(vec))
+	{
+		temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
+		alloc = EE_TRUE;
+	}
+	else
+	{
+		temp = &vec->buffer[vec->top];
+	}
+
+	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
+
+	for (size_t i = vec->elem_size; i < vec->top; i += vec->elem_size)
+	{
+		memcpy(temp, &vec->buffer[i], vec->elem_size);
+
+		size_t j = i;
+
+		while (j > 0 && cmp(&vec->buffer[j - vec->elem_size], temp) > 0)
+		{
+			memcpy(&vec->buffer[j], &vec->buffer[j - vec->elem_size], vec->elem_size);
+
+			j -= vec->elem_size;
+		}
+
+		memcpy(&vec->buffer[j], temp, vec->elem_size);
+	}
+
+	if (alloc)
+	{
+		free(temp);
+	}
+}
+
+EE_INLINE void ee_vec_introsort(Vec* vec, VecCmp cmp)
+{
+
 }
 
 #endif // EE_VEC_H

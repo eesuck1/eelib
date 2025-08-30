@@ -642,50 +642,68 @@ EE_INLINE DictValue ee_val_from_8u8(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t 
 
 EE_INLINE void ee_key_set_2s32(DictKey* out, int32_t a, int32_t b)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int32_t));
 	memcpy(out->bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
 }
 
 EE_INLINE void ee_val_set_2s32(DictValue* out, int32_t a, int32_t b)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int32_t));
 	memcpy(out->bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
 }
 
 EE_INLINE void ee_key_set_2u32(DictKey* out, uint32_t a, uint32_t b)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint32_t));
 	memcpy(out->bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
 }
 
 EE_INLINE void ee_val_set_2u32(DictValue* out, uint32_t a, uint32_t b)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint32_t));
 	memcpy(out->bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
 }
 
 EE_INLINE void ee_key_set_s64(DictKey* out, int64_t a)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int64_t));
 }
 
 EE_INLINE void ee_val_set_s64(DictValue* out, int64_t a)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int64_t));
 }
 
 EE_INLINE void ee_key_set_u64(DictKey* out, uint64_t a)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint64_t));
 }
 
 EE_INLINE void ee_val_set_u64(DictValue* out, uint64_t a)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint64_t));
 }
 
 EE_INLINE void ee_key_set_4s16(DictKey* out, int16_t a, int16_t b, int16_t c, int16_t d)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int16_t));
 	memcpy(out->bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
 	memcpy(out->bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
@@ -694,6 +712,8 @@ EE_INLINE void ee_key_set_4s16(DictKey* out, int16_t a, int16_t b, int16_t c, in
 
 EE_INLINE void ee_val_set_4s16(DictValue* out, int16_t a, int16_t b, int16_t c, int16_t d)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	memcpy(out->bytes, (uint8_t*)&a, sizeof(int16_t));
 	memcpy(out->bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
 	memcpy(out->bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
@@ -702,17 +722,25 @@ EE_INLINE void ee_val_set_4s16(DictValue* out, int16_t a, int16_t b, int16_t c, 
 
 EE_INLINE void ee_key_set_bytes(DictKey* out, const uint8_t* data, size_t len)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	EE_ASSERT(data != NULL, "Trying to set a key from NULL input data");
+	
 	memcpy(out->bytes, data, len > EE_KEY_SIZE ? EE_KEY_SIZE : len);
 }
 
 EE_INLINE void ee_val_set_bytes(DictValue* out, const uint8_t* data, size_t len)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	EE_ASSERT(data != NULL, "Trying to set a value from NULL input data");
+	
 	memcpy(out->bytes, data, len > EE_VAL_SIZE ? EE_VAL_SIZE : len);
 }
 
 EE_INLINE void ee_key_set_8u8(DictKey* out, uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
 	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
 {
+	EE_ASSERT(out != NULL, "Trying to set a key in NULL output");
+	
 	out->bytes[0] = a0;
 	out->bytes[1] = a1;
 	out->bytes[2] = a2;
@@ -726,6 +754,8 @@ EE_INLINE void ee_key_set_8u8(DictKey* out, uint8_t a0, uint8_t a1, uint8_t a2, 
 EE_INLINE void ee_val_set_8u8(DictValue* out, uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
 	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
 {
+	EE_ASSERT(out != NULL, "Trying to set a value in NULL output");
+	
 	out->bytes[0] = a0;
 	out->bytes[1] = a1;
 	out->bytes[2] = a2;
@@ -734,6 +764,154 @@ EE_INLINE void ee_val_set_8u8(DictValue* out, uint8_t a0, uint8_t a1, uint8_t a2
 	out->bytes[5] = a5;
 	out->bytes[6] = a6;
 	out->bytes[7] = a7;
+}
+
+EE_INLINE void ee_key_to_2s32(DictKey key, int32_t* a, int32_t* b)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	
+	memcpy(a, key.bytes, sizeof(int32_t));
+	memcpy(b, key.bytes + sizeof(int32_t), sizeof(int32_t));
+}
+
+EE_INLINE void ee_val_to_2s32(DictValue val, int32_t* a, int32_t* b)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	
+	memcpy(a, val.bytes, sizeof(int32_t));
+	memcpy(b, val.bytes + sizeof(int32_t), sizeof(int32_t));
+}
+
+EE_INLINE void ee_key_to_2u32(DictKey key, uint32_t* a, uint32_t* b)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	
+	memcpy(a, key.bytes, sizeof(uint32_t));
+	memcpy(b, key.bytes + sizeof(uint32_t), sizeof(uint32_t));
+}
+
+EE_INLINE void ee_val_to_2u32(DictValue val, uint32_t* a, uint32_t* b)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	
+	memcpy(a, val.bytes, sizeof(uint32_t));
+	memcpy(b, val.bytes + sizeof(uint32_t), sizeof(uint32_t));
+}
+
+EE_INLINE void ee_key_to_s64(DictKey key, int64_t* a)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output");
+	
+	memcpy(a, key.bytes, sizeof(int64_t));
+}
+
+EE_INLINE void ee_val_to_s64(DictValue val, int64_t* a)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output");
+	
+	memcpy(a, val.bytes, sizeof(int64_t));
+}
+
+EE_INLINE void ee_key_to_u64(DictKey key, uint64_t* a)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output");
+	
+	memcpy(a, key.bytes, sizeof(uint64_t));
+}
+
+EE_INLINE void ee_val_to_u64(DictValue val, uint64_t* a)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output");
+	
+	memcpy(a, val.bytes, sizeof(uint64_t));
+}
+
+EE_INLINE void ee_key_to_4s16(DictKey key, int16_t* a, int16_t* b, int16_t* c, int16_t* d)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	EE_ASSERT(c != NULL, "Trying to write extracted value to NULL output c");
+	EE_ASSERT(d != NULL, "Trying to write extracted value to NULL output d");
+	
+	memcpy(a, key.bytes, sizeof(int16_t));
+	memcpy(b, key.bytes + sizeof(int16_t), sizeof(int16_t));
+	memcpy(c, key.bytes + 2 * sizeof(int16_t), sizeof(int16_t));
+	memcpy(d, key.bytes + 3 * sizeof(int16_t), sizeof(int16_t));
+}
+
+EE_INLINE void ee_val_to_4s16(DictValue val, int16_t* a, int16_t* b, int16_t* c, int16_t* d)
+{
+	EE_ASSERT(a != NULL, "Trying to write extracted value to NULL output a");
+	EE_ASSERT(b != NULL, "Trying to write extracted value to NULL output b");
+	EE_ASSERT(c != NULL, "Trying to write extracted value to NULL output c");
+	EE_ASSERT(d != NULL, "Trying to write extracted value to NULL output d");
+	
+	memcpy(a, val.bytes, sizeof(int16_t));
+	memcpy(b, val.bytes + sizeof(int16_t), sizeof(int16_t));
+	memcpy(c, val.bytes + 2 * sizeof(int16_t), sizeof(int16_t));
+	memcpy(d, val.bytes + 3 * sizeof(int16_t), sizeof(int16_t));
+}
+
+EE_INLINE void ee_key_to_bytes(DictKey key, uint8_t* data, size_t len)
+{
+	EE_ASSERT(data != NULL, "Trying to write key bytes to NULL output buffer");
+	
+	memcpy(data, key.bytes, len > EE_KEY_SIZE ? EE_KEY_SIZE : len);
+}
+
+EE_INLINE void ee_val_to_bytes(DictValue val, uint8_t* data, size_t len)
+{
+	EE_ASSERT(data != NULL, "Trying to write value bytes to NULL output buffer");
+	
+	memcpy(data, val.bytes, len > EE_VAL_SIZE ? EE_VAL_SIZE : len);
+}
+
+EE_INLINE void ee_key_to_8u8(DictKey key, uint8_t* a0, uint8_t* a1, uint8_t* a2, uint8_t* a3,
+	uint8_t* a4, uint8_t* a5, uint8_t* a6, uint8_t* a7)
+{
+	EE_ASSERT(a0 != NULL, "Trying to write extracted value to NULL output a0");
+	EE_ASSERT(a1 != NULL, "Trying to write extracted value to NULL output a1");
+	EE_ASSERT(a2 != NULL, "Trying to write extracted value to NULL output a2");
+	EE_ASSERT(a3 != NULL, "Trying to write extracted value to NULL output a3");
+	EE_ASSERT(a4 != NULL, "Trying to write extracted value to NULL output a4");
+	EE_ASSERT(a5 != NULL, "Trying to write extracted value to NULL output a5");
+	EE_ASSERT(a6 != NULL, "Trying to write extracted value to NULL output a6");
+	EE_ASSERT(a7 != NULL, "Trying to write extracted value to NULL output a7");
+	
+	*a0 = key.bytes[0];
+	*a1 = key.bytes[1];
+	*a2 = key.bytes[2];
+	*a3 = key.bytes[3];
+	*a4 = key.bytes[4];
+	*a5 = key.bytes[5];
+	*a6 = key.bytes[6];
+	*a7 = key.bytes[7];
+}
+
+EE_INLINE void ee_val_to_8u8(DictValue val, uint8_t* a0, uint8_t* a1, uint8_t* a2, uint8_t* a3,
+	uint8_t* a4, uint8_t* a5, uint8_t* a6, uint8_t* a7)
+{
+	EE_ASSERT(a0 != NULL, "Trying to write extracted value to NULL output a0");
+	EE_ASSERT(a1 != NULL, "Trying to write extracted value to NULL output a1");
+	EE_ASSERT(a2 != NULL, "Trying to write extracted value to NULL output a2");
+	EE_ASSERT(a3 != NULL, "Trying to write extracted value to NULL output a3");
+	EE_ASSERT(a4 != NULL, "Trying to write extracted value to NULL output a4");
+	EE_ASSERT(a5 != NULL, "Trying to write extracted value to NULL output a5");
+	EE_ASSERT(a6 != NULL, "Trying to write extracted value to NULL output a6");
+	EE_ASSERT(a7 != NULL, "Trying to write extracted value to NULL output a7");
+	
+	*a0 = val.bytes[0];
+	*a1 = val.bytes[1];
+	*a2 = val.bytes[2];
+	*a3 = val.bytes[3];
+	*a4 = val.bytes[4];
+	*a5 = val.bytes[5];
+	*a6 = val.bytes[6];
+	*a7 = val.bytes[7];
 }
 
 #endif // EE_DICT_H

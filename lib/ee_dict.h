@@ -486,4 +486,254 @@ EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
 	return EE_FALSE;
 }
 
+EE_INLINE DictKey ee_key_from_2s32(int32_t a, int32_t b)
+{
+	DictKey out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int32_t));
+	memcpy(out.bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_2s32(int32_t a, int32_t b)
+{
+	DictValue out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int32_t));
+	memcpy(out.bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_2u32(uint32_t a, uint32_t b)
+{
+	DictKey out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(uint32_t));
+	memcpy(out.bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_2u32(uint32_t a, uint32_t b)
+{
+	DictValue out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(uint32_t));
+	memcpy(out.bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_s64(int64_t a)
+{
+	DictKey out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int64_t));
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_s64(int64_t a)
+{
+	DictValue out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int64_t));
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_u64(uint64_t a)
+{
+	DictKey out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(uint64_t));
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_u64(uint64_t a)
+{
+	DictValue out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(uint64_t));
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_4s16(int16_t a, int16_t b, int16_t c, int16_t d)
+{
+	DictKey out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int16_t));
+	memcpy(out.bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
+	memcpy(out.bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
+	memcpy(out.bytes + 3 * sizeof(int16_t), (uint8_t*)&d, sizeof(int16_t));
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_4s16(int16_t a, int16_t b, int16_t c, int16_t d)
+{
+	DictValue out = { 0 };
+
+	memcpy(out.bytes, (uint8_t*)&a, sizeof(int16_t));
+	memcpy(out.bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
+	memcpy(out.bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
+	memcpy(out.bytes + 3 * sizeof(int16_t), (uint8_t*)&d, sizeof(int16_t));
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_bytes(const uint8_t* data, size_t len)
+{
+	EE_ASSERT(len > EE_VAL_SIZE, "Trying to create a dict key from (%zu) bytes when maximum key size (%d)", len, EE_KEY_SIZE);
+	
+	DictKey out = { 0 };
+	memcpy(out.bytes, data, len > EE_KEY_SIZE ? EE_KEY_SIZE : len);
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_bytes(const uint8_t* data, size_t len)
+{
+	EE_ASSERT(len > EE_VAL_SIZE, "Trying to create a dict value from (%zu) bytes when maximum value size (%d)", len, EE_VAL_SIZE);
+
+	DictValue out = { 0 };
+	memcpy(out.bytes, data, len > EE_VAL_SIZE ? EE_VAL_SIZE : len);
+
+	return out;
+}
+
+EE_INLINE DictKey ee_key_from_8u8(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
+	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
+{
+	DictKey out = { 0 };
+
+	out.bytes[0] = a0;
+	out.bytes[1] = a1;
+	out.bytes[2] = a2;
+	out.bytes[3] = a3;
+	out.bytes[4] = a4;
+	out.bytes[5] = a5;
+	out.bytes[6] = a6;
+	out.bytes[7] = a7;
+
+	return out;
+}
+
+EE_INLINE DictValue ee_val_from_8u8(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
+	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
+{
+	DictValue out = { 0 };
+
+	out.bytes[0] = a0;
+	out.bytes[1] = a1;
+	out.bytes[2] = a2;
+	out.bytes[3] = a3;
+	out.bytes[4] = a4;
+	out.bytes[5] = a5;
+	out.bytes[6] = a6;
+	out.bytes[7] = a7;
+
+	return out;
+}
+
+EE_INLINE void ee_key_set_2s32(DictKey* out, int32_t a, int32_t b)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int32_t));
+	memcpy(out->bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
+}
+
+EE_INLINE void ee_val_set_2s32(DictValue* out, int32_t a, int32_t b)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int32_t));
+	memcpy(out->bytes + sizeof(int32_t), (uint8_t*)&b, sizeof(int32_t));
+}
+
+EE_INLINE void ee_key_set_2u32(DictKey* out, uint32_t a, uint32_t b)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint32_t));
+	memcpy(out->bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
+}
+
+EE_INLINE void ee_val_set_2u32(DictValue* out, uint32_t a, uint32_t b)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint32_t));
+	memcpy(out->bytes + sizeof(uint32_t), (uint8_t*)&b, sizeof(uint32_t));
+}
+
+EE_INLINE void ee_key_set_s64(DictKey* out, int64_t a)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int64_t));
+}
+
+EE_INLINE void ee_val_set_s64(DictValue* out, int64_t a)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int64_t));
+}
+
+EE_INLINE void ee_key_set_u64(DictKey* out, uint64_t a)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint64_t));
+}
+
+EE_INLINE void ee_val_set_u64(DictValue* out, uint64_t a)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(uint64_t));
+}
+
+EE_INLINE void ee_key_set_4s16(DictKey* out, int16_t a, int16_t b, int16_t c, int16_t d)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int16_t));
+	memcpy(out->bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
+	memcpy(out->bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
+	memcpy(out->bytes + 3 * sizeof(int16_t), (uint8_t*)&d, sizeof(int16_t));
+}
+
+EE_INLINE void ee_val_set_4s16(DictValue* out, int16_t a, int16_t b, int16_t c, int16_t d)
+{
+	memcpy(out->bytes, (uint8_t*)&a, sizeof(int16_t));
+	memcpy(out->bytes + sizeof(int16_t), (uint8_t*)&b, sizeof(int16_t));
+	memcpy(out->bytes + 2 * sizeof(int16_t), (uint8_t*)&c, sizeof(int16_t));
+	memcpy(out->bytes + 3 * sizeof(int16_t), (uint8_t*)&d, sizeof(int16_t));
+}
+
+EE_INLINE void ee_key_set_bytes(DictKey* out, const uint8_t* data, size_t len)
+{
+	memcpy(out->bytes, data, len > EE_KEY_SIZE ? EE_KEY_SIZE : len);
+}
+
+EE_INLINE void ee_val_set_bytes(DictValue* out, const uint8_t* data, size_t len)
+{
+	memcpy(out->bytes, data, len > EE_VAL_SIZE ? EE_VAL_SIZE : len);
+}
+
+EE_INLINE void ee_key_set_8u8(DictKey* out, uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
+	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
+{
+	out->bytes[0] = a0;
+	out->bytes[1] = a1;
+	out->bytes[2] = a2;
+	out->bytes[3] = a3;
+	out->bytes[4] = a4;
+	out->bytes[5] = a5;
+	out->bytes[6] = a6;
+	out->bytes[7] = a7;
+}
+
+EE_INLINE void ee_val_set_8u8(DictValue* out, uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3,
+	uint8_t a4, uint8_t a5, uint8_t a6, uint8_t a7)
+{
+	out->bytes[0] = a0;
+	out->bytes[1] = a1;
+	out->bytes[2] = a2;
+	out->bytes[3] = a3;
+	out->bytes[4] = a4;
+	out->bytes[5] = a5;
+	out->bytes[6] = a6;
+	out->bytes[7] = a7;
+}
+
 #endif // EE_DICT_H

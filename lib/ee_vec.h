@@ -59,6 +59,10 @@ EE_INLINE int ee_is_pow2(uint64_t x)
 	return (x != 0) && ((x & (x - 1)) == 0);
 }
 
+#if defined(_MSC_VER)
+	#include "intrin.h"
+#endif
+
 EE_INLINE int32_t ee_vec_first_bit_u32(uint32_t x)
 {
 #if defined(__BMI__)

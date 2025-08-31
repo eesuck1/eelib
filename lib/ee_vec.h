@@ -122,12 +122,12 @@ EE_INLINE int ee_vec_empty(Vec* vec)
 	return vec->top < vec->elem_size;
 }
 
-EE_INLINE size_t ee_vec_size(Vec* vec)
+EE_INLINE size_t ee_vec_len(Vec* vec)
 {
 	return vec->top / vec->elem_size;
 }
 
-EE_INLINE size_t ee_vec_bsize(Vec* vec)
+EE_INLINE size_t ee_vec_size(Vec* vec)
 {
 	return vec->top;
 }
@@ -205,7 +205,7 @@ EE_INLINE uint8_t* ee_vec_top(Vec* vec)
 EE_INLINE uint8_t* ee_vec_at(Vec* vec, size_t i)
 {
 	EE_ASSERT(vec != NULL, "Trying to get NULL Vec element");
-	EE_ASSERT(i * vec->elem_size < vec->top, "Trying to get top element of empty Vec");
+	EE_ASSERT(i * vec->elem_size < vec->top, "Index (%zu) is out of bounds for vector with top (%zu)", i, vec->top / vec->elem_size);
 
 	return &vec->buffer[i * vec->elem_size];
 }
@@ -272,63 +272,15 @@ EE_INLINE void ee_vec_erase(Vec* vec, size_t i)
 	vec->top -= vec->elem_size;
 }
 
-EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp)
+EE_INLINE void ee_vec_swap(Vec* vec, size_t i, size_t j, uint8_t* temp)
 {
-	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+	EE_ASSERT(vec != NULL, "Trying to swap an elements in NULL Vec");
+	EE_ASSERT(ee_vec_size(vec) >= 2, "Trying to swap Vec with number of elements (%zu), minimum is 2", ee_vec_size(vec));
 
-	if (ee_vec_empty(vec))
+	size_t alloc = EE_FALSE;
+
+	if (temp == NULL)
 	{
-		return;
-	}
-
-	uint8_t* temp = NULL;
-	int32_t alloc = EE_FALSE;
-
-	if (ee_vec_full(vec))
-	{
-		temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
-		alloc = EE_TRUE;
-	}
-	else
-	{
-		temp = &vec->buffer[vec->top];
-	}
-
-	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
-
-	for (size_t i = vec->elem_size; i < vec->top; i += vec->elem_size)
-	{
-		memcpy(temp, &vec->buffer[i], vec->elem_size);
-
-		size_t j = i;
-
-		while (j > 0 && cmp(&vec->buffer[j - vec->elem_size], temp) > 0)
-		{
-			memcpy(&vec->buffer[j], &vec->buffer[j - vec->elem_size], vec->elem_size);
-
-			j -= vec->elem_size;
-		}
-
-		memcpy(&vec->buffer[j], temp, vec->elem_size);
-	}
-
-	if (alloc)
-	{
-		free(temp);
-	}
-}
-
-EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, size_t low, size_t high)
-{
-	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
-
-	if (low < high)
-	{
-		uint8_t* temp = NULL;
-		int32_t alloc = EE_FALSE;
-
 		if (ee_vec_full(vec))
 		{
 			temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
@@ -338,59 +290,123 @@ EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, size_t low, size_t high)
 		{
 			temp = &vec->buffer[vec->top];
 		}
+	}
 
-		EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
+	memcpy(temp, ee_vec_at(vec, i), vec->elem_size);
+	memcpy(ee_vec_at(vec, i), ee_vec_at(vec, j), vec->elem_size);
+	memcpy(ee_vec_at(vec, j), temp, vec->elem_size);
 
-		size_t low_id = low / vec->elem_size;
-		size_t high_id = high / vec->elem_size;
-		size_t mid_id = (low_id + high_id) / 2;
+	if (alloc)
+	{
+		free(temp);
+	}
+}
 
-		uint8_t* pivot = &vec->buffer[mid_id * vec->elem_size];
+EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp, size_t low, size_t high, uint8_t* temp)
+{
+	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
 
-		int64_t i = low;
-		int64_t j = high;
+	if (ee_vec_empty(vec))
+	{
+		return;
+	}
 
-		while (EE_TRUE)
+	size_t alloc = EE_FALSE;
+
+	if (temp == NULL)
+	{
+		if (ee_vec_full(vec))
 		{
-			while (cmp(&vec->buffer[i], pivot) < 0)
-			{
-				i += vec->elem_size;
-			}
+			temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
+			alloc = EE_TRUE;
+		}
+		else
+		{
+			temp = &vec->buffer[vec->top];
+		}
+	}
 
-			while (cmp(&vec->buffer[j], pivot) > 0)
-			{
-				j -= vec->elem_size;
-			}
+	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
 
-			if (i >= j)
-			{
-				break;
-			}
+	for (size_t i = low; i < high; ++i)
+	{
+		memcpy(temp, ee_vec_at(vec, i), vec->elem_size);
 
-			memcpy(temp, &vec->buffer[i], vec->elem_size);
-			memcpy(&vec->buffer[i], &vec->buffer[j], vec->elem_size);
-			memcpy(&vec->buffer[j], temp, vec->elem_size);
-		
-			i += vec->elem_size;
-			j -= vec->elem_size;
+		size_t j = i;
+
+		while (j > 0 && cmp(ee_vec_at(vec, j - 1), temp) > 0)
+		{
+			ee_vec_set(vec, j, ee_vec_at(vec, j - 1));
+			j--;
 		}
 
-		if (alloc)
-		{
-			free(temp);
-		}
+		ee_vec_set(vec, j, temp);
+	}
 
-		ee_vec_quicksort(vec, cmp, low, j);
-		ee_vec_quicksort(vec, cmp, j + vec->elem_size, high);
+	if (alloc)
+	{
+		free(temp);
+	}
+}
+
+EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, int64_t low, int64_t high, uint8_t* temp)
+{
+	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+
+	if (ee_vec_empty(vec))
+		return;
+
+	if (low < 0 || high < 0 || low >= high)
+		return;
+
+	size_t alloc = EE_FALSE;
+
+	if (temp == NULL)
+	{
+		if (ee_vec_full(vec))
+		{
+			temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
+			alloc = EE_TRUE;
+		}
+		else
+		{
+			temp = &vec->buffer[vec->top];
+		}
+	}
+
+	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", vec->elem_size * sizeof(uint8_t));
+
+	uint8_t* pivot = ee_vec_at(vec, low);
+
+	int64_t i = low - 1;
+	int64_t j = high + 1;
+
+	while (EE_TRUE)
+	{
+		do { i++; } 
+		while (cmp(ee_vec_at(vec, i), pivot) < 0);
+
+		do { j--; }
+		while (cmp(ee_vec_at(vec, j), pivot) > 0);
+
+		if (i >= j) { break; }
+
+		ee_vec_swap(vec, i, j, temp);
+	}
+
+	ee_vec_quicksort(vec, cmp, low, j, temp);
+	ee_vec_quicksort(vec, cmp, j + 1, high, temp);
+
+	if (alloc)
+	{
+		free(temp);
 	}
 }
 
 EE_INLINE void ee_vec_introsort(Vec* vec, VecCmp cmp)
 {
-	if (vec->top < vec->elem_size * EE_VEC_SORT_TH)
-	{
-		ee_vec_insertsort(vec, cmp);
-	}
 }
 
 #endif // EE_VEC_H

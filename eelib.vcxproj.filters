@@ -32,5 +32,8 @@
     <ClInclude Include="lib\ee_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\ee_matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -45,6 +45,8 @@
 #define EE_SLOT_DELETED              (0xFE)
 #define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
 
+#define EE_DICT_DT(x)                ((uint8_t*)(&(x)))
+
 #ifndef EE_FIND_FIRST_BIT_INVALID
 	#define EE_FIND_FIRST_BIT_INVALID    (32)
 #endif // EE_FIND_FIRST_BIT_INVALID
@@ -57,20 +59,10 @@
 	#define EE_FALSE           (0)
 #endif // EE_FALSE
 
-typedef struct DictKey
-{
-	uint8_t bytes[EE_KEY_SIZE];
-} DictKey;
-
-typedef struct DictValue
-{
-	uint8_t bytes[EE_VAL_SIZE];
-} DictValue;
-
 typedef struct Slot
 {
-	DictKey key;
-	DictValue val;
+	uint8_t key[EE_KEY_SIZE];
+	uint8_t val[EE_VAL_SIZE];
 } Slot;
 
 typedef struct Dict
@@ -125,9 +117,11 @@ EE_INLINE uint64_t ee_dict_th(uint64_t x)
 	return (x * 896) >> 10;
 }
 
-EE_INLINE uint64_t ee_hash64(DictKey key) 
+EE_INLINE uint64_t ee_hash64(uint8_t* key) 
 {
-	uint64_t hash = ((uint64_t*)key.bytes)[0];
+	uint64_t hash;
+
+	memcpy(&hash, key, sizeof(uint64_t));
 
 	hash ^= hash >> 30;
 	hash *= 0xbf58476d1ce4e5b9ULL;
@@ -159,9 +153,9 @@ EE_INLINE uint64_t ee_next_pow_2(uint64_t x)
 	return x;
 }
 
-EE_INLINE int ee_key_cmp(DictKey first, DictKey second)
+EE_INLINE int ee_key_cmp(uint8_t* first, uint8_t* second)
 {
-	return memcmp(first.bytes, second.bytes, EE_KEY_SIZE) == 0;
+	return memcmp(first, second, EE_KEY_SIZE) == 0;
 }
 
 EE_INLINE Dict ee_dict_new(size_t size)
@@ -208,7 +202,7 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	memset(dict, 0, sizeof(Dict));
 }
 
-EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
+EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
@@ -230,8 +224,8 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
-		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
@@ -244,7 +238,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
-				dict->slots[group_index + first].val = val;
+				memcpy(&dict->slots[group_index + first].val, val, EE_VAL_SIZE);
 				return;
 			}
 
@@ -260,8 +254,9 @@ EE_INLINE void ee_dict_insert(Dict* dict, DictKey key, DictValue val)
 		{
 			int32_t slot_index = group_index + ee_first_bit_u32(free_mask);
 
-			dict->slots[slot_index].key = key;
-			dict->slots[slot_index].val = val;
+			memcpy(&dict->slots[slot_index].key, key, EE_KEY_SIZE);
+			memcpy(&dict->slots[slot_index].val, val, EE_VAL_SIZE);
+
 			dict->ctrls[slot_index] = hash_sign;
 			dict->count++;
 
@@ -293,7 +288,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 	*dict = out;
 }
 
-EE_INLINE void ee_dict_set(Dict* dict, DictKey key, DictValue val)
+EE_INLINE void ee_dict_set(Dict* dict, uint8_t* key, uint8_t* val)
 {
 	ee_dict_insert(dict, key, val);
 
@@ -303,7 +298,7 @@ EE_INLINE void ee_dict_set(Dict* dict, DictKey key, DictValue val)
 	}
 }
 
-EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
+EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
@@ -324,8 +319,8 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
-		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
@@ -361,7 +356,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, DictKey key)
 	}
 }
 
-EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
+EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
@@ -382,8 +377,8 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		_mm_prefetch(&dict->ctrls[next_group_index], _MM_HINT_T0);
-		_mm_prefetch(&dict->slots[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
+		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
@@ -396,7 +391,7 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
-				return &dict->slots[group_index + first].val;
+				return dict->slots[group_index + first].val;
 			}
 
 			match_mask = match_mask & (~(1 << first));
@@ -418,27 +413,11 @@ EE_INLINE DictValue* ee_dict_at(Dict* dict, DictKey key)
 	return NULL;
 }
 
-EE_INLINE DictValue ee_dict_get(Dict* dict, DictKey key)
-{
-	EE_ASSERT(dict != NULL, "Trying to get from NULL Dict");
-
-	DictValue* val = ee_dict_at(dict, key);
-
-	if (val == NULL)
-	{
-		DictValue out = { 0 };
-
-		return out;
-	}
-
-	return *val;
-}
-
-EE_INLINE int ee_dict_contains(Dict* dict, DictKey key)
+EE_INLINE int ee_dict_contains(Dict* dict, uint8_t* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to check NULL Dict");
 
-	DictValue* val = ee_dict_at(dict, key);
+	uint8_t* val = ee_dict_at(dict, key);
 
 	return val != NULL;
 }
@@ -462,11 +441,11 @@ EE_INLINE void ee_dict_iter_reset(DictIter* it)
 	it->index = 0;
 }
 
-EE_INLINE int ee_dict_iter_next(DictIter* it, DictKey* key, DictValue* val)
+EE_INLINE int ee_dict_iter_next(DictIter* it, uint8_t** key, uint8_t** val)
 {
 	EE_ASSERT(it != NULL && it->dict != NULL, "Trying to iterate over NULL Dict");
-	EE_ASSERT(key != NULL, "Trying to dereference NULL DictKey");
-	EE_ASSERT(val != NULL, "Trying to dereference NULL DictValue");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL uint8_t*");
+	EE_ASSERT(val != NULL, "Trying to dereference NULL uint8_t*");
 
 	while (it->index < it->dict->cap)
 	{

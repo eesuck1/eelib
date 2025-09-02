@@ -190,7 +190,7 @@ EE_INLINE void ee_vec_clear(Vec* vec)
 
 EE_INLINE void ee_vec_reserve(Vec* vec, size_t size)
 {
-	EE_ASSERT(vec != NULL, "Trying to grow NULL Vec");
+	EE_ASSERT(vec != NULL, "Trying to reserve NULL Vec");
 	EE_ASSERT(vec->buffer != NULL, "Trying to reallocate NULL Vec.buffer");
 	EE_ASSERT(size * vec->elem_size > vec->cap, "Reserve expects Vec to grow, given size (%zu) current capacity (%zu)", size, vec->cap / vec->elem_size);
 

@@ -459,7 +459,7 @@ EE_INLINE void ee_vec_heapsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
 				child += vec->elem_size;
 			}
 
-			if (cmp(&vec->buffer[low + root], &vec->buffer[low + child] < 0))
+			if (cmp(&vec->buffer[low + root], &vec->buffer[low + child]) < 0)
 			{
 				memcpy(temp, &vec->buffer[low + root], vec->elem_size);
 				memcpy(&vec->buffer[low + root], &vec->buffer[low + child], vec->elem_size);

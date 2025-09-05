@@ -52,7 +52,10 @@ typedef struct Vec
 	uint8_t* buffer;
 } Vec;
 
-typedef int (*VecCmp)(const void* a, const void* b);
+#ifndef EE_BIN_CMP
+#define EE_BIN_CMP
+typedef int (*BinCmp)(const void* a, const void* b);
+#endif // EE_BIN_CMP
 
 typedef enum VecSortType
 {
@@ -190,6 +193,8 @@ EE_INLINE void ee_vec_clear(Vec* vec)
 
 EE_INLINE void ee_vec_reserve(Vec* vec, size_t size)
 {
+	// TODO(eesuck): improve to handle shrinking
+
 	EE_ASSERT(vec != NULL, "Trying to reserve NULL Vec");
 	EE_ASSERT(vec->buffer != NULL, "Trying to reallocate NULL Vec.buffer");
 	EE_ASSERT(size * vec->elem_size > vec->cap, "Reserve expects Vec to grow, given size (%zu) current capacity (%zu)", size, vec->cap / vec->elem_size);
@@ -340,10 +345,10 @@ EE_INLINE void ee_vec_swap(Vec* vec, size_t i, size_t j, uint8_t* temp)
 	}
 }
 
-EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_vec_insertsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)
 {
 	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
 
 	if (ee_vec_empty(vec))
 	{
@@ -369,10 +374,10 @@ EE_INLINE void ee_vec_insertsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high
 	}
 }
 
-EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_vec_quicksort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)
 {
 	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
 
 	if (ee_vec_empty(vec))
 		return;
@@ -415,10 +420,10 @@ EE_INLINE void ee_vec_quicksort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
 	ee_vec_quicksort(vec, cmp, j + vec->elem_size, high);
 }
 
-EE_INLINE void ee_vec_heapsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_vec_heapsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)
 {
 	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
 
 	if (ee_vec_empty(vec))
 		return;
@@ -475,10 +480,10 @@ EE_INLINE void ee_vec_heapsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high)
 	}
 }
 
-EE_INLINE void ee_vec_introsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high, int32_t max_depth)
+EE_INLINE void ee_vec_introsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high, int32_t max_depth)
 {
 	EE_ASSERT(vec != NULL, "Trying to sort a NULL Vec");
-	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL VecCmp");
+	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
 
 	if (ee_vec_empty(vec))
 		return;
@@ -531,7 +536,7 @@ EE_INLINE void ee_vec_introsort(Vec* vec, VecCmp cmp, int64_t low, int64_t high,
 	}
 }
 
-EE_INLINE void ee_vec_sort(Vec* vec, VecCmp cmp, VecSortType type)
+EE_INLINE void ee_vec_sort(Vec* vec, BinCmp cmp, VecSortType type)
 {
 	switch (type)
 	{
@@ -561,6 +566,47 @@ EE_INLINE void ee_vec_sort(Vec* vec, VecCmp cmp, VecSortType type)
 		return;
 	}
 	}
+}
+
+EE_INLINE void ee_vec_fill(Vec* vec, uint8_t* val, size_t a, size_t b)
+{
+	EE_ASSERT(vec != NULL, "Trying to fill a NULL Vec");
+	EE_ASSERT(val != NULL, "Trying to fill a Vec with a NULL value");
+	EE_ASSERT((a < b) && (a * vec->elem_size < vec->cap) && (b * vec->elem_size <= vec->cap), 
+		"Incorrect fill bounds (%zu):(%zu) for vector with len (%zu)", a, b, ee_vec_len(vec));
+
+	size_t low  = a * vec->elem_size;
+	size_t high = b * vec->elem_size;
+
+	for (size_t i = low; i < high; i += vec->elem_size)
+	{
+		memcpy(&vec->buffer[i], val, vec->elem_size);
+	}
+
+	if (high > vec->top)
+	{
+		vec->top = high;
+	}
+}
+
+EE_INLINE Vec ee_vec_copy(Vec* vec)
+{
+	// TODO(eesuck): probably perform realloc
+
+	EE_ASSERT(vec != NULL, "Trying to copy into NULL Vec");
+	EE_ASSERT(vec->buffer != NULL, "Trying to copy into NULL Vec.buffer");
+
+	Vec out = { 0 };
+
+	out.buffer = (uint8_t*)malloc(vec->cap);
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Vec.buffer copy", vec->cap);
+
+	out.cap = vec->cap;
+	out.elem_size = vec->elem_size;
+	out.top = vec->top;
+
+	return out;
 }
 
 #endif // EE_VEC_H

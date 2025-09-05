@@ -8,56 +8,83 @@
 #include "stdint.h"
 #include "immintrin.h"
 
-#ifndef EE_NO_ASSERT
-#ifndef EE_ASSERT
-#include "stdio.h"
-
-#define EE_ASSERT(cond, fmt, ...) do {                                    \
-		if (!(cond)) {                                                        \
-			fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-			fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-			exit(1);                                                          \
-		}                                                                     \
-	} while (0)
-#endif // EE_ASSERT
-#else
-#define EE_ASSERT(cond, fmt, ...)    ((void)0)
-#endif // EE_NO_ASSERT
-
-#ifndef EE_INLINE
-#define EE_INLINE    static inline
-#endif // EE_INLINE
-
-#ifndef EE_TRUE
-#define EE_TRUE     (1)
-#endif // EE_TRUE
-
-#ifndef EE_FALSE
-#define EE_FALSE    (0)
-#endif // EE_FALSE
+#include "ee_vec.h"
 
 #define EE_NODE_PL_SIZE    (8)
+#define EE_NODE_NULL       (-1)
 
-typedef enum NodeColor
-{
-	EE_RED   = 1,
-	EE_BLACK = 2,
-} NodeColor;
+static const uint8_t EE_RED   = 0x00;
+static const uint8_t EE_BLACK = 0xFF;
 
 typedef struct Node
 {
-	size_t left;
-	size_t right;
-	size_t prev;
-
-	NodeColor color;
+	int64_t left;
+	int64_t right;
+	int64_t prev;
 	uint8_t data[EE_NODE_PL_SIZE];
 } Node;
 
 typedef struct Set
 {
-	Node* root;
-	Node* nodes;
+	int64_t root;
+	int64_t min;
+	int64_t max;
+
+	BinCmp cmp;
+
+	Vec nodes;
+	Vec free;
+	Vec colors;
 };
+
+EE_INLINE Node ee_node_new(int64_t prev, uint8_t data[EE_NODE_PL_SIZE])
+{
+	Node out = { 0 };
+
+	out.left  = EE_NODE_NULL;
+	out.right = EE_NODE_NULL;
+	out.prev  = prev;
+
+	if (data == NULL)
+		memset(out.data, 0, EE_NODE_PL_SIZE);
+	else
+		memcpy(out.data, data, EE_NODE_PL_SIZE);
+
+	return out;
+}
+
+EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
+{
+	EE_ASSERT(cmp != NULL, "Passed NULL comparator");
+
+	Set out = { 0 };
+
+	out.root   = EE_NODE_NULL;
+	out.max    = EE_NODE_NULL;
+	out.min    = EE_NODE_NULL;
+	
+	out.cmp    = cmp;
+
+	out.nodes  = ee_vec_new(size, sizeof(Node));
+	out.free   = ee_vec_new(size, sizeof(int64_t));
+	out.colors = ee_vec_new(size, sizeof(uint8_t));
+
+	ee_vec_fill(&out.colors, EE_VEC_DT(EE_RED), 0, size);
+
+	return out;
+}
+
+EE_INLINE void ee_set_insert(Set* set, uint8_t data[EE_NODE_PL_SIZE])
+{
+	if (set->root == EE_NODE_NULL)
+	{
+		Node root = ee_node_new(EE_NODE_NULL, data);
+		
+		set->root = ee_vec_len(&set->nodes);
+
+		ee_vec_push(&set->nodes, EE_VEC_DT(root));
+		ee_vec_push(&set->colors, EE_VEC_DT(EE_BLACK));
+	}
+}
 
 #endif // EE_SET_H

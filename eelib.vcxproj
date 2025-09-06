@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="lib\ee_arena.h" />
     <ClInclude Include="lib\ee_dict.h" />
+    <ClInclude Include="lib\ee_grid.h" />
     <ClInclude Include="lib\ee_set.h" />
     <ClInclude Include="lib\ee_string.h" />
     <ClInclude Include="lib\ee_vec.h" />

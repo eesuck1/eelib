@@ -35,5 +35,8 @@
     <ClInclude Include="lib\ee_set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\ee_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -237,6 +237,32 @@ EE_INLINE void ee_vec_push(Vec* vec, uint8_t* val)
 	vec->top += vec->elem_size;
 }
 
+EE_INLINE void ee_vec_push_zero(Vec* vec)
+{
+	EE_ASSERT(vec != NULL, "Trying to push into NULL Vec");
+
+	if (ee_vec_full(vec))
+	{
+		ee_vec_grow(vec);
+	}
+
+	memset(&vec->buffer[vec->top], 0, vec->elem_size);
+
+	vec->top += vec->elem_size;
+}
+
+EE_INLINE void ee_vec_push_nothing(Vec* vec)
+{
+	EE_ASSERT(vec != NULL, "Trying to push into NULL Vec");
+
+	if (ee_vec_full(vec))
+	{
+		ee_vec_grow(vec);
+	}
+
+	vec->top += vec->elem_size;
+}
+
 EE_INLINE uint8_t* ee_vec_top(Vec* vec)
 {
 	EE_ASSERT(vec != NULL, "Trying to get NULL Vec top");

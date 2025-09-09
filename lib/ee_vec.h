@@ -279,12 +279,17 @@ EE_INLINE uint8_t* ee_vec_at(Vec* vec, size_t i)
 	return &vec->buffer[i * vec->elem_size];
 }
 
-EE_INLINE void ee_vec_pop(Vec* vec)
+EE_INLINE void ee_vec_pop(Vec* vec, uint8_t* out_val)
 {
 	EE_ASSERT(vec != NULL, "Trying to pop NULL Vec");
 	EE_ASSERT(vec->top >= vec->elem_size, "Trying to pop empty Vec");
 
 	vec->top -= vec->elem_size;
+
+	if (out_val != NULL)
+	{
+		memcpy(out_val, &vec->buffer[vec->top], vec->elem_size);
+	}
 }
 
 EE_INLINE void ee_vec_set(Vec* vec, size_t i, uint8_t* val)
@@ -341,34 +346,16 @@ EE_INLINE void ee_vec_erase(Vec* vec, size_t i)
 	vec->top -= vec->elem_size;
 }
 
-EE_INLINE void ee_vec_swap(Vec* vec, size_t i, size_t j, uint8_t* temp)
+EE_INLINE void ee_vec_swap(Vec* vec, size_t i, size_t j)
 {
 	EE_ASSERT(vec != NULL, "Trying to swap an elements in NULL Vec");
 	EE_ASSERT(ee_vec_size(vec) >= 2, "Trying to swap Vec with number of elements (%zu), minimum is 2", ee_vec_size(vec));
 
-	size_t alloc = EE_FALSE;
-
-	if (temp == NULL)
-	{
-		if (ee_vec_full(vec))
-		{
-			temp = (uint8_t*)malloc(vec->elem_size * sizeof(uint8_t));
-			alloc = EE_TRUE;
-		}
-		else
-		{
-			temp = &vec->buffer[vec->top];
-		}
-	}
+	uint8_t* temp = (uint8_t*)alloca(vec->elem_size);
 
 	memcpy(temp, ee_vec_at(vec, i), vec->elem_size);
 	memcpy(ee_vec_at(vec, i), ee_vec_at(vec, j), vec->elem_size);
 	memcpy(ee_vec_at(vec, j), temp, vec->elem_size);
-
-	if (alloc)
-	{
-		free(temp);
-	}
 }
 
 EE_INLINE void ee_vec_insertsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)

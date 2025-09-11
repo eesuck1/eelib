@@ -622,4 +622,21 @@ EE_INLINE Vec ee_vec_copy(Vec* vec)
 	return out;
 }
 
+EE_INLINE void ee_vec_reverse(Vec* vec)
+{
+	EE_ASSERT(vec != NULL, "Trying to reverse NULL Vec");
+
+	uint8_t* temp = (uint8_t*)alloca(vec->elem_size);
+	size_t len = ee_vec_len(vec);
+
+	for (size_t i = 0; i < (len >> 1); ++i)
+	{
+		size_t j = len - i - 1;
+
+		memcpy(temp, ee_vec_at(vec, i), vec->elem_size);
+		memcpy(ee_vec_at(vec, i), ee_vec_at(vec, j), vec->elem_size);
+		memcpy(ee_vec_at(vec, j), temp, vec->elem_size);
+	}
+}
+
 #endif // EE_VEC_H

@@ -36,17 +36,6 @@
 	#define EE_INLINE    static inline
 #endif // EE_INLINE
 
-#define EE_GROUP_SIZE                (16)
-#define EE_DICT_START_SIZE           (32)
-#define EE_KEY_SIZE                  (8)
-#define EE_VAL_SIZE                  (8)
-
-#define EE_SLOT_EMPTY                (0x80)
-#define EE_SLOT_DELETED              (0xFE)
-#define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
-
-#define EE_DICT_DT(x)                ((uint8_t*)(&(x)))
-
 #ifndef EE_FIND_FIRST_BIT_INVALID
 	#define EE_FIND_FIRST_BIT_INVALID    (32)
 #endif // EE_FIND_FIRST_BIT_INVALID
@@ -58,6 +47,29 @@
 #ifndef EE_FALSE
 	#define EE_FALSE           (0)
 #endif // EE_FALSE
+
+static const uint64_t EE_ZERO_U64 = 0;
+static const uint64_t EE_ONE_U64  = 1;
+static const uint64_t EE_MAX_U64  = 0xffffffffffffffff;
+
+static const double   EE_ZERO_F64 = 0.0;
+static const double   EE_ONE_F64  = 1.0;
+
+#define EE_GROUP_SIZE                (16)
+#define EE_DICT_START_SIZE           (32)
+#define EE_KEY_SIZE                  (8)
+#define EE_VAL_SIZE                  (8)
+
+#define EE_SLOT_EMPTY                (0x80)
+#define EE_SLOT_DELETED              (0xFE)
+#define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
+
+#define EE_DICT_DT(x)                ((uint8_t*)(&(x)))
+#define EE_CONST_ZERO                (EE_DICT_DT(EE_ZERO_U64))
+#define EE_CONST_ONE                 (EE_DICT_DT(EE_ONE_U64))
+#define EE_CONST_MAX_U64             (EE_DICT_DT(EE_MAX_U64))
+#define EE_CONST_ZERO_F64            (EE_DICT_DT(EE_ZERO_F64))
+#define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
 typedef struct Slot
 {

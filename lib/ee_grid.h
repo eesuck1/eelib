@@ -178,7 +178,7 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 	float dist = ee_octile(x_0, y_0, x_1, y_1);
 	size_t start_size = (size_t)(dist * dist * 2.0f + 16.0f);
 
-	Vec out_path = ee_vec_new((size_t)(dist * 2.0f), sizeof(GridPos));
+	Vec out_path = ee_vec_new((size_t)(dist * 2.0f), sizeof(GridNode));
 	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp);
 
 	Dict score = ee_dict_new(start_size);
@@ -203,11 +203,21 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 
 			while (ee_dict_contains(&parent, EE_DICT_DT(pos)))
 			{
-				ee_vec_push(&out_path, EE_VEC_DT(pos));
+				double* score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(pos));
+				double out_score = score_ptr == NULL ? EE_INF : *score_ptr;
+
+				GridNode out_node = { pos, (float)out_score };
+
+				ee_vec_push(&out_path, EE_VEC_DT(out_node));
 				pos = *(GridPos*)ee_dict_at(&parent, EE_DICT_DT(pos));
 			}
 
-			ee_vec_push(&out_path, EE_VEC_DT(start_pos));
+			double* score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(start_pos));
+			double out_score = score_ptr == NULL ? EE_INF : *score_ptr;
+
+			GridNode out_node = { start_pos, (float)out_score };
+
+			ee_vec_push(&out_path, EE_VEC_DT(out_node));
 			ee_vec_reverse(&out_path);
 
 			break;
@@ -284,6 +294,71 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 	ee_heap_free(&open_set);
 
 	return out_path;
+}
+
+EE_INLINE size_t ee_grid_subpath(Vec* path, float max_cost)
+{
+	EE_ASSERT(path != NULL, "Trying to find subpath in NULL path");
+	EE_ASSERT(path->buffer != NULL, "Trying to find subpath in path with NULL buffer (could be that path is not found)");
+
+	size_t lo = 0;
+	size_t hi = ee_vec_len(path);
+	size_t out = 0;
+
+	while (lo < hi)
+	{
+		size_t mid = (lo + hi) >> 1;
+		GridNode* node = (GridNode*)ee_vec_at(path, mid);
+
+		if (node->cost <= max_cost)
+		{
+			out = mid;
+			lo = mid + 1;
+		}
+		else
+		{
+			hi = mid;
+		}
+	}
+
+	return out;
+}
+
+EE_INLINE Grid ee_grid_from_frame(Frame frame)
+{
+	EE_ASSERT(frame.src != NULL, "Trying to copy from NULL src frame");
+
+	Grid out = { 0 };
+
+	out.buffer = (uint8_t*)malloc((size_t)frame.h * frame.w * frame.src->elem_size);
+	out.elem_size = frame.src->elem_size;
+	out.w = frame.w;
+	out.h = frame.h;
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Grid.buffer", frame.h * frame.src->elem_size * frame.w);
+
+	for (size_t y = 0; y < frame.h; ++y)
+	{
+		memcpy(&out.buffer[y * frame.w * frame.src->elem_size], ee_frame_at(frame, 0, y), frame.w * frame.src->elem_size);
+	}
+
+	return out;
+}
+
+EE_INLINE void ee_frame_fill(Frame frame, uint8_t* val)
+{
+	EE_ASSERT(val != NULL, "Trying to fill frame with NULL value");
+	EE_ASSERT(frame.src != NULL, "Trying to fill NULL src frame");
+
+	for (size_t x = 0; x < frame.w; ++x)
+	{
+		ee_frame_set(frame, x, 0, val);
+	}
+
+	for (size_t y = 1; y < frame.h; ++y)
+	{
+		memcpy(ee_frame_at(frame, 0, y), ee_frame_at(frame, 0, 0), frame.w * frame.src->elem_size);
+	}
 }
 
 #endif // EE_GRID_H

@@ -96,7 +96,7 @@ EE_INLINE void ee_grid_set(Grid* grid, int32_t x, int32_t y, uint8_t* val)
 	EE_ASSERT(val != NULL, "Trying to set NULL value");
 	EE_ASSERT(x < grid->w && y < grid->h, "Invalid x, y value (%d, %d) for grid with size (%d, %d)", x, y, grid->w, grid->h);
 
-	memcpy(&grid->buffer[(y * grid->w + x) * grid->elem_size], val, grid->elem_size);
+	memcpy(&grid->buffer[((size_t)y * grid->w + x) * grid->elem_size], val, grid->elem_size);
 }
 
 EE_INLINE uint8_t* ee_grid_at(Grid* grid, int32_t x, int32_t y)
@@ -104,7 +104,7 @@ EE_INLINE uint8_t* ee_grid_at(Grid* grid, int32_t x, int32_t y)
 	EE_ASSERT(grid != NULL, "Trying to get from NULL grid");
 	EE_ASSERT(x < grid->w && y < grid->h, "Invalid x, y value (%d, %d) for grid with size (%d, %d)", x, y, grid->w, grid->h);
 
-	return &grid->buffer[(y * grid->w + x) * grid->elem_size];
+	return &grid->buffer[((size_t)y * grid->w + x) * grid->elem_size];
 }
 
 EE_INLINE Frame ee_grid_frame(Grid* grid, int32_t left_x, int32_t top_y, int32_t width, int32_t height)
@@ -132,7 +132,7 @@ EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to set into empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
 	EE_ASSERT(x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
-	uint8_t* dest = &frame.src->buffer[((y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
+	uint8_t* dest = &frame.src->buffer[(((size_t)y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 	memcpy(dest, val, frame.src->elem_size);
 }
 

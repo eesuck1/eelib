@@ -105,7 +105,7 @@ EE_INLINE int32_t ee_vec_first_bit_u32(uint32_t x)
 #endif
 }
 
-int ee_vec_log2_u32(uint32_t x)
+EE_INLINE int ee_vec_log2_u32(uint32_t x)
 {
 #if defined(__GNUC__) || defined(__clang__)
 	return x ? 31 - __builtin_clz(x) : -1;

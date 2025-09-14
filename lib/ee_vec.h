@@ -40,9 +40,11 @@
 	#define EE_FIND_FIRST_BIT_INVALID    (32)
 #endif // EE_FIND_FIRST_BIT_INVALID
 
-#define EE_VEC_DT(x)      ((uint8_t*)(&(x)))
-#define EE_VEC_INVALID    (0xffffffffffffffffull)
-#define EE_VEC_SORT_TH    (16)
+#define EE_VEC_DT(x)                   ((uint8_t*)(&(x)))
+#define EE_VEC_INVALID                 (0xffffffffffffffffull)
+#define EE_VEC_SORT_TH                 (16)
+#define EE_VEC_AT(v_ptr, i, dtype)     ((dtype*)ee_vec_at(v_ptr, i))
+#define EE_VEC_GET(v_ptr, i, dtype)    (*(dtype*)ee_vec_at(v_ptr, i))
 
 typedef struct Vec
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef EE_Heap_H
-#define EE_Heap_H
+#ifndef EE_HEAP_H
+#define EE_HEAP_H
 
 #include "ee_vec.h"
 
@@ -10,15 +10,13 @@
 #define EE_HEAP_PARENT(x)    (((x) - 1) >> 1)
 #define EE_HEAP_DT(x)        (EE_VEC_DT(x))
 
-typedef int (*HeapCmp)(const void* a, const void* b);
-
 typedef struct Heap
 {	
 	Vec items;
-	HeapCmp cmp;
+	BinCmp cmp;
 } Heap;
 
-EE_INLINE Heap ee_heap_new(size_t size, size_t elem_size, HeapCmp cmp)
+EE_INLINE Heap ee_heap_new(size_t size, size_t elem_size, BinCmp cmp)
 {
 	EE_ASSERT(cmp != NULL, "Trying to set NULL comparator");
 

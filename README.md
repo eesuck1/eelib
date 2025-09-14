@@ -25,7 +25,7 @@ Its goal is to give C developers a **minimal**, **dependency-free toolkit** with
 
 There are two ways to use **ee** in your project:
 
-#### **1. Clone the repository**
+- **Clone the repository**
 
 Clone or download the repository and add the ```lib/``` directory to your include path.
 This way you get access to all modules at once:
@@ -43,7 +43,7 @@ Then in your code:
 #include "ee_arena.h"
 ```
 
-#### **2. Copy specific headers**
+- **Copy specific headers**
 
 Since **ee** is header-only, you can also copy a single header (or a subset) into your project.
 
@@ -82,10 +82,3 @@ graph TD
 | `ee_grid.h`   | Provides a 2D grid structure with utilities for subregions and pathfinding.                        | Depends on `ee_vec.h`, `ee_dict.h`, `ee_heap.h`.  |
 | `ee_heap.h`   | Implements a binary heap (priority queue) on top of the dynamic vector with custom comparison.     | Depends on `ee_vec.h`.                            |
 | `ee_set.h`    | Implements a set data structure using nodes and vectors, supporting a Red-Black tree layout.       | Depends on `ee_vec.h`.                            |
-
-## Notes
-
-The arena is ideal for cases where you need many short-lived allocations.
-By using marks and rewinds, you can efficiently revert allocations without
-calling `free` repeatedly. This pattern improves cache locality and reduces
-allocation overhead in high-performance scenarios.

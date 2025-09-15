@@ -130,7 +130,7 @@ EE_INLINE Frame ee_grid_frame(Grid* grid, int32_t left_x, int32_t top_y, int32_t
 EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to set into empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
-	EE_ASSERT(x > 0 && y > 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
+	EE_ASSERT(x >= 0 && y >= 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
 	uint8_t* dest = &frame.src->buffer[(((size_t)y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 	memcpy(dest, val, frame.src->elem_size);
@@ -139,7 +139,7 @@ EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
 EE_INLINE uint8_t* ee_frame_at(Frame frame, int32_t x, int32_t y)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to get from empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
-	EE_ASSERT(x > 0 && y > 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
+	EE_ASSERT(x >= 0 && y >= 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
 	return &frame.src->buffer[((y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 }

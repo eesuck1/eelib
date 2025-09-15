@@ -130,7 +130,7 @@ EE_INLINE Frame ee_grid_frame(Grid* grid, int32_t left_x, int32_t top_y, int32_t
 EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to set into empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
-	EE_ASSERT(x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
+	EE_ASSERT(x > 0 && y > 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
 	uint8_t* dest = &frame.src->buffer[(((size_t)y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 	memcpy(dest, val, frame.src->elem_size);
@@ -139,7 +139,7 @@ EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
 EE_INLINE uint8_t* ee_frame_at(Frame frame, int32_t x, int32_t y)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to get from empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
-	EE_ASSERT(x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
+	EE_ASSERT(x > 0 && y > 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
 	return &frame.src->buffer[((y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 }
@@ -337,7 +337,7 @@ EE_INLINE Grid ee_grid_from_frame(Frame frame)
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Grid.buffer", frame.h * frame.src->elem_size * frame.w);
 
-	for (size_t y = 0; y < frame.h; ++y)
+	for (int32_t y = 0; y < frame.h; ++y)
 	{
 		memcpy(&out.buffer[y * frame.w * frame.src->elem_size], ee_frame_at(frame, 0, y), frame.w * frame.src->elem_size);
 	}
@@ -350,15 +350,20 @@ EE_INLINE void ee_frame_fill(Frame frame, uint8_t* val)
 	EE_ASSERT(val != NULL, "Trying to fill frame with NULL value");
 	EE_ASSERT(frame.src != NULL, "Trying to fill NULL src frame");
 
-	for (size_t x = 0; x < frame.w; ++x)
+	for (int32_t x = 0; x < frame.w; ++x)
 	{
 		ee_frame_set(frame, x, 0, val);
 	}
 
-	for (size_t y = 1; y < frame.h; ++y)
+	for (int32_t y = 1; y < frame.h; ++y)
 	{
 		memcpy(ee_frame_at(frame, 0, y), ee_frame_at(frame, 0, 0), frame.w * frame.src->elem_size);
 	}
+}
+
+EE_INLINE void ee_grid_set_zero(Grid* grid, int32_t x, int32_t y)
+{
+	memset(ee_grid_at(grid, x, y), 0, grid->elem_size);
 }
 
 #endif // EE_GRID_H

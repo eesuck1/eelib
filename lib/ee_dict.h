@@ -264,7 +264,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
 
 		if (free_mask)
 		{
-			int32_t slot_index = group_index + ee_first_bit_u32(free_mask);
+			size_t slot_index = group_index + (size_t)ee_first_bit_u32(free_mask);
 
 			memcpy(&dict->slots[slot_index].key, key, EE_KEY_SIZE);
 			memcpy(&dict->slots[slot_index].val, val, EE_VAL_SIZE);

@@ -453,7 +453,7 @@ EE_INLINE void ee_vec_heapsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)
 	int64_t start = (count >> 1) * vec->elem_size;
 	int64_t end = count * vec->elem_size;
 
-	while (end > vec->elem_size)
+	while ((size_t)end > vec->elem_size)
 	{
 		if (start > 0)
 		{
@@ -470,11 +470,11 @@ EE_INLINE void ee_vec_heapsort(Vec* vec, BinCmp cmp, int64_t low, int64_t high)
 
 		int64_t root = start;
 
-		while ((2 * root + vec->elem_size) < end)
+		while ((2 * root + vec->elem_size) < (size_t)end)
 		{
 			int64_t child = 2 * root + vec->elem_size;
 
-			if ((child + vec->elem_size < end) && cmp(&vec->buffer[low + child], &vec->buffer[low + child + vec->elem_size]) < 0)
+			if ((child + vec->elem_size < (size_t)end) && cmp(&vec->buffer[low + child], &vec->buffer[low + child + vec->elem_size]) < 0)
 			{
 				child += vec->elem_size;
 			}
@@ -570,7 +570,7 @@ EE_INLINE void ee_vec_sort(Vec* vec, BinCmp cmp, VecSortType type)
 	case EE_DEFAULT:
 	case EE_INTRO:
 		{
-		int64_t len = ee_vec_len(vec);
+		uint32_t len = (uint32_t)ee_vec_len(vec); // TODO(eesuck): log2 for numbers greater than max u32
 		int32_t max_depth = ee_vec_log2_u32(len) * 2;
 
 		ee_vec_introsort(vec, cmp, 0, (len - 1) * vec->elem_size, max_depth);

@@ -57,7 +57,7 @@ EE_INLINE void ee_heap_up(Heap* heap, int64_t i)
 
 EE_INLINE void ee_heap_down(Heap* heap, int64_t i)
 {
-	size_t len = ee_vec_len(&heap->items);
+	int64_t len = (int64_t)ee_vec_len(&heap->items);
 	int64_t left = 0, right = 0, smallest = 0;
 
 	while (left < len)

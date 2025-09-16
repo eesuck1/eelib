@@ -16,13 +16,13 @@ typedef struct Heap
 	BinCmp cmp;
 } Heap;
 
-EE_INLINE Heap ee_heap_new(size_t size, size_t elem_size, BinCmp cmp)
+EE_INLINE Heap ee_heap_new(size_t size, size_t elem_size, BinCmp cmp, Allocator* allocator)
 {
 	EE_ASSERT(cmp != NULL, "Trying to set NULL comparator");
 
 	Heap out = { 0 };
 
-	out.items = ee_vec_new(size, elem_size);
+	out.items = ee_vec_new(size, elem_size, allocator);
 	out.cmp = cmp;
 
 	return out;

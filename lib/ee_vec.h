@@ -46,12 +46,49 @@
 #define EE_VEC_AT(v_ptr, i, dtype)     ((dtype*)ee_vec_at(v_ptr, i))
 #define EE_VEC_GET(v_ptr, i, dtype)    (*(dtype*)ee_vec_at(v_ptr, i))
 
+#ifndef EE_ALLOCATOR
+#define EE_ALLOCATOR
+
+typedef struct Allocator
+{
+	void* (*alloc_fn)(struct Allocator* self, size_t size);
+	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
+	void  (*free_fn)(struct Allocator* self, void* buffer);
+	void* context;
+} Allocator;
+
+EE_INLINE void* ee_default_alloc(Allocator* allocator, size_t size)
+{
+	(void)allocator;
+
+	return malloc(size);
+}
+
+EE_INLINE void* ee_default_realloc(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
+{
+	(void)allocator;
+	(void)old_size;
+
+	return realloc(buffer, new_size);
+}
+
+EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
+{
+	(void)allocator;
+
+	free(buffer);
+}
+
+#endif // EE_ALLOCATOR
+
+
 typedef struct Vec
 {
 	size_t top;
 	size_t cap;
 	size_t elem_size;
 	uint8_t* buffer;
+	Allocator allocator;
 } Vec;
 
 #ifndef EE_BIN_CMP
@@ -135,20 +172,35 @@ EE_INLINE int ee_vec_log2_u32(uint32_t x)
 #endif
 }
 
-
-EE_INLINE Vec ee_vec_new(size_t size, size_t elem_size)
+EE_INLINE Vec ee_vec_new(size_t size, size_t elem_size, Allocator* allocator)
 {
 	EE_ASSERT(size > 0, "Invalid vector size (%zu)", size);
 	EE_ASSERT(elem_size > 0, "Invalid vector elem_size (%zu)", elem_size);
 
 	Vec out = { 0 };
 
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
 	out.top = 0;
 	out.cap = elem_size * size;
 	out.elem_size = elem_size;
-	out.buffer = (uint8_t*)malloc(elem_size * size);
+	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
-	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Vec.buffer", elem_size * size);
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Vec.buffer", out.cap);
 	
 	return out;
 }
@@ -180,7 +232,7 @@ EE_INLINE void ee_vec_free(Vec* vec)
 	EE_ASSERT(vec != NULL, "Trying to free NULL Vec");
 	EE_ASSERT(vec->buffer != NULL, "Trying to free NULL Vec.buffer");
 
-	free(vec->buffer);
+	vec->allocator.free_fn(&vec->allocator, vec->buffer);
 
 	memset(vec, 0, sizeof(Vec));
 }
@@ -201,12 +253,12 @@ EE_INLINE void ee_vec_reserve(Vec* vec, size_t size)
 	EE_ASSERT(vec->buffer != NULL, "Trying to reallocate NULL Vec.buffer");
 	EE_ASSERT(size * vec->elem_size > vec->cap, "Reserve expects Vec to grow, given size (%zu) current capacity (%zu)", size, vec->cap / vec->elem_size);
 
+	size_t new_cap = size * vec->elem_size;
+	uint8_t* new_buffer = (uint8_t*)vec->allocator.realloc_fn(&vec->allocator, vec->buffer, vec->cap, new_cap);
+	
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Vec.buffer", new_cap);
+	
 	vec->cap = size * vec->elem_size;
-
-	uint8_t* new_buffer = (uint8_t*)realloc(vec->buffer, vec->cap);
-
-	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Vec.buffer", vec->cap);
-
 	vec->buffer = new_buffer;
 }
 
@@ -215,12 +267,12 @@ EE_INLINE void ee_vec_grow(Vec* vec)
 	EE_ASSERT(vec != NULL, "Trying to grow NULL Vec");
 	EE_ASSERT(vec->buffer != NULL, "Trying to reallocate NULL Vec.buffer");
 
-	vec->cap = vec->cap + (vec->cap >> 1);
-
-	uint8_t* new_buffer = (uint8_t*)realloc(vec->buffer, vec->cap * vec->elem_size);
-
-	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Vec.buffer", vec->cap * vec->elem_size);
-
+	size_t new_cap = vec->cap + (vec->cap >> 1);
+	uint8_t* new_buffer = (uint8_t*)vec->allocator.realloc_fn(&vec->allocator, vec->buffer, vec->cap, new_cap);
+	
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Vec.buffer", new_cap);
+	
+	vec->cap = new_cap;
 	vec->buffer = new_buffer;
 }
 
@@ -611,15 +663,13 @@ EE_INLINE Vec ee_vec_copy(Vec* vec)
 	EE_ASSERT(vec != NULL, "Trying to copy into NULL Vec");
 	EE_ASSERT(vec->buffer != NULL, "Trying to copy into NULL Vec.buffer");
 
-	Vec out = { 0 };
+	Vec out = *vec;
 
-	out.buffer = (uint8_t*)malloc(vec->cap);
+	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
-	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Vec.buffer copy", vec->cap);
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Vec.buffer copy", out.cap);
 
-	out.cap = vec->cap;
-	out.elem_size = vec->elem_size;
-	out.top = vec->top;
+	memcpy(out.buffer, vec->buffer, out.cap);
 
 	return out;
 }

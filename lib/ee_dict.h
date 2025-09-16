@@ -71,6 +71,41 @@ static const double   EE_ONE_F64  = 1.0;
 #define EE_CONST_ZERO_F64            (EE_DICT_DT(EE_ZERO_F64))
 #define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
+#ifndef EE_ALLOCATOR
+#define EE_ALLOCATOR
+
+typedef struct Allocator
+{
+	void* (*alloc_fn)(struct Allocator* self, size_t size);
+	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
+	void  (*free_fn)(struct Allocator* self, void* buffer);
+	void* context;
+} Allocator;
+
+EE_INLINE void* ee_default_alloc(Allocator * allocator, size_t size)
+{
+	(void)allocator;
+
+	return malloc(size);
+}
+
+EE_INLINE void* ee_default_realloc(Allocator * allocator, void* buffer, size_t old_size, size_t new_size)
+{
+	(void)allocator;
+	(void)old_size;
+
+	return realloc(buffer, new_size);
+}
+
+EE_INLINE void ee_default_free(Allocator * allocator, void* buffer)
+{
+	(void)allocator;
+
+	free(buffer);
+}
+
+#endif // EE_ALLOCATOR
+
 typedef struct Slot
 {
 	uint8_t key[EE_KEY_SIZE];
@@ -86,6 +121,8 @@ typedef struct Dict
 	size_t cap;
 	size_t mask;
 	size_t th;
+
+	Allocator allocator;
 } Dict;
 
 typedef struct DictIter
@@ -170,7 +207,7 @@ EE_INLINE int ee_key_cmp(uint8_t* first, uint8_t* second)
 	return memcmp(first, second, EE_KEY_SIZE) == 0;
 }
 
-EE_INLINE Dict ee_dict_new(size_t size)
+EE_INLINE Dict ee_dict_new(size_t size, Allocator* allocator)
 {
 	Dict out = { 0 };
 
@@ -181,10 +218,26 @@ EE_INLINE Dict ee_dict_new(size_t size)
 		return out;
 	}
 
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
 	size_t cap = ee_next_pow_2(size);
 
-	out.slots = (Slot*)malloc(sizeof(Slot) * cap);
-	out.ctrls = (uint8_t*)malloc(sizeof(uint8_t) * cap);
+	out.slots = (Slot*)out.allocator.alloc_fn(&out.allocator, sizeof(Slot) * cap);
+	out.ctrls = (uint8_t*)out.allocator.alloc_fn(&out.allocator, cap);
 
 	out.count = 0;
 	out.cap = cap;
@@ -208,8 +261,8 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	EE_ASSERT(dict->ctrls != NULL, "Trying to free NULL Dict.ctrls");
 	EE_ASSERT(dict->slots != NULL, "Trying to free NULL Dict.slots");
 
-	free(dict->ctrls);
-	free(dict->slots);
+	dict->allocator.free_fn(&dict->allocator, dict->ctrls);
+	dict->allocator.free_fn(&dict->allocator, dict->slots);
 
 	memset(dict, 0, sizeof(Dict));
 }
@@ -284,7 +337,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap * 2);
+	Dict out = ee_dict_new(dict->cap * 2, &dict->allocator);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -294,8 +347,8 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 		}
 	}
 
-	free(dict->slots);
-	free(dict->ctrls);
+	dict->allocator.free_fn(&dict->allocator, dict->ctrls);
+	dict->allocator.free_fn(&dict->allocator, dict->slots);
 
 	*dict = out;
 }

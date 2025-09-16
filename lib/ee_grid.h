@@ -25,6 +25,8 @@ typedef struct Grid
 	int32_t w;
 	int32_t h;
 	size_t elem_size;
+
+	Allocator allocator;
 } Grid;
 
 typedef struct Frame
@@ -68,16 +70,36 @@ EE_INLINE int32_t ee_clip_s32(int32_t x, int32_t a, int32_t b)
 	return x;
 }
 
-EE_INLINE Grid ee_grid_new(int32_t width, int32_t height, size_t elem_size)
+EE_INLINE Grid ee_grid_new(int32_t width, int32_t height, size_t elem_size, Allocator* allocator)
 {
 	Grid out = { 0 };
 
-	out.buffer = (uint8_t*)calloc((size_t)width * height, elem_size);
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
+	size_t size = (size_t)width * height * elem_size;
+
+	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, size);
 	out.w = width;
 	out.h = height;
 	out.elem_size = elem_size;
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Grid.buffer", elem_size * width * height);
+
+	memset(out.buffer, 0, size);
 
 	return out;
 }
@@ -178,12 +200,12 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 	float dist = ee_octile(x_0, y_0, x_1, y_1);
 	size_t start_size = (size_t)(dist * dist * 2.0f + 16.0f);
 
-	Vec out_path = ee_vec_new((size_t)(dist * 2.0f), sizeof(GridNode));
-	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp);
+	Vec out_path = ee_vec_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
+	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp, &grid->allocator);
 
-	Dict score = ee_dict_new(start_size);
-	Dict parent = ee_dict_new(start_size);
-	Dict closed = ee_dict_new(start_size);
+	Dict score = ee_dict_new(start_size, &grid->allocator);
+	Dict parent = ee_dict_new(start_size, &grid->allocator);
+	Dict closed = ee_dict_new(start_size, &grid->allocator);
 
 	GridPos start_pos = { x_0, y_0 };
 	GridNode start_node = { start_pos, dist };

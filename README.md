@@ -75,10 +75,10 @@ graph TD
 
 | Header        | Description                                                                                       | Dependencies                          |
 |---------------|---------------------------------------------------------------------------------------------------|---------------------------------------|
-| `ee_arena.h`  | Provides a fast, linear memory allocator.                                                         | Independent.                           |
-| `ee_dict.h`   | An open-addressing hash map designed for fixed-size keys and values.                              | Independent.                           |
-| `ee_string.h` | Provides string types for C, supporting dynamic allocation, fixed-size strings, and string views. | Independent.                           |
-| `ee_vec.h`    | A dynamic, contiguous array for arbitrary element sizes. Provides fast insertion, deletion, and random access. Supports growing capacity automatically when needed.      | Independent.                           |
-| `ee_grid.h`   | Provides a 2D grid structure with utilities for subregions and pathfinding.                        | Depends on `ee_vec.h`, `ee_dict.h`, `ee_heap.h`.  |
-| `ee_heap.h`   | Implements a binary heap (priority queue) on top of the dynamic vector with custom comparison.     | Depends on `ee_vec.h`.                            |
-| `ee_set.h`    | Implements a set data structure using nodes and vectors, supporting a Red-Black tree layout.       | Depends on `ee_vec.h`.                            |
+| [`ee_arena.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_arena.h)  | Provides a fast, linear memory allocator.                                                         | Independent.                           |
+| [`ee_dict.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_dict.h)   | An open-addressing hash map designed for fixed-size keys and values.                              | Independent.                           |
+| [`ee_string.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_string.h) | Provides string types for C, supporting dynamic allocation, fixed-size strings, and string views. | Independent.                           |
+| [`ee_vec.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_vec.h)    | A dynamic, contiguous array for arbitrary element sizes. Provides fast insertion, deletion, and random access. Supports growing capacity automatically when needed.      | Independent.                           |
+| [`ee_grid.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_grid.h)   | Provides a 2D grid structure with utilities for subregions and pathfinding.                        | Depends on `ee_vec.h`, `ee_dict.h`, `ee_heap.h`.  |
+| [`ee_heap.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_heap.h)   | Implements a binary heap (priority queue) on top of the dynamic vector with custom comparison.     | Depends on `ee_vec.h`.                            |
+| [`ee_set.h`](https://github.com/eesuck1/eelib/blob/docs/lib/ee_set.h)    | Implements a set data structure using nodes and vectors, supporting a Red-Black tree layout.       | Depends on `ee_vec.h`.                            |

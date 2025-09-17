@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\ee_vec.h">
+    <ClInclude Include="lib\ee_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lib\ee_arena.h">

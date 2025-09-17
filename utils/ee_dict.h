@@ -82,14 +82,14 @@ typedef struct Allocator
 	void* context;
 } Allocator;
 
-EE_INLINE void* ee_default_alloc(Allocator * allocator, size_t size)
+EE_INLINE void* ee_default_alloc(Allocator* allocator, size_t size)
 {
 	(void)allocator;
 
 	return malloc(size);
 }
 
-EE_INLINE void* ee_default_realloc(Allocator * allocator, void* buffer, size_t old_size, size_t new_size)
+EE_INLINE void* ee_default_realloc(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
 {
 	(void)allocator;
 	(void)old_size;
@@ -97,7 +97,7 @@ EE_INLINE void* ee_default_realloc(Allocator * allocator, void* buffer, size_t o
 	return realloc(buffer, new_size);
 }
 
-EE_INLINE void ee_default_free(Allocator * allocator, void* buffer)
+EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
 {
 	(void)allocator;
 

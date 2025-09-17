@@ -8,7 +8,7 @@
 #include "stdint.h"
 #include "immintrin.h"
 
-#include "ee_vec.h"
+#include "ee_array.h"
 
 #define EE_NODE_PL_SIZE    (8)
 #define EE_NODE_NULL       (-1)
@@ -32,9 +32,9 @@ typedef struct Set
 
 	BinCmp cmp;
 
-	Vec nodes;
-	Vec free;
-	Vec colors;
+	Array nodes;
+	Array free;
+	Array colors;
 };
 
 EE_INLINE Node ee_node_new(int64_t prev, uint8_t data[EE_NODE_PL_SIZE])
@@ -65,11 +65,11 @@ EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
 	
 	out.cmp    = cmp;
 
-	out.nodes  = ee_vec_new(size, sizeof(Node));
-	out.free   = ee_vec_new(size, sizeof(int64_t));
-	out.colors = ee_vec_new(size, sizeof(uint8_t));
+	out.nodes  = ee_array_new(size, sizeof(Node));
+	out.free   = ee_array_new(size, sizeof(int64_t));
+	out.colors = ee_array_new(size, sizeof(uint8_t));
 
-	ee_vec_fill(&out.colors, EE_VEC_DT(EE_RED), 0, size);
+	ee_array_fill(&out.colors, EE_ARRAY_DT(EE_RED), 0, size);
 
 	return out;
 }
@@ -80,10 +80,10 @@ EE_INLINE void ee_set_insert(Set* set, uint8_t data[EE_NODE_PL_SIZE])
 	{
 		Node root = ee_node_new(EE_NODE_NULL, data);
 		
-		set->root = ee_vec_len(&set->nodes);
+		set->root = ee_array_len(&set->nodes);
 
-		ee_vec_push(&set->nodes, EE_VEC_DT(root));
-		ee_vec_push(&set->colors, EE_VEC_DT(EE_BLACK));
+		ee_array_push(&set->nodes, EE_ARRAY_DT(root));
+		ee_array_push(&set->colors, EE_ARRAY_DT(EE_BLACK));
 	}
 }
 

@@ -3,7 +3,7 @@
 #ifndef EE_GRID_H
 #define EE_GRID_H
 
-#include "ee_vec.h"
+#include "ee_array.h"
 #include "ee_dict.h"
 #include "ee_heap.h"
 
@@ -195,12 +195,12 @@ EE_INLINE float ee_octile(int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1)
 	return sum + EE_OCTILE_C * min_d;
 }
 
-EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1, GridCost step_cost_fn)
+EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1, GridCost step_cost_fn)
 {
 	float dist = ee_octile(x_0, y_0, x_1, y_1);
 	size_t start_size = (size_t)(dist * dist * 2.0f + 16.0f);
 
-	Vec out_path = ee_vec_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
+	Array out_path = ee_array_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
 	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp, &grid->allocator);
 
 	Dict score = ee_dict_new(start_size, &grid->allocator);
@@ -230,7 +230,7 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 
 				GridNode out_node = { pos, (float)out_score };
 
-				ee_vec_push(&out_path, EE_VEC_DT(out_node));
+				ee_array_push(&out_path, EE_ARRAY_DT(out_node));
 				pos = *(GridPos*)ee_dict_at(&parent, EE_DICT_DT(pos));
 			}
 
@@ -239,8 +239,8 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 
 			GridNode out_node = { start_pos, (float)out_score };
 
-			ee_vec_push(&out_path, EE_VEC_DT(out_node));
-			ee_vec_reverse(&out_path);
+			ee_array_push(&out_path, EE_ARRAY_DT(out_node));
+			ee_array_reverse(&out_path);
 
 			break;
 		}
@@ -318,19 +318,19 @@ EE_INLINE Vec ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, 
 	return out_path;
 }
 
-EE_INLINE size_t ee_grid_subpath(Vec* path, float max_cost)
+EE_INLINE size_t ee_grid_subpath(Array* path, float max_cost)
 {
 	EE_ASSERT(path != NULL, "Trying to find subpath in NULL path");
 	EE_ASSERT(path->buffer != NULL, "Trying to find subpath in path with NULL buffer (could be that path is not found)");
 
 	size_t lo = 0;
-	size_t hi = ee_vec_len(path);
+	size_t hi = ee_array_len(path);
 	size_t out = 0;
 
 	while (lo < hi)
 	{
 		size_t mid = (lo + hi) >> 1;
-		GridNode* node = (GridNode*)ee_vec_at(path, mid);
+		GridNode* node = (GridNode*)ee_array_at(path, mid);
 
 		if (node->cost <= max_cost)
 		{

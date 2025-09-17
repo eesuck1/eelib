@@ -136,7 +136,7 @@
     <ClInclude Include="lib\ee_heap.h" />
     <ClInclude Include="lib\ee_set.h" />
     <ClInclude Include="lib\ee_string.h" />
-    <ClInclude Include="lib\ee_vec.h" />
+    <ClInclude Include="lib\ee_array.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

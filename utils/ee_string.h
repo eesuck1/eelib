@@ -119,6 +119,59 @@ void ee_str_free(Str* str)
 	memset(str, 0, sizeof(Str));
 }
 
+void ee_str_grow(Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to grow NULL string");
+	EE_ASSERT(str->buffer != NULL, "Trying to grow NULL string buffer");
+
+	size_t new_cap = str->cap + (str->cap >> 1);
+	uint8_t* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer");
+
+	str->cap = new_cap;
+	str->buffer = new_buffer;
+}
+
+int32_t ee_str_full(Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to check NULL string");
+
+	return str->top >= str->cap;
+}
+
+int32_t ee_str_empty(Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to check NULL string");
+
+	return str->top == 0;
+}
+
+void ee_str_push(Str* str, char symbol)
+{
+	EE_ASSERT(str != NULL, "Trying to push into NULL string");
+
+	if (ee_str_full(str))
+	{
+		ee_str_grow(str);
+	}
+
+	str->buffer[str->top++] = symbol;
+}
+
+void ee_str_pop(Str* str, char* out_val)
+{
+	EE_ASSERT(str != NULL, "Trying to pop from NULL string");
+	EE_ASSERT(!ee_str_empty(str), "Trying to pop from empty string");
+
+	str->top--;
+
+	if (out_val != NULL)
+	{
+		*out_val = str->buffer[str->top];
+	}
+}
+
 int32_t ee_str_cmp(Str* a, Str* b)
 {
 	if (a->top < b->top)
@@ -132,7 +185,5 @@ int32_t ee_str_cmp(Str* a, Str* b)
 	
 	return memcmp(a->buffer, b->buffer, a->top);
 }
-
-
 
 #endif // EE_STRING_H

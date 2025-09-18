@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef EE_STRING_H
 #define EE_STRING_H
 
@@ -42,219 +40,99 @@
 #define EE_FALSE            (0)
 #endif // EE_FALSE
 
-#define EE_START_STR_SIZE    (16)
 
-typedef uint8_t str_dt;
+#ifndef EE_ALLOCATOR
+#define EE_ALLOCATOR
+
+typedef struct Allocator
+{
+	void* (*alloc_fn)(struct Allocator* self, size_t size);
+	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
+	void  (*free_fn)(struct Allocator* self, void* buffer);
+	void* context;
+} Allocator;
+
+EE_INLINE void* ee_default_alloc(Allocator * allocator, size_t size)
+{
+	(void)allocator;
+
+	return malloc(size);
+}
+
+EE_INLINE void* ee_default_realloc(Allocator * allocator, void* buffer, size_t old_size, size_t new_size)
+{
+	(void)allocator;
+	(void)old_size;
+
+	return realloc(buffer, new_size);
+}
+
+EE_INLINE void ee_default_free(Allocator * allocator, void* buffer)
+{
+	(void)allocator;
+
+	free(buffer);
+}
+
+#endif // EE_ALLOCATOR
 
 typedef struct Str
 {
-	size_t len;
+	size_t top;
 	size_t cap;
-	str_dt* buffer;
+	uint8_t* buffer;
+	Allocator allocator;
 } Str;
 
-typedef struct LongStr
+Str ee_str_new(size_t size, Allocator* allocator)
 {
-	int len;
-	str_dt prefix[EE_LS_PREFIX_LEN];
-	str_dt* buffer;
-} LongStr;
+	Str out = { 0 };
 
-typedef struct ShortStr
-{
-	int len;
-	str_dt buffer[EE_SS_LEN];
-} ShortStr;
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
 
-typedef struct StrView
-{
-	size_t len;
-	const str_dt* buffer;
-} StrView;
+	out.cap = size;
+	out.top = 0;
+	out.buffer = out.allocator.alloc_fn(&out.allocator, size);
 
-EE_INLINE uint64_t ee_str_next_pow_2(uint64_t x)
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", size);
+
+	return out;
+}
+
+void ee_str_free(Str* str)
 {
-	if (x == 0)
+	EE_ASSERT(str != NULL, "Trying to free NULL string");
+	EE_ASSERT(str->buffer != NULL, "Trying to free NULL string buffer");
+
+	str->allocator.free_fn(&str->allocator, str->buffer);
+
+	memset(str, 0, sizeof(Str));
+}
+
+int32_t ee_str_cmp(Str* a, Str* b)
+{
+	if (a->top < b->top)
+	{
+		return -1;
+	}
+	else if (a->top > b->top)
 	{
 		return 1;
 	}
-
-	x--;
-
-	x |= x >> 1;
-	x |= x >> 2;
-	x |= x >> 4;
-	x |= x >> 8;
-	x |= x >> 16;
-	x |= x >> 32;
-
-	x++;
-
-	return x;
-}
-
-EE_INLINE ShortStr ee_short_str_new(const str_dt* buffer, int32_t len)
-{
-	EE_ASSERT(len <= EE_SS_LEN, "Given buffer length (%d) should not be grater than (%d)", len, EE_SS_LEN);
-
-	ShortStr out = { 0 };
-
-	memcpy(out.buffer, buffer, len);
-	out.len = len;
 	
-	return out;
+	return memcmp(a->buffer, b->buffer, a->top);
 }
 
-EE_INLINE int ee_short_str_cmp(ShortStr first, ShortStr second)
-{
-	EE_ASSERT(EE_SS_LEN == 16, "String comparator expects 16-byte short strings, (%d) given", EE_SS_LEN);
 
-	const uint64_t* f_data = (uint64_t*)first.buffer;
-	const uint64_t* s_data = (uint64_t*)second.buffer;
-
-	return (first.len == second.len) && !((f_data[0] ^ s_data[0]) && (f_data[1] ^ s_data[1]));
-}
-
-EE_INLINE Str ee_str_new()
-{
-	Str out = { 0 };
-
-	out.len = 0;
-	out.cap = EE_START_STR_SIZE;
-	out.buffer = (str_dt*)malloc(sizeof(str_dt) * EE_START_STR_SIZE);
-
-	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%d) bytes for Str.buffer", EE_START_STR_SIZE);
-
-	return out;
-}
-
-EE_INLINE Str ee_str_from(const char* cstr)
-{
-	Str out = { 0 };
-
-	size_t len = strlen(cstr);
-
-	out.len = len;
-	out.cap = ee_str_next_pow_2(len + 1);
-	out.buffer = (str_dt*)malloc(sizeof(str_dt) * out.cap);
-
-	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", sizeof(str_dt) * out.cap);
-
-	if (out.buffer != NULL)
-	{
-		memcpy(out.buffer, cstr, len + 1);
-	}
-
-	return out;
-}
-
-EE_INLINE void ee_str_free(Str* str)
-{
-	EE_ASSERT(str != NULL, "Unable to free NULL Str pointer");
-	EE_ASSERT(str->buffer != NULL, "Unable to free NULL Str.buffer pointer");
-
-	free(str->buffer);
-}
-
-EE_INLINE Str ee_str_copy(const Str* src)
-{
-	EE_ASSERT(src != NULL, "NULL Str pointer");
-	EE_ASSERT(src->buffer != NULL, "NULL Str.buffer pointer");
-
-	Str out = { 0 };
-
-	out.len = src->len;
-	out.cap = src->cap;
-	out.buffer = (str_dt*)malloc(sizeof(str_dt) * src->len);
-	
-	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", sizeof(str_dt) * src->len);
-
-	if (out.buffer == NULL)
-	{
-		return out;
-	}
-
-	memcpy(out.buffer, src->buffer, out.len);
-
-	return out;
-}
-
-EE_INLINE void ee_str_expand(Str* str)
-{
-	// TODO
-}
-
-EE_INLINE void ee_str_assign(Str* dest, const Str* src)
-{
-	EE_ASSERT(dest != NULL, "NULL dest Str pointer");
-	EE_ASSERT(dest->buffer != NULL, "NULL dest Str.buffer pointer");
-	EE_ASSERT(src != NULL, "NULL src Str pointer");
-	EE_ASSERT(src->buffer != NULL, "NULL src Str.buffer pointer");
-
-	if (src->len >= dest->cap)
-	{
-		dest->cap = src->cap;
-		str_dt* new_buffer = (str_dt*)realloc(dest->buffer, sizeof(str_dt) * dest->cap);
-
-		EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", sizeof(str_dt) * dest->cap);
-
-		if (new_buffer == NULL)
-		{
-			return;
-		}
-
-		dest->buffer = new_buffer;
-	}
-
-	memcpy(dest->buffer, src->buffer, src->len + 1);
-}
-
-EE_INLINE char* ee_str_cstr(const Str* str)
-{
-	EE_ASSERT(str != NULL, "NULL Str pointer");
-	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
-
-	char* out = (char*)malloc(sizeof(str_dt) * (str->len + 1));
-
-	EE_ASSERT(out != NULL, "Unable to allocate (%zu) bytes for out buffer", sizeof(str_dt) * (str->len + 1));
-
-	if (out == NULL)
-	{
-		return NULL;
-	}
-
-	memcpy(out, str->buffer, str->len);
-	out[str->len] = '\0';
-
-	return out;
-}
-
-EE_INLINE void ee_str_clear(Str* str)
-{
-	EE_ASSERT(str != NULL, "NULL Str pointer");
-	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
-
-	str->len = 0;
-	str->buffer[0] = '\0';
-}
-
-EE_INLINE void ee_str_reset(Str* str)
-{
-	EE_ASSERT(str != NULL, "NULL Str pointer");
-	EE_ASSERT(str->buffer != NULL, "NULL Str.buffer pointer");
-
-	str_dt* new_buffer = (str_dt*)realloc(str->buffer, sizeof(str_dt) * EE_START_STR_SIZE);
-
-	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", sizeof(str_dt) * EE_START_STR_SIZE);
-
-	if (new_buffer == NULL)
-	{
-		return;
-	}
-
-	str->len = 0;
-	str->cap = EE_START_STR_SIZE;
-	str->buffer = new_buffer;
-}
 
 #endif // EE_STRING_H

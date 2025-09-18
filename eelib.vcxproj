@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="main_utils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\ee_arena.h" />

@@ -23,25 +23,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\ee_array.h">
+    <ClInclude Include="utils\ee_string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_arena.h">
+    <ClInclude Include="utils\ee_arena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_dict.h">
+    <ClInclude Include="utils\ee_array.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_string.h">
+    <ClInclude Include="utils\ee_dict.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_set.h">
+    <ClInclude Include="utils\ee_grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_grid.h">
+    <ClInclude Include="utils\ee_heap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\ee_heap.h">
+    <ClInclude Include="utils\ee_set.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

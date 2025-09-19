@@ -1,14 +1,19 @@
 #ifndef EE_STRING_H
 #define EE_STRING_H
 
+#ifdef _WIN32
+#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
+#pragma warning (disable : 4996)
+#endif
+
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
+#include "stdio.h"
 
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
-
-#include "stdio.h"
 
 #define EE_ASSERT(cond, fmt, ...) do {                                    \
 	if (!(cond)) {                                                        \
@@ -124,7 +129,6 @@ typedef struct Str
 	Allocator allocator;
 } Str;
 
-
 EE_INLINE int32_t ee_str_first_bit_u32(uint32_t x)
 {
 #if defined(__BMI__)
@@ -152,6 +156,25 @@ EE_INLINE int32_t ee_str_first_bit_u32(uint32_t x)
 	}
 
 	return EE_FIND_FIRST_BIT_INVALID;
+#endif
+}
+
+EE_INLINE int32_t ee_str_popcnt_u32(uint32_t x)
+{
+#if defined(__GNUC__) || defined(__clang__)
+	return __builtin_popcount(x);
+#elif defined(_MSC_VER)
+	return __popcnt(x);
+#else
+	int32_t count = 0;
+
+	while (x) 
+	{
+		x &= x - 1;
+		count++;
+	}
+
+	return count;
 #endif
 }
 
@@ -209,6 +232,49 @@ EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
 	return out;
 }
 
+EE_INLINE Str ee_str_from_file(const char* file_path, const Allocator* allocator)
+{
+	EE_ASSERT(file_path != NULL, "Trying to open NULL file path");
+
+	FILE* file = fopen(file_path, "r");
+
+	EE_ASSERT(file != NULL, "Unable to open file (%s)", file_path);
+
+	fseek(file, 0, SEEK_END);
+	int32_t file_size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	EE_ASSERT(file_size > 0, "Unable to get file size");
+
+	Str out = { 0 };
+
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	out.cap = file_size;
+	out.top = file_size;
+	out.buffer = out.allocator.alloc_fn(&out.allocator, out.cap);
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
+
+	size_t bytes_read = fread(out.buffer, 1, file_size, file);
+	
+	EE_ASSERT(bytes_read == file_size, "Unable to read (%zu) bytes from file", file_size);
+
+	fclose(file);
+
+	return out;
+}
+
 EE_INLINE const char* ee_str_to_cstr(Str* str)
 {
 	EE_ASSERT(str != NULL, "Trying to get c string from NULL string");
@@ -222,6 +288,24 @@ EE_INLINE const char* ee_str_to_cstr(Str* str)
 	c_str[c_str_len - 1] = '\0';
 
 	return (const char*)c_str;
+}
+
+EE_INLINE void ee_str_to_file(Str* str, const char* file_path, const char* mode)
+{
+	EE_ASSERT(str != NULL, "Trying to write a NULL string to file");
+	EE_ASSERT(file_path != NULL, "Trying to write to a NULL file path");
+
+	FILE* file = NULL;
+
+	file = fopen(file_path, mode);
+
+	EE_ASSERT(file != NULL, "Unable to open file (%s)", file_path);
+
+	size_t bytes_wrote = fwrite(str->buffer, 1, str->top, file);
+
+	EE_ASSERT(bytes_wrote == str->top, "Unable to write (%zu) bytes to file", str->top);
+
+	fclose(file);
 }
 
 EE_INLINE void ee_str_free(Str* str)
@@ -426,6 +510,35 @@ EE_INLINE size_t ee_str_findc(const Str* str, char target)
 EE_INLINE size_t ee_str_find(const Str* str, const Str* target)
 {
 	return ee_str_find_b(str, target, 0, str->top);
+}
+
+EE_INLINE size_t ee_str_countc_b(const Str* str, char target, size_t low, size_t high)
+{
+	EE_ASSERT(str != NULL, "Trying to search in NULL string");
+	EE_ASSERT(high <= str->top, "Invalid upper bound");
+	EE_ASSERT(low <= str->top, "Invalid lower bound");
+	EE_ASSERT(low < high, "Trying to set lower bound bigger than upper bound (%zu, %zu)", low, high);
+
+	ee_simd_i mask = ee_set1_epi8(target);
+
+	size_t out = 0;
+	size_t i = low;
+
+	// NOTE: last bytes can be done after loop and if condition would be unnecessary
+	for (; i < high; i += EE_SIMD_BYTES)
+	{
+		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i match = ee_cmpeq_epi8(group, mask);
+
+		int32_t match_mask = ee_movemask_epi8(match);
+
+		if (match_mask)
+		{
+			out += ee_str_popcnt_u32(match_mask);
+		}
+	}
+
+	return out;
 }
 
 EE_INLINE int32_t ee_str_lev_m64(const Str* a, const Str* b)

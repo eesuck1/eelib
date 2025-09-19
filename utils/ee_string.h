@@ -82,9 +82,17 @@ typedef __m128i ee_simd_i;
 #endif
 
 
-#define EE_STR_LEV_BLOCK_SIZE    (64)
-#define EE_STR_CHARS_MASK_LEN    (0xFF)
-#define EE_STR_INVALID           (0xffffffffffffffffull)
+#define EE_STR_LEV_BLOCK_SIZE       (64)
+#define EE_STR_CHARS_MASK_LEN       (0xFF)
+#define EE_STR_INVALID              (0xffffffffffffffffull)
+
+#define EE_STR_FILE_READ            ("r")
+#define EE_STR_FILE_READ_BYTES      ("rb")
+#define EE_STR_FILE_WRITE           ("w")
+#define EE_STR_FILE_APPEND          ("a")
+#define EE_STR_FILE_WRITE_BYTES     ("wb")
+#define EE_STR_FILE_APPEND_BYTES    ("ab")
+
 
 #ifndef EE_ALLOCATOR
 #define EE_ALLOCATOR
@@ -203,7 +211,7 @@ EE_INLINE Str ee_str_new(size_t size, const Allocator* allocator)
 	return out;
 }
 
-EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
+EE_INLINE Str ee_str_from_cstr(const uint8_t* c_str, const Allocator* allocator)
 {
 	Str out = { 0 };
 
@@ -232,11 +240,17 @@ EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
 	return out;
 }
 
-EE_INLINE Str ee_str_from_file(const char* file_path, const Allocator* allocator)
+EE_INLINE Str ee_str_from_file(const uint8_t* file_path, const uint8_t* mode, const Allocator* allocator)
 {
 	EE_ASSERT(file_path != NULL, "Trying to open NULL file path");
+	EE_ASSERT(mode == EE_STR_FILE_READ || mode == EE_STR_FILE_READ_BYTES, "Invalid mode for reading from file (%s)", mode);
 
-	FILE* file = fopen(file_path, "r");
+	if (mode == NULL)
+	{
+		mode = EE_STR_FILE_READ_BYTES;
+	}
+
+	FILE* file = fopen(file_path, mode);
 
 	EE_ASSERT(file != NULL, "Unable to open file (%s)", file_path);
 
@@ -268,32 +282,39 @@ EE_INLINE Str ee_str_from_file(const char* file_path, const Allocator* allocator
 
 	size_t bytes_read = fread(out.buffer, 1, file_size, file);
 	
-	EE_ASSERT(bytes_read == file_size, "Unable to read (%zu) bytes from file", file_size);
+	EE_ASSERT(bytes_read == file_size, "Unable to read (%d) bytes from file", file_size);
 
 	fclose(file);
 
 	return out;
 }
 
-EE_INLINE const char* ee_str_to_cstr(Str* str)
+EE_INLINE const uint8_t* ee_str_to_cstr(Str* str)
 {
 	EE_ASSERT(str != NULL, "Trying to get c string from NULL string");
 
 	size_t c_str_len = str->top + 1;
-	char* c_str = str->allocator.alloc_fn(&str->allocator, c_str_len);
+	uint8_t* c_str = str->allocator.alloc_fn(&str->allocator, c_str_len);
 
 	EE_ASSERT(c_str != NULL, "Unable to allocate (%zu) bytes for C string buffer", c_str_len);
 
 	memcpy(c_str, str->buffer, str->top);
 	c_str[c_str_len - 1] = '\0';
 
-	return (const char*)c_str;
+	return (const uint8_t*)c_str;
 }
 
-EE_INLINE void ee_str_to_file(Str* str, const char* file_path, const char* mode)
+EE_INLINE void ee_str_to_file(Str* str, const uint8_t* file_path, const uint8_t* mode)
 {
 	EE_ASSERT(str != NULL, "Trying to write a NULL string to file");
 	EE_ASSERT(file_path != NULL, "Trying to write to a NULL file path");
+	EE_ASSERT(mode == EE_STR_FILE_WRITE || mode == EE_STR_FILE_WRITE_BYTES ||
+		mode == EE_STR_FILE_APPEND || mode == EE_STR_FILE_APPEND_BYTES, "Invalid mode for writing to file (%s)", mode);
+
+	if (mode == NULL)
+	{
+		mode = EE_STR_FILE_APPEND_BYTES;
+	}
 
 	FILE* file = NULL;
 
@@ -326,7 +347,7 @@ EE_INLINE void ee_str_grow(Str* str)
 	size_t new_cap = str->cap + (str->cap >> 1);
 	uint8_t* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
 
-	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer");
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
 
 	str->cap = new_cap;
 	str->buffer = new_buffer;
@@ -346,7 +367,7 @@ EE_INLINE int32_t ee_str_empty(const Str* str)
 	return str->top == 0;
 }
 
-EE_INLINE void ee_str_push(Str* str, char symbol)
+EE_INLINE void ee_str_push(Str* str, uint8_t symbol)
 {
 	EE_ASSERT(str != NULL, "Trying to push into NULL string");
 
@@ -358,7 +379,7 @@ EE_INLINE void ee_str_push(Str* str, char symbol)
 	str->buffer[str->top++] = symbol;
 }
 
-EE_INLINE void ee_str_pop(Str* str, char* out_val)
+EE_INLINE void ee_str_pop(Str* str, uint8_t* out_val)
 {
 	EE_ASSERT(str != NULL, "Trying to pop from NULL string");
 	EE_ASSERT(!ee_str_empty(str), "Trying to pop from empty string");
@@ -385,126 +406,59 @@ EE_INLINE int32_t ee_str_cmp(const Str* a, const Str* b)
 	return memcmp(a->buffer, b->buffer, a->top);
 }
 
-EE_INLINE int64_t ee_str_finds_b(const Str* str, const char* target, size_t low, size_t high)
-{
-	EE_ASSERT(str != NULL, "Trying to search in NULL string");
-	EE_ASSERT(target != NULL, "Trying to search a NULL target");
-	EE_ASSERT(high <= str->top, "Invalid upper bound");
-	EE_ASSERT(low <= str->top, "Invalid lower bound");
-	EE_ASSERT(low < high, "Trying to set lower bound bigger than upper bound (%zu, %zu)", low, high);
-
-	size_t target_len = strnlen(target, str->top);
-
-	EE_ASSERT(target_len < high - low, "Too long target char array for bounds (%zu, %zu)", low, high);
-
-	ee_simd_i mask = ee_set1_epi8(target[0]);
-
-	size_t i = low;
-
-	for (; i < high; i += EE_SIMD_BYTES)
-	{
-		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
-		ee_simd_i match = ee_cmpeq_epi8(group, mask);
-
-		int32_t match_mask = ee_movemask_epi8(match);
-
-		while (match_mask)
-		{
-			int32_t first = ee_str_first_bit_u32(match_mask);
-
-			if ((i + first + target_len <= high) && (memcmp(&str->buffer[i + first], target, target_len) == 0))
-			{
-				return i + first;
-			}
-
-			match_mask = match_mask & (~(1 << first));
-		}
-	}
-
-	return EE_STR_INVALID;
-}
-
 EE_INLINE size_t ee_str_find_b(const Str* str, const Str* target, size_t low, size_t high)
 {
 	EE_ASSERT(str != NULL, "Trying to search in NULL string");
 	EE_ASSERT(target != NULL, "Trying to search a NULL target");
-	EE_ASSERT(high <= str->top, "Invalid upper bound");
-	EE_ASSERT(low <= str->top, "Invalid lower bound");
-	EE_ASSERT(low < high, "Trying to set lower bound bigger than upper bound (%zu, %zu)", low, high);
+	EE_ASSERT(low <= str->top && high <= str->top && low < high, "Invalid bounds (%zu, %zu) for string with length (%zu)", low, high, str->top);
 
 	size_t target_len = target->top;
 
-	EE_ASSERT(target_len < high - low, "Too long target char array for bounds (%zu, %zu)", low, high);
+	EE_ASSERT(target_len <= high - low, "Target too long for bounds");
 
 	ee_simd_i mask = ee_set1_epi8(target->buffer[0]);
 
 	size_t i = low;
+	size_t upper = (high & ~(EE_SIMD_BYTES - 1));
+	size_t start_block = (low + EE_SIMD_BYTES - 1) & ~(EE_SIMD_BYTES - 1);
 
-	for (; i < high; i += EE_SIMD_BYTES)
+	for (; i < start_block && i + target_len <= high; ++i)
 	{
-		ee_simd_i group = ee_loadu_si((const ee_simd_i*) & str->buffer[i]);
-		ee_simd_i match = ee_cmpeq_epi8(group, mask);
+		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
+		{
+			return i;
+		}
+	}
 
+	for (; i < upper; i += EE_SIMD_BYTES)
+	{
+		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		int32_t match_mask = ee_movemask_epi8(match);
 
 		while (match_mask)
 		{
 			int32_t first = ee_str_first_bit_u32(match_mask);
 
-			if ((i + first + target_len <= high) && (memcmp(&str->buffer[i + first], target->buffer, target_len) == 0))
+			if ((i + first + target_len <= high) &&
+				memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
 			{
 				return i + first;
 			}
 
-			match_mask = match_mask & (~(1 << first));
+			match_mask &= match_mask - 1;
 		}
 	}
 
-	return EE_STR_INVALID;
-}
-
-EE_INLINE int64_t ee_str_findc_b(const Str* str, char target, size_t low, size_t high)
-{
-	EE_ASSERT(str != NULL, "Trying to search in NULL string");
-	EE_ASSERT(high <= str->top, "Invalid upper bound");
-	EE_ASSERT(low <= str->top, "Invalid lower bound");
-	EE_ASSERT(low < high, "Trying to set lower bound bigger than upper bound (%zu, %zu)", low, high);
-
-	ee_simd_i mask = ee_set1_epi8(target);
-
-	size_t i = low;
-
-	for (; i < high; i += EE_SIMD_BYTES)
+	for (; i < high && i + target_len <= high; ++i)
 	{
-		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
-		ee_simd_i match = ee_cmpeq_epi8(group, mask);
-
-		int32_t match_mask = ee_movemask_epi8(match);
-
-		if (match_mask)
+		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
 		{
-			int32_t first = ee_str_first_bit_u32(match_mask);
-
-			if (i + first < high)
-			{
-				return i + first;
-			}
-
-			return EE_STR_INVALID;
+			return i;
 		}
 	}
 
 	return EE_STR_INVALID;
-}
-
-EE_INLINE size_t ee_str_finds(const Str* str, const char* target)
-{
-	return ee_str_finds_b(str, target, 0, str->top);
-}
-
-EE_INLINE size_t ee_str_findc(const Str* str, char target)
-{
-	return ee_str_findc_b(str, target, 0, str->top);
 }
 
 EE_INLINE size_t ee_str_find(const Str* str, const Str* target)
@@ -512,33 +466,102 @@ EE_INLINE size_t ee_str_find(const Str* str, const Str* target)
 	return ee_str_find_b(str, target, 0, str->top);
 }
 
-EE_INLINE size_t ee_str_countc_b(const Str* str, char target, size_t low, size_t high)
+EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, size_t high)
 {
-	EE_ASSERT(str != NULL, "Trying to search in NULL string");
-	EE_ASSERT(high <= str->top, "Invalid upper bound");
-	EE_ASSERT(low <= str->top, "Invalid lower bound");
-	EE_ASSERT(low < high, "Trying to set lower bound bigger than upper bound (%zu, %zu)", low, high);
+	EE_ASSERT(str != NULL, "Trying to count in NULL string");
+	EE_ASSERT(target != NULL, "Trying to count NULL target");
+	EE_ASSERT(low <= str->top && high <= str->top && low < high, "Invalid bounds (%zu, %zu) for string with length (%zu)", low, high, str->top);
 
-	ee_simd_i mask = ee_set1_epi8(target);
+	size_t target_len = target->top;
+
+	EE_ASSERT(target_len <= high - low, "Target too long for bounds");
+
+	ee_simd_i mask = ee_set1_epi8(target->buffer[0]);
 
 	size_t out = 0;
 	size_t i = low;
+	size_t upper = (high & ~(EE_SIMD_BYTES - 1));
+	size_t start_block = (low + EE_SIMD_BYTES - 1) & ~(EE_SIMD_BYTES - 1);
 
-	// NOTE: last bytes can be done after loop and if condition would be unnecessary
-	for (; i < high; i += EE_SIMD_BYTES)
+	for (; i < start_block && i + target_len <= high; ++i)
+	{
+		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
+		{
+			out++;
+		}
+	}
+
+	for (; i < upper; i += EE_SIMD_BYTES)
 	{
 		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
-
+		
 		int32_t match_mask = ee_movemask_epi8(match);
 
-		if (match_mask)
+		while (match_mask)
 		{
-			out += ee_str_popcnt_u32(match_mask);
+			int32_t first = ee_str_first_bit_u32(match_mask);
+
+			if ((i + first + target_len <= high) && memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
+			{
+				out++;
+			}
+
+			match_mask &= match_mask - 1;
+		}
+	}
+
+	for (; i < high && i + target_len <= high; ++i)
+	{
+		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
+		{
+			out++;
 		}
 	}
 
 	return out;
+}
+
+EE_INLINE size_t ee_str_count(const Str* str, const Str* target)
+{
+	return ee_str_count_b(str, target, 0, str->top);
+}
+
+EE_INLINE size_t ee_str_replace(Str* str, const Str* old_str, const Str* new_str, size_t max_count)
+{
+	EE_ASSERT(str != NULL, "Trying to replace in NULL string");
+	EE_ASSERT(old_str != NULL, "Trying to replace NULL old substring");
+	EE_ASSERT(new_str != NULL, "Trying to replace with NULL new substring");
+
+	size_t old_len = old_str->top;
+	size_t new_len = new_str->top;
+	size_t str_len = str->top;
+
+	ee_simd_i mask = ee_set1_epi8(old_str->buffer[0]);
+
+	size_t count = 0;
+	size_t i = 0;
+	size_t upper = str_len & ~(EE_SIMD_BYTES - 1);
+
+	// TODO
+
+	return count;
+}
+
+EE_INLINE void ee_str_set(Str* str, size_t i, uint8_t symbol)
+{
+	EE_ASSERT(str != NULL, "Trying to set into NULL string");
+	EE_ASSERT(i < str->top, "Invalid set index (%zu) for string with length (%zu)", i, str->top);
+
+	str->buffer[i] = symbol;
+}
+
+EE_INLINE uint8_t ee_str_get(Str* str, size_t i)
+{
+	EE_ASSERT(str != NULL, "Trying to get from NULL string");
+	EE_ASSERT(i < str->top, "Invalid get index (%zu) for string with length (%zu)", i, str->top);
+
+	return str->buffer[i];
 }
 
 EE_INLINE int32_t ee_str_lev_m64(const Str* a, const Str* b)
@@ -549,10 +572,10 @@ EE_INLINE int32_t ee_str_lev_m64(const Str* a, const Str* b)
 		"Max string length for this function is (%d), a: (%zu), b: (%zu)", EE_STR_LEV_BLOCK_SIZE, a->top, b->top);
 
 	if (a->top == 0)
-		return b->top;
+		return (int32_t)b->top;
 
 	if (b->top == 0)
-		return a->top;
+		return (int32_t)a->top;
 
 	const Str* shorter = a;
 	const Str* longer = b;
@@ -576,7 +599,7 @@ EE_INLINE int32_t ee_str_lev_m64(const Str* a, const Str* b)
 	uint64_t neg_vec = 0;
 	uint64_t last = 1ull << (longer->top - 1);
 
-	int32_t score = longer->top;
+	int32_t score = (int32_t)longer->top;
 
 	for (size_t j = 0; j < shorter->top; ++j)
 	{

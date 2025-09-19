@@ -307,7 +307,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
 				return;
 			}
 
-			match_mask = match_mask & (~(1 << first));
+			match_mask &= match_mask - 1;
 		}
 
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);
@@ -404,7 +404,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
 				return;
 			}
 
-			match_mask = match_mask & (~(1 << first));
+			match_mask &= match_mask - 1;
 		}
 
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);
@@ -459,7 +459,7 @@ EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
 				return dict->slots[group_index + first].val;
 			}
 
-			match_mask = match_mask & (~(1 << first));
+			match_mask &= match_mask - 1;
 		}
 
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);

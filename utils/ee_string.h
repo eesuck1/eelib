@@ -4,7 +4,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
-#include "immintrin.h"
 
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
@@ -47,6 +46,8 @@
 
 #if !defined(EE_NO_AVX2)
 
+#include "immintrin.h"
+
 #define EE_SIMD_BYTES       (32)
 #define EE_SIMD_BITS        (EE_SIMD_BYTES * 8)
 
@@ -58,6 +59,8 @@
 typedef __m256i ee_simd_i;
 
 #elif !defined(EE_NO_SSE2)
+
+#include "immintrin.h"
 
 #define EE_SIMD_BYTES       (16)
 #define EE_SIMD_BITS        (EE_SIMD_BYTES * 8)

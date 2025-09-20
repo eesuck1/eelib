@@ -488,6 +488,7 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
 		{
 			out++;
+			i += target_len - 1;
 		}
 	}
 
@@ -505,9 +506,14 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 			if ((i + first + target_len <= high) && memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
 			{
 				out++;
-			}
 
-			match_mask &= match_mask - 1;
+				uint64_t remove = (1ull << (first + target_len)) - 1ull;
+				match_mask &= ~(int32_t)remove;
+			}
+			else
+			{
+				match_mask &= match_mask - 1;
+			}
 		}
 	}
 
@@ -516,6 +522,7 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 		if (memcmp(&str->buffer[i], target->buffer, target_len) == 0)
 		{
 			out++;
+			i += target_len - 1;
 		}
 	}
 
@@ -527,15 +534,24 @@ EE_INLINE size_t ee_str_count(const Str* str, const Str* target)
 	return ee_str_count_b(str, target, 0, str->top);
 }
 
-EE_INLINE size_t ee_str_replace(Str* str, const Str* old_str, const Str* new_str, size_t max_count)
+EE_INLINE size_t ee_str_replace_b(Str* str, const Str* old_str, const Str* new_str, size_t max_count, size_t low, size_t high)
 {
 	EE_ASSERT(str != NULL, "Trying to replace in NULL string");
 	EE_ASSERT(old_str != NULL, "Trying to replace NULL old substring");
 	EE_ASSERT(new_str != NULL, "Trying to replace with NULL new substring");
 
-	size_t old_len = old_str->top;
-	size_t new_len = new_str->top;
-	size_t str_len = str->top;
+	int64_t old_len = old_str->top;
+	int64_t new_len = new_str->top;
+	int64_t str_len = str->top;
+
+	int64_t replace_count = ee_str_count_b(str, old_str, low, high);
+	int64_t new_str_len = str_len + replace_count * (new_len - old_len);
+
+	EE_ASSERT(new_str_len > 0, "Invalid resulting length of the buffer");
+
+	uint8_t* new_buffer = str->allocator.alloc_fn(&str->allocator, new_str_len);
+
+	EE_ASSERT(new_buffer != NULL, "Unable to allocate (%zd) bytes for temporary buffer", new_str_len);
 
 	ee_simd_i mask = ee_set1_epi8(old_str->buffer[0]);
 

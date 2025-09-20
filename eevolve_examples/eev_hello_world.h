@@ -5,8 +5,8 @@
 
 void run_hello_world()
 {
-	Str f = ee_str_from_cstr("ababab", NULL);
-	Str t = ee_str_from_cstr("abab", NULL);
+	Str test_0 = ee_str_from_cstr("asd", NULL);
+	Str test_1 = ee_str_from_cstr("afd", NULL);
 
-	printf("Count %zu\n", ee_str_count(&f, &t));
+	ee_str_lev_m64();
 }

@@ -874,4 +874,41 @@ EE_INLINE s32 ee_str_lev(const Str* a, const Str* b)
 	return ee_str_lev_mx(longer, shorter);
 }
 
+EE_INLINE void ee_str_print(const Str* str)
+{
+	fwrite(str->buffer, 1, str->cap, stdout);
+}
+
+EE_INLINE Str ee_str_copy(const Str* str, Allocator* allocator)
+{
+	EE_ASSERT(str != NULL, "Trying to copy into NULL Array");
+	EE_ASSERT(str->buffer != NULL, "Trying to copy into NULL Array.buffer");
+
+	Str out = *str;
+
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer copy", out.cap);
+
+	memcpy(out.buffer, str->buffer, out.cap);
+
+	return out;
+}
+
 #endif // EE_STRING_H

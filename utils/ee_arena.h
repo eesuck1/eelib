@@ -56,14 +56,10 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 
 #endif // EE_TYPES
 
-#if __STDC_VERSION__ >= 201112L
-#include "stdalign.h"
-#define EE_MAX_ALIGN    (alignof(max_align_t))
-#else
-#define EE_MAX_ALIGN    (16)
-#endif
-
-#define EE_ALIGN_MASK           (~(EE_MAX_ALIGN - 1))
+// TODO(eesuck): better max_align
+#define EE_MAX_ALIGN     (16)
+#define EE_ALIGN_MASK    (~(EE_MAX_ALIGN - 1))
+#define EE_NO_REWIND     (0)
 
 #ifndef EE_ALLOCATOR
 #define EE_ALLOCATOR
@@ -140,7 +136,11 @@ EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* alloca
 	u8* buffer = (u8*)out.allocator.alloc_fn(&out.allocator, total_size);
 
 	out.buffer = buffer;
-	out.marks = (size_t*)&out.buffer[aligned_size];
+	
+	if (rewind_depth != EE_NO_REWIND)
+	{
+		out.marks = (size_t*)&out.buffer[aligned_size];
+	}
 
 	out.size = aligned_size;
 	out.offset = 0;
@@ -206,5 +206,46 @@ EE_INLINE void ee_arena_free(Arena* arena)
 	memset(arena, 0, sizeof(Arena));
 }
 
+EE_INLINE void* eev_arena_alloc_fn(Allocator* allocator, size_t size)
+{
+	EE_ASSERT(allocator != NULL, "Trying to alloc with NULL allocator");
+	EE_ASSERT(allocator->context != NULL, "Trying to alloc with NULL allocator context");
+
+	Arena* arena = (Arena*)allocator->context;
+
+	return  ee_arena_alloc(arena, size);
+}
+
+EE_INLINE void* eev_arena_realloc_fn(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
+{
+	// TODO(eesuck): possibly could be done if block is on top of the arena
+
+	(void)allocator;
+	(void)buffer;
+	(void)old_size;
+	(void)new_size;
+
+	return NULL;
+}
+
+EE_INLINE void eev_arena_free_fn(Allocator* allocator, void* buffer)
+{
+	(void)allocator;
+	(void)buffer;
+
+	return;
+}
+
+EE_INLINE Allocator ee_arena_allocator(Arena* arena)
+{
+	Allocator out = { 0 };
+
+	out.alloc_fn = eev_arena_alloc_fn;
+	out.realloc_fn = eev_arena_realloc_fn;
+	out.free_fn = eev_arena_free_fn;
+	out.context = arena;
+
+	return out;
+}
 
 #endif // EE_ARENA_H

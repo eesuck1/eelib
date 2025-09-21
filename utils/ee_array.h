@@ -123,11 +123,11 @@ typedef int (*BinCmp)(const void* a, const void* b);
 
 typedef enum ArraySortType
 {
-	EE_DEFAULT = 0,
-	EE_INSERT  = 1,
-	EE_QUICK   = 2,
-	EE_HEAP    = 3,
-	EE_INTRO   = 4,
+	EE_SORT_DEFAULT = 0,
+	EE_SORT_INSERT  = 1,
+	EE_SORT_QUICK   = 2,
+	EE_SORT_HEAP    = 3,
+	EE_SORT_INTRO   = 4,
 } ArraySortType;
 
 EE_INLINE int ee_is_pow2(u64 x)
@@ -632,20 +632,20 @@ EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)
 {
 	switch (type)
 	{
-	case EE_INSERT:
+	case EE_SORT_INSERT:
 		{
 		ee_array_insertsort(array, cmp, 0, ee_array_size(array) - array->elem_size);
 		} break;
-	case EE_QUICK:
+	case EE_SORT_QUICK:
 		{
 		ee_array_quicksort(array, cmp, 0, ee_array_size(array) - array->elem_size);
 		} break;
-	case EE_HEAP:
+	case EE_SORT_HEAP:
 		{
 		ee_array_heapsort(array, cmp, 0, ee_array_size(array) - array->elem_size);
 		} break;
-	case EE_DEFAULT:
-	case EE_INTRO:
+	case EE_SORT_DEFAULT:
+	case EE_SORT_INTRO:
 		{
 		u32 len = (u32)ee_array_len(array); // TODO(eesuck): log2 for numbers greater than max u32
 		s32 max_depth = ee_array_log2_u32(len) * 2;
@@ -681,14 +681,28 @@ EE_INLINE void ee_array_fill(Array* array, u8* val, size_t a, size_t b)
 	}
 }
 
-EE_INLINE Array ee_array_copy(Array* array)
+EE_INLINE Array ee_array_copy(Array* array, Allocator* allocator)
 {
-	// TODO(eesuck): probably perform realloc
-
 	EE_ASSERT(array != NULL, "Trying to copy into NULL Array");
 	EE_ASSERT(array->buffer != NULL, "Trying to copy into NULL Array.buffer");
 
 	Array out = *array;
+
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
 
 	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
 

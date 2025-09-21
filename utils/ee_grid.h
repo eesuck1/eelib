@@ -12,7 +12,7 @@
 #define EE_INF                    (INFINITY)
 #endif // EE_INF
 
-#define EE_GRID_DT(x)             ((uint8_t*)(&(x)))
+#define EE_GRID_DT(x)             ((u8*)(&(x)))
 #define EE_SQRT_2                 (1.41421356237f)
 #define EE_OCTILE_C               (EE_SQRT_2 - 2.0f)
 #define EE_SEARCH_EPS             (1e-6f)
@@ -20,10 +20,10 @@
 
 typedef struct Grid
 {
-	uint8_t* buffer;
+	u8* buffer;
 
-	int32_t w;
-	int32_t h;
+	s32 w;
+	s32 h;
 	size_t elem_size;
 
 	Allocator allocator;
@@ -33,32 +33,32 @@ typedef struct Frame
 {
 	Grid* src;
 
-	int32_t x;
-	int32_t y;
-	int32_t w;
-	int32_t h;
+	s32 x;
+	s32 y;
+	s32 w;
+	s32 h;
 } Frame;
 
 typedef struct GridPos
 {
-	int32_t x;
-	int32_t y;
+	s32 x;
+	s32 y;
 } GridPos;
 
 typedef struct GridNode
 {
 	GridPos pos;
-	float cost;
+	f32 cost;
 } GridNode;
 
-typedef float (*GridCost)(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1);
+typedef f32 (*GridCost)(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1);
 
-static const int32_t EE_SEARCH_NEIGHS[EE_SEARCH_NEIGHS_COUNT][2] = {
+static const s32 EE_SEARCH_NEIGHS[EE_SEARCH_NEIGHS_COUNT][2] = {
 	{ 1, 0 }, { -1, 0 }, {  0, 1 }, {  0, -1 },
 	{ 1, 1 }, { 1, -1 }, { -1, 1 }, { -1, -1 }
 };
 
-EE_INLINE int32_t ee_clip_s32(int32_t x, int32_t a, int32_t b)
+EE_INLINE s32 ee_clip_s32(s32 x, s32 a, s32 b)
 {
 	EE_ASSERT(a < b, "Invalid bounds (%d, %d)", a, b);
 
@@ -70,7 +70,7 @@ EE_INLINE int32_t ee_clip_s32(int32_t x, int32_t a, int32_t b)
 	return x;
 }
 
-EE_INLINE Grid ee_grid_new(int32_t width, int32_t height, size_t elem_size, Allocator* allocator)
+EE_INLINE Grid ee_grid_new(s32 width, s32 height, size_t elem_size, Allocator* allocator)
 {
 	Grid out = { 0 };
 
@@ -92,7 +92,7 @@ EE_INLINE Grid ee_grid_new(int32_t width, int32_t height, size_t elem_size, Allo
 
 	size_t size = (size_t)width * height * elem_size;
 
-	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, size);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, size);
 	out.w = width;
 	out.h = height;
 	out.elem_size = elem_size;
@@ -112,7 +112,7 @@ EE_INLINE void ee_grid_free(Grid* grid)
 	memset(grid, 0, sizeof(Grid));
 }
 
-EE_INLINE void ee_grid_set(Grid* grid, int32_t x, int32_t y, uint8_t* val)
+EE_INLINE void ee_grid_set(Grid* grid, s32 x, s32 y, u8* val)
 {
 	EE_ASSERT(grid != NULL, "Trying to set into NULL grid");
 	EE_ASSERT(val != NULL, "Trying to set NULL value");
@@ -121,7 +121,7 @@ EE_INLINE void ee_grid_set(Grid* grid, int32_t x, int32_t y, uint8_t* val)
 	memcpy(&grid->buffer[((size_t)y * grid->w + x) * grid->elem_size], val, grid->elem_size);
 }
 
-EE_INLINE uint8_t* ee_grid_at(Grid* grid, int32_t x, int32_t y)
+EE_INLINE u8* ee_grid_at(Grid* grid, s32 x, s32 y)
 {
 	EE_ASSERT(grid != NULL, "Trying to get from NULL grid");
 	EE_ASSERT(x < grid->w && y < grid->h, "Invalid x, y value (%d, %d) for grid with size (%d, %d)", x, y, grid->w, grid->h);
@@ -129,14 +129,14 @@ EE_INLINE uint8_t* ee_grid_at(Grid* grid, int32_t x, int32_t y)
 	return &grid->buffer[((size_t)y * grid->w + x) * grid->elem_size];
 }
 
-EE_INLINE Frame ee_grid_frame(Grid* grid, int32_t left_x, int32_t top_y, int32_t width, int32_t height)
+EE_INLINE Frame ee_grid_frame(Grid* grid, s32 left_x, s32 top_y, s32 width, s32 height)
 {
 	Frame out = { 0 };
 	
-	int32_t min_x = ee_clip_s32(left_x, 0, grid->w);
-	int32_t min_y = ee_clip_s32(top_y, 0, grid->h);
-	int32_t max_x = ee_clip_s32(left_x + width, 0, grid->w);
-	int32_t max_y = ee_clip_s32(top_y + height, 0, grid->h);
+	s32 min_x = ee_clip_s32(left_x, 0, grid->w);
+	s32 min_y = ee_clip_s32(top_y, 0, grid->h);
+	s32 max_x = ee_clip_s32(left_x + width, 0, grid->w);
+	s32 max_y = ee_clip_s32(top_y + height, 0, grid->h);
 
 	EE_ASSERT(min_x != max_x || min_y != max_y, "Trying to create an empty frame (%d, %d, %d, %d)", left_x, top_y, width, height);
 
@@ -149,16 +149,16 @@ EE_INLINE Frame ee_grid_frame(Grid* grid, int32_t left_x, int32_t top_y, int32_t
 	return out;
 }
 
-EE_INLINE void ee_frame_set(Frame frame, int32_t x, int32_t y, uint8_t* val)
+EE_INLINE void ee_frame_set(Frame frame, s32 x, s32 y, u8* val)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to set into empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
 	EE_ASSERT(x >= 0 && y >= 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
 
-	uint8_t* dest = &frame.src->buffer[(((size_t)y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
+	u8* dest = &frame.src->buffer[(((size_t)y + frame.y) * frame.src->w + x + frame.x) * frame.src->elem_size];
 	memcpy(dest, val, frame.src->elem_size);
 }
 
-EE_INLINE uint8_t* ee_frame_at(Frame frame, int32_t x, int32_t y)
+EE_INLINE u8* ee_frame_at(Frame frame, s32 x, s32 y)
 {
 	EE_ASSERT(frame.w != 0 && frame.h != 0, "Trying to get from empty frame (%d, %d, %d, %d)", frame.x, frame.y, frame.w, frame.h);
 	EE_ASSERT(x >= 0 && y >= 0 && x < frame.w && y < frame.h, "Invalid frame coordinates (%d, %d) for frame size (%d, %d)", x, y, frame.w, frame.h);
@@ -184,20 +184,20 @@ EE_INLINE int ee_grid_cost_cmp(const void* a_ptr, const void* b_ptr)
 	return 0;
 }
 
-EE_INLINE float ee_octile(int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1)
+EE_INLINE f32 ee_octile(s32 x_0, s32 y_0, s32 x_1, s32 y_1)
 {
-	int32_t dx = abs(x_1 - x_0);
-	int32_t dy = abs(y_1 - y_0);
+	s32 dx = abs(x_1 - x_0);
+	s32 dy = abs(y_1 - y_0);
 
-	float min_d = dx < dy ? (float)dx : (float)dy;
-	float sum = (float)(dx + dy);
+	f32 min_d = dx < dy ? (f32)dx : (f32)dy;
+	f32 sum = (f32)(dx + dy);
 
 	return sum + EE_OCTILE_C * min_d;
 }
 
-EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1, int32_t y_1, GridCost step_cost_fn)
+EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, GridCost step_cost_fn)
 {
-	float dist = ee_octile(x_0, y_0, x_1, y_1);
+	f32 dist = ee_octile(x_0, y_0, x_1, y_1);
 	size_t start_size = (size_t)(dist * dist * 2.0f + 16.0f);
 
 	Array out_path = ee_array_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
@@ -225,19 +225,19 @@ EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1
 
 			while (ee_dict_contains(&parent, EE_DICT_DT(pos)))
 			{
-				double* score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(pos));
-				double out_score = score_ptr == NULL ? EE_INF : *score_ptr;
+				f64* score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(pos));
+				f64 out_score = score_ptr == NULL ? EE_INF : *score_ptr;
 
-				GridNode out_node = { pos, (float)out_score };
+				GridNode out_node = { pos, (f32)out_score };
 
 				ee_array_push(&out_path, EE_ARRAY_DT(out_node));
 				pos = *(GridPos*)ee_dict_at(&parent, EE_DICT_DT(pos));
 			}
 
-			double* score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(start_pos));
-			double out_score = score_ptr == NULL ? EE_INF : *score_ptr;
+			f64* score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(start_pos));
+			f64 out_score = score_ptr == NULL ? EE_INF : *score_ptr;
 
-			GridNode out_node = { start_pos, (float)out_score };
+			GridNode out_node = { start_pos, (f32)out_score };
 
 			ee_array_push(&out_path, EE_ARRAY_DT(out_node));
 			ee_array_reverse(&out_path);
@@ -250,16 +250,16 @@ EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1
 			continue;
 		}
 
-		double* current_score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(current.pos));
-		float current_score = EE_INF;
+		f64* current_score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(current.pos));
+		f32 current_score = EE_INF;
 
 		if (current_score_ptr != NULL)
 		{
-			current_score = (float)(*current_score_ptr);
+			current_score = (f32)(*current_score_ptr);
 		}
 
-		float expected_cost = current_score + ee_octile(current.pos.x, current.pos.y, x_1, y_1);
-		float cost_diff = expected_cost - current.cost;
+		f32 expected_cost = current_score + ee_octile(current.pos.x, current.pos.y, x_1, y_1);
+		f32 cost_diff = expected_cost - current.cost;
 		
 		if (cost_diff > EE_SEARCH_EPS || cost_diff < -EE_SEARCH_EPS)
 		{
@@ -270,8 +270,8 @@ EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1
 
 		for (int i = 0; i < EE_SEARCH_NEIGHS_COUNT; ++i)
 		{
-			int32_t neigh_x = current.pos.x + EE_SEARCH_NEIGHS[i][0];
-			int32_t neigh_y = current.pos.y + EE_SEARCH_NEIGHS[i][1];
+			s32 neigh_x = current.pos.x + EE_SEARCH_NEIGHS[i][0];
+			s32 neigh_y = current.pos.y + EE_SEARCH_NEIGHS[i][1];
 
 			if (neigh_x < 0 || neigh_y < 0 || neigh_x >= grid->w || neigh_y >= grid->h)
 			{
@@ -285,21 +285,21 @@ EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1
 				continue;
 			}
 
-			float step_cost = step_cost_fn(grid, current.pos.x, current.pos.y, neigh_x, neigh_y);
-			float tent_cost = current_score + step_cost;
+			f32 step_cost = step_cost_fn(grid, current.pos.x, current.pos.y, neigh_x, neigh_y);
+			f32 tent_cost = current_score + step_cost;
 
-			double* neigh_score_ptr = (double*)ee_dict_at(&score, EE_DICT_DT(neigh_pos));
-			float neigh_score = EE_INF;
+			f64* neigh_score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(neigh_pos));
+			f32 neigh_score = EE_INF;
 
 			if (neigh_score_ptr != NULL)
 			{
-				neigh_score = (float)(*neigh_score_ptr);
+				neigh_score = (f32)(*neigh_score_ptr);
 			}
 
 			if (tent_cost < neigh_score)
 			{
-				double neigh_score_f64 = tent_cost;
-				float f_score = tent_cost + ee_octile(neigh_x, neigh_y, x_1, y_1);
+				f64 neigh_score_f64 = tent_cost;
+				f32 f_score = tent_cost + ee_octile(neigh_x, neigh_y, x_1, y_1);
 				
 				GridNode next_node = { neigh_pos , f_score };
 
@@ -318,7 +318,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, int32_t x_0, int32_t y_0, int32_t x_1
 	return out_path;
 }
 
-EE_INLINE size_t ee_grid_subpath(Array* path, float max_cost)
+EE_INLINE size_t ee_grid_subpath(Array* path, f32 max_cost)
 {
 	EE_ASSERT(path != NULL, "Trying to find subpath in NULL path");
 	EE_ASSERT(path->buffer != NULL, "Trying to find subpath in path with NULL buffer (could be that path is not found)");
@@ -352,14 +352,14 @@ EE_INLINE Grid ee_grid_from_frame(Frame frame)
 
 	Grid out = { 0 };
 
-	out.buffer = (uint8_t*)malloc((size_t)frame.h * frame.w * frame.src->elem_size);
+	out.buffer = (u8*)malloc((size_t)frame.h * frame.w * frame.src->elem_size);
 	out.elem_size = frame.src->elem_size;
 	out.w = frame.w;
 	out.h = frame.h;
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Grid.buffer", frame.h * frame.src->elem_size * frame.w);
 
-	for (int32_t y = 0; y < frame.h; ++y)
+	for (s32 y = 0; y < frame.h; ++y)
 	{
 		memcpy(&out.buffer[y * frame.w * frame.src->elem_size], ee_frame_at(frame, 0, y), frame.w * frame.src->elem_size);
 	}
@@ -367,23 +367,23 @@ EE_INLINE Grid ee_grid_from_frame(Frame frame)
 	return out;
 }
 
-EE_INLINE void ee_frame_fill(Frame frame, uint8_t* val)
+EE_INLINE void ee_frame_fill(Frame frame, u8* val)
 {
 	EE_ASSERT(val != NULL, "Trying to fill frame with NULL value");
 	EE_ASSERT(frame.src != NULL, "Trying to fill NULL src frame");
 
-	for (int32_t x = 0; x < frame.w; ++x)
+	for (s32 x = 0; x < frame.w; ++x)
 	{
 		ee_frame_set(frame, x, 0, val);
 	}
 
-	for (int32_t y = 1; y < frame.h; ++y)
+	for (s32 y = 1; y < frame.h; ++y)
 	{
 		memcpy(ee_frame_at(frame, 0, y), ee_frame_at(frame, 0, 0), frame.w * frame.src->elem_size);
 	}
 }
 
-EE_INLINE void ee_grid_set_zero(Grid* grid, int32_t x, int32_t y)
+EE_INLINE void ee_grid_set_zero(Grid* grid, s32 x, s32 y)
 {
 	memset(ee_grid_at(grid, x, y), 0, grid->elem_size);
 }

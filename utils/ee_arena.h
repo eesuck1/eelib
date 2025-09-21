@@ -31,6 +31,31 @@
 #define EE_INLINE    static inline
 #endif // EE_INLINE
 
+
+#ifndef EE_TYPES
+#define EE_TYPES
+
+typedef uint8_t     u8;
+typedef uint16_t    u16;
+typedef uint32_t    u32;
+typedef uint64_t    u64;
+
+typedef int8_t      s8;
+typedef int16_t     s16;
+typedef int32_t     s32;
+typedef int64_t     s64;
+
+typedef float       f32;
+typedef double      f64;
+typedef long double f80;
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
+_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
+#endif
+
+#endif // EE_TYPES
+
 #if __STDC_VERSION__ >= 201112L
 #include "stdalign.h"
 #define EE_MAX_ALIGN    (alignof(max_align_t))
@@ -78,7 +103,7 @@ EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
 typedef struct Arena
 {
 	size_t* marks;
-	uint8_t* buffer;
+	u8* buffer;
 
 	size_t size;
 	size_t offset;
@@ -112,7 +137,7 @@ EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* alloca
 	size_t aligned_size = (size + EE_MAX_ALIGN - 1) & EE_ALIGN_MASK;
 	size_t total_size = aligned_size + marks_size;
 
-	uint8_t* buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, total_size);
+	u8* buffer = (u8*)out.allocator.alloc_fn(&out.allocator, total_size);
 
 	out.buffer = buffer;
 	out.marks = (size_t*)&out.buffer[aligned_size];

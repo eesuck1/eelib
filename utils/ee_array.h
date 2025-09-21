@@ -40,7 +40,32 @@
 	#define EE_FIND_FIRST_BIT_INVALID    (32)
 #endif // EE_FIND_FIRST_BIT_INVALID
 
-#define EE_ARRAY_DT(x)                   ((uint8_t*)(&(x)))
+
+#ifndef EE_TYPES
+#define EE_TYPES
+
+typedef uint8_t     u8;
+typedef uint16_t    u16;
+typedef uint32_t    u32;
+typedef uint64_t    u64;
+
+typedef int8_t      s8;
+typedef int16_t     s16;
+typedef int32_t     s32;
+typedef int64_t     s64;
+
+typedef float       f32;
+typedef double      f64;
+typedef long double f80;
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
+_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
+#endif
+
+#endif // EE_TYPES
+
+#define EE_ARRAY_DT(x)                   ((u8*)(&(x)))
 #define EE_ARRAY_INVALID                 (0xffffffffffffffffull)
 #define EE_ARRAY_SORT_TH                 (16)
 #define EE_ARRAY_AT(v_ptr, i, dtype)     ((dtype*)ee_array_at(v_ptr, i))
@@ -87,7 +112,7 @@ typedef struct Array
 	size_t top;
 	size_t cap;
 	size_t elem_size;
-	uint8_t* buffer;
+	u8* buffer;
 	Allocator allocator;
 } Array;
 
@@ -105,7 +130,7 @@ typedef enum ArraySortType
 	EE_INTRO   = 4,
 } ArraySortType;
 
-EE_INLINE int ee_is_pow2(uint64_t x)
+EE_INLINE int ee_is_pow2(u64 x)
 {
 	return (x != 0) && ((x & (x - 1)) == 0);
 }
@@ -114,7 +139,7 @@ EE_INLINE int ee_is_pow2(uint64_t x)
 	#include "intrin.h"
 #endif
 
-EE_INLINE int32_t ee_array_first_bit_u32(uint32_t x)
+EE_INLINE s32 ee_array_first_bit_u32(u32 x)
 {
 #if defined(__BMI__)
 	return _tzcnt_u32(x);
@@ -125,14 +150,14 @@ EE_INLINE int32_t ee_array_first_bit_u32(uint32_t x)
 
 	if (_BitScanForward(&i, x))
 	{
-		return (int32_t)i;
+		return (s32)i;
 	}
 	else
 	{
 		return EE_FIND_FIRST_BIT_INVALID;
 	}
 #else
-	for (int32_t i = 0; i < 32; ++i)
+	for (s32 i = 0; i < 32; ++i)
 	{
 		if (x & (1u << i))
 		{
@@ -144,7 +169,7 @@ EE_INLINE int32_t ee_array_first_bit_u32(uint32_t x)
 #endif
 }
 
-EE_INLINE int ee_array_log2_u32(uint32_t x)
+EE_INLINE int ee_array_log2_u32(u32 x)
 {
 #if defined(__GNUC__) || defined(__clang__)
 	return x ? 31 - __builtin_clz(x) : -1;
@@ -198,7 +223,7 @@ EE_INLINE Array ee_array_new(size_t size, size_t elem_size, Allocator* allocator
 	out.top = 0;
 	out.cap = elem_size * size;
 	out.elem_size = elem_size;
-	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Array.buffer", out.cap);
 	
@@ -254,7 +279,7 @@ EE_INLINE void ee_array_reserve(Array* array, size_t size)
 	EE_ASSERT(size * array->elem_size > array->cap, "Reserve expects Array to grow, given size (%zu) current capacity (%zu)", size, array->cap / array->elem_size);
 
 	size_t new_cap = size * array->elem_size;
-	uint8_t* new_buffer = (uint8_t*)array->allocator.realloc_fn(&array->allocator, array->buffer, array->cap, new_cap);
+	u8* new_buffer = (u8*)array->allocator.realloc_fn(&array->allocator, array->buffer, array->cap, new_cap);
 	
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Array.buffer", new_cap);
 	
@@ -268,7 +293,7 @@ EE_INLINE void ee_array_grow(Array* array)
 	EE_ASSERT(array->buffer != NULL, "Trying to reallocate NULL Array.buffer");
 
 	size_t new_cap = array->cap + (array->cap >> 1);
-	uint8_t* new_buffer = (uint8_t*)array->allocator.realloc_fn(&array->allocator, array->buffer, array->cap, new_cap);
+	u8* new_buffer = (u8*)array->allocator.realloc_fn(&array->allocator, array->buffer, array->cap, new_cap);
 	
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Array.buffer", new_cap);
 	
@@ -276,7 +301,7 @@ EE_INLINE void ee_array_grow(Array* array)
 	array->buffer = new_buffer;
 }
 
-EE_INLINE void ee_array_push(Array* array, uint8_t* val)
+EE_INLINE void ee_array_push(Array* array, u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to push into NULL Array");
 	EE_ASSERT(val != NULL, "Trying to push NULL value");
@@ -317,7 +342,7 @@ EE_INLINE void ee_array_push_nothing(Array* array)
 	array->top += array->elem_size;
 }
 
-EE_INLINE uint8_t* ee_array_top(Array* array)
+EE_INLINE u8* ee_array_top(Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to get NULL Array top");
 	EE_ASSERT(array->top >= array->elem_size, "Trying to get top element of empty Array");
@@ -325,7 +350,7 @@ EE_INLINE uint8_t* ee_array_top(Array* array)
 	return &array->buffer[array->top - array->elem_size];
 }
 
-EE_INLINE uint8_t* ee_array_at(Array* array, size_t i)
+EE_INLINE u8* ee_array_at(Array* array, size_t i)
 {
 	EE_ASSERT(array != NULL, "Trying to get NULL Array element");
 	EE_ASSERT(i * array->elem_size < array->top, "Index (%zu) is out of bounds for arraytor with top (%zu)", i, array->top / array->elem_size);
@@ -333,7 +358,7 @@ EE_INLINE uint8_t* ee_array_at(Array* array, size_t i)
 	return &array->buffer[i * array->elem_size];
 }
 
-EE_INLINE void ee_array_pop(Array* array, uint8_t* out_val)
+EE_INLINE void ee_array_pop(Array* array, u8* out_val)
 {
 	EE_ASSERT(array != NULL, "Trying to pop NULL Array");
 	EE_ASSERT(array->top >= array->elem_size, "Trying to pop empty Array");
@@ -346,7 +371,7 @@ EE_INLINE void ee_array_pop(Array* array, uint8_t* out_val)
 	}
 }
 
-EE_INLINE void ee_array_set(Array* array, size_t i, uint8_t* val)
+EE_INLINE void ee_array_set(Array* array, size_t i, u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to set into NULL Array");
 	EE_ASSERT(array->top >= i * array->elem_size, "Invalid setting index (%zu) Array.top at position (%zu)", i, array->top / array->elem_size);
@@ -354,7 +379,7 @@ EE_INLINE void ee_array_set(Array* array, size_t i, uint8_t* val)
 	memcpy(&array->buffer[i * array->elem_size], val, array->elem_size);
 }
 
-EE_INLINE size_t ee_array_find(Array* array, uint8_t* target)
+EE_INLINE size_t ee_array_find(Array* array, u8* target)
 {
 	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
@@ -370,7 +395,7 @@ EE_INLINE size_t ee_array_find(Array* array, uint8_t* target)
 	return EE_ARRAY_INVALID;
 }
 
-EE_INLINE void ee_array_insert(Array* array, size_t i, uint8_t* val)
+EE_INLINE void ee_array_insert(Array* array, size_t i, u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to insert into NULL Array");
 	EE_ASSERT(i <= array->top / array->elem_size, "Index out of bounds");
@@ -405,14 +430,14 @@ EE_INLINE void ee_array_swap(Array* array, size_t i, size_t j)
 	EE_ASSERT(array != NULL, "Trying to swap an elements in NULL Array");
 	EE_ASSERT(ee_array_size(array) >= 2, "Trying to swap Array with number of elements (%zu), minimum is 2", ee_array_size(array));
 
-	uint8_t* temp = (uint8_t*)alloca(array->elem_size);
+	u8* temp = (u8*)alloca(array->elem_size);
 
 	memcpy(temp, ee_array_at(array, i), array->elem_size);
 	memcpy(ee_array_at(array, i), ee_array_at(array, j), array->elem_size);
 	memcpy(ee_array_at(array, j), temp, array->elem_size);
 }
 
-EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -422,14 +447,14 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, int64_t low, int64_
 		return;
 	}
 
-	uint8_t* temp = (uint8_t*)alloca(array->elem_size);
+	u8* temp = (u8*)alloca(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
-	for (int64_t i = low; i <= high; i += array->elem_size)
+	for (s64 i = low; i <= high; i += array->elem_size)
 	{
 		memcpy(temp, &array->buffer[i], array->elem_size);
 
-		int64_t j = i;
+		s64 j = i;
 
 		while (j > low && cmp(&array->buffer[j - array->elem_size], temp) > 0)
 		{
@@ -441,7 +466,7 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, int64_t low, int64_
 	}
 }
 
-EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -452,8 +477,8 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, int64_t low, int64_t
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	uint8_t* temp = (uint8_t*)alloca(array->elem_size);
-	uint8_t* pivot = (uint8_t*)alloca(array->elem_size);
+	u8* temp = (u8*)alloca(array->elem_size);
+	u8* pivot = (u8*)alloca(array->elem_size);
 	
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 	EE_ASSERT(pivot != NULL, "Unable to allocate (%zu) for pivot", array->elem_size);
@@ -464,8 +489,8 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, int64_t low, int64_t
 	
 	memcpy(pivot, &array->buffer[mid_index * array->elem_size], array->elem_size);
 
-	int64_t i = low - array->elem_size;
-	int64_t j = high + array->elem_size;
+	s64 i = low - array->elem_size;
+	s64 j = high + array->elem_size;
 
 	while (EE_TRUE)
 	{
@@ -487,7 +512,7 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, int64_t low, int64_t
 	ee_array_quicksort(array, cmp, j + array->elem_size, high);
 }
 
-EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, int64_t low, int64_t high)
+EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -498,12 +523,12 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, int64_t low, int64_t 
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	uint8_t* temp = (uint8_t*)alloca(array->elem_size);
+	u8* temp = (u8*)alloca(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
-	int64_t count = (high - low) / array->elem_size + 1;
-	int64_t start = (count >> 1) * array->elem_size;
-	int64_t end = count * array->elem_size;
+	s64 count = (high - low) / array->elem_size + 1;
+	s64 start = (count >> 1) * array->elem_size;
+	s64 end = count * array->elem_size;
 
 	while ((size_t)end > array->elem_size)
 	{
@@ -520,11 +545,11 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, int64_t low, int64_t 
 			memcpy(&array->buffer[low + end], temp, array->elem_size);
 		}
 
-		int64_t root = start;
+		s64 root = start;
 
 		while ((2 * root + array->elem_size) < (size_t)end)
 		{
-			int64_t child = 2 * root + array->elem_size;
+			s64 child = 2 * root + array->elem_size;
 
 			if ((child + array->elem_size < (size_t)end) && cmp(&array->buffer[low + child], &array->buffer[low + child + array->elem_size]) < 0)
 			{
@@ -547,7 +572,7 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, int64_t low, int64_t 
 	}
 }
 
-EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, int64_t low, int64_t high, int32_t max_depth)
+EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s32 max_depth)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -558,7 +583,7 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, int64_t low, int64_t
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	int64_t len = (high - low) / array->elem_size + 1;
+	s64 len = (high - low) / array->elem_size + 1;
 
 	if (len <= EE_ARRAY_SORT_TH)
 	{
@@ -570,8 +595,8 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, int64_t low, int64_t
 	}
 	else
 	{
-		uint8_t* temp = (uint8_t*)alloca(array->elem_size);
-		uint8_t* pivot = (uint8_t*)alloca(array->elem_size);
+		u8* temp = (u8*)alloca(array->elem_size);
+		u8* pivot = (u8*)alloca(array->elem_size);
 
 		size_t low_index = low / array->elem_size;
 		size_t high_index = high / array->elem_size;
@@ -579,8 +604,8 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, int64_t low, int64_t
 
 		memcpy(pivot, &array->buffer[mid_index * array->elem_size], array->elem_size);
 
-		int64_t i = low - array->elem_size;
-		int64_t j = high + array->elem_size;
+		s64 i = low - array->elem_size;
+		s64 j = high + array->elem_size;
 
 		while (EE_TRUE)
 		{
@@ -622,8 +647,8 @@ EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)
 	case EE_DEFAULT:
 	case EE_INTRO:
 		{
-		uint32_t len = (uint32_t)ee_array_len(array); // TODO(eesuck): log2 for numbers greater than max u32
-		int32_t max_depth = ee_array_log2_u32(len) * 2;
+		u32 len = (u32)ee_array_len(array); // TODO(eesuck): log2 for numbers greater than max u32
+		s32 max_depth = ee_array_log2_u32(len) * 2;
 
 		ee_array_introsort(array, cmp, 0, (len - 1) * array->elem_size, max_depth);
 		} break;
@@ -635,7 +660,7 @@ EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)
 	}
 }
 
-EE_INLINE void ee_array_fill(Array* array, uint8_t* val, size_t a, size_t b)
+EE_INLINE void ee_array_fill(Array* array, u8* val, size_t a, size_t b)
 {
 	EE_ASSERT(array != NULL, "Trying to fill a NULL Array");
 	EE_ASSERT(val != NULL, "Trying to fill a Array with a NULL value");
@@ -665,7 +690,7 @@ EE_INLINE Array ee_array_copy(Array* array)
 
 	Array out = *array;
 
-	out.buffer = (uint8_t*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Array.buffer copy", out.cap);
 
@@ -678,7 +703,7 @@ EE_INLINE void ee_array_reverse(Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to reverse NULL Array");
 
-	uint8_t* temp = (uint8_t*)alloca(array->elem_size);
+	u8* temp = (u8*)alloca(array->elem_size);
 	size_t len = ee_array_len(array);
 
 	for (size_t i = 0; i < (len >> 1); ++i)

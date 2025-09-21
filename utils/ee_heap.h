@@ -36,11 +36,11 @@ EE_INLINE void ee_heap_free(Heap* heap)
 	memset(heap, 0, sizeof(Heap));
 }
 
-EE_INLINE void ee_heap_up(Heap* heap, int64_t i)
+EE_INLINE void ee_heap_up(Heap* heap, s64 i)
 {
 	while (i > 0)
 	{
-		int64_t parent = EE_HEAP_PARENT(i);
+		s64 parent = EE_HEAP_PARENT(i);
 
 		if (heap->cmp(ee_array_at(&heap->items, i), ee_array_at(&heap->items, parent)) < 0)
 		{
@@ -55,10 +55,10 @@ EE_INLINE void ee_heap_up(Heap* heap, int64_t i)
 	}
 }
 
-EE_INLINE void ee_heap_down(Heap* heap, int64_t i)
+EE_INLINE void ee_heap_down(Heap* heap, s64 i)
 {
-	int64_t len = (int64_t)ee_array_len(&heap->items);
-	int64_t left = 0, right = 0, smallest = 0;
+	s64 len = (s64)ee_array_len(&heap->items);
+	s64 left = 0, right = 0, smallest = 0;
 
 	while (left < len)
 	{
@@ -89,7 +89,7 @@ EE_INLINE void ee_heap_down(Heap* heap, int64_t i)
 	}
 }
 
-EE_INLINE void ee_heap_push(Heap* heap, uint8_t* val)
+EE_INLINE void ee_heap_push(Heap* heap, u8* val)
 {
 	EE_ASSERT(heap != NULL, "Trying to push into NULL heap");
 
@@ -97,7 +97,7 @@ EE_INLINE void ee_heap_push(Heap* heap, uint8_t* val)
 	ee_heap_up(heap, ee_array_len(&heap->items) - 1);
 }
 
-EE_INLINE void ee_heap_pop(Heap* heap, uint8_t* out_val)
+EE_INLINE void ee_heap_pop(Heap* heap, u8* out_val)
 {
 	EE_ASSERT(heap != NULL, "Trying to push into NULL heap");
 
@@ -130,14 +130,14 @@ EE_INLINE size_t ee_heap_len(Heap* heap)
 	return ee_array_len(&heap->items);
 }
 
-EE_INLINE uint8_t* ee_heap_top(Heap* heap)
+EE_INLINE u8* ee_heap_top(Heap* heap)
 {
 	EE_ASSERT(heap != NULL, "Trying to get top element of NULL heap");
 
 	return ee_array_at(&heap->items, 0);
 }
 
-EE_INLINE uint8_t* ee_heap_at(Heap* heap, size_t i)
+EE_INLINE u8* ee_heap_at(Heap* heap, size_t i)
 {
 	EE_ASSERT(heap != NULL, "Trying to get top element of NULL heap");
 

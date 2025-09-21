@@ -128,7 +128,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="main_utils.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils\ee_arena.h" />

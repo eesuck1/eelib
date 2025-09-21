@@ -13,22 +13,22 @@
 #define EE_NODE_PL_SIZE    (8)
 #define EE_NODE_NULL       (-1)
 
-static const uint8_t EE_RED   = 0x00;
-static const uint8_t EE_BLACK = 0xFF;
+static const u8 EE_RED   = 0x00;
+static const u8 EE_BLACK = 0xFF;
 
 typedef struct Node
 {
-	int64_t left;
-	int64_t right;
-	int64_t prev;
-	uint8_t data[EE_NODE_PL_SIZE];
+	s64 left;
+	s64 right;
+	s64 prev;
+	u8 data[EE_NODE_PL_SIZE];
 } Node;
 
 typedef struct Set
 {
-	int64_t root;
-	int64_t min;
-	int64_t max;
+	s64 root;
+	s64 min;
+	s64 max;
 
 	BinCmp cmp;
 
@@ -37,7 +37,7 @@ typedef struct Set
 	Array colors;
 };
 
-EE_INLINE Node ee_node_new(int64_t prev, uint8_t data[EE_NODE_PL_SIZE])
+EE_INLINE Node ee_node_new(s64 prev, u8 data[EE_NODE_PL_SIZE])
 {
 	Node out = { 0 };
 
@@ -66,15 +66,15 @@ EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
 	out.cmp    = cmp;
 
 	out.nodes  = ee_array_new(size, sizeof(Node));
-	out.free   = ee_array_new(size, sizeof(int64_t));
-	out.colors = ee_array_new(size, sizeof(uint8_t));
+	out.free   = ee_array_new(size, sizeof(s64));
+	out.colors = ee_array_new(size, sizeof(u8));
 
 	ee_array_fill(&out.colors, EE_ARRAY_DT(EE_RED), 0, size);
 
 	return out;
 }
 
-EE_INLINE void ee_set_insert(Set* set, uint8_t data[EE_NODE_PL_SIZE])
+EE_INLINE void ee_set_insert(Set* set, u8 data[EE_NODE_PL_SIZE])
 {
 	if (set->root == EE_NODE_NULL)
 	{

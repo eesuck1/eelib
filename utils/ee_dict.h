@@ -48,12 +48,37 @@
 	#define EE_FALSE           (0)
 #endif // EE_FALSE
 
-static const uint64_t EE_ZERO_U64 = 0;
-static const uint64_t EE_ONE_U64  = 1;
-static const uint64_t EE_MAX_U64  = 0xffffffffffffffff;
 
-static const double   EE_ZERO_F64 = 0.0;
-static const double   EE_ONE_F64  = 1.0;
+#ifndef EE_TYPES
+#define EE_TYPES
+
+typedef uint8_t     u8;
+typedef uint16_t    u16;
+typedef uint32_t    u32;
+typedef uint64_t    u64;
+
+typedef int8_t      s8;
+typedef int16_t     s16;
+typedef int32_t     s32;
+typedef int64_t     s64;
+
+typedef float       f32;
+typedef double      f64;
+typedef long double f80;
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
+_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
+#endif
+
+#endif // EE_TYPES
+
+static const u64 EE_ZERO_U64 = 0;
+static const u64 EE_ONE_U64  = 1;
+static const u64 EE_MAX_U64  = 0xffffffffffffffff;
+
+static const f64   EE_ZERO_F64 = 0.0;
+static const f64   EE_ONE_F64  = 1.0;
 
 #define EE_GROUP_SIZE                (16)
 #define EE_DICT_START_SIZE           (32)
@@ -64,7 +89,7 @@ static const double   EE_ONE_F64  = 1.0;
 #define EE_SLOT_DELETED              (0xFE)
 #define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
 
-#define EE_DICT_DT(x)                ((uint8_t*)(&(x)))
+#define EE_DICT_DT(x)                ((u8*)(&(x)))
 #define EE_CONST_ZERO                (EE_DICT_DT(EE_ZERO_U64))
 #define EE_CONST_ONE                 (EE_DICT_DT(EE_ONE_U64))
 #define EE_CONST_MAX_U64             (EE_DICT_DT(EE_MAX_U64))
@@ -108,14 +133,14 @@ EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
 
 typedef struct Slot
 {
-	uint8_t key[EE_KEY_SIZE];
-	uint8_t val[EE_VAL_SIZE];
+	u8 key[EE_KEY_SIZE];
+	u8 val[EE_VAL_SIZE];
 } Slot;
 
 typedef struct Dict
 {
 	Slot* slots;
-	uint8_t* ctrls;
+	u8* ctrls;
 
 	size_t count;
 	size_t cap;
@@ -131,7 +156,7 @@ typedef struct DictIter
 	size_t index;
 } DictIter;
 
-EE_INLINE int32_t ee_first_bit_u32(uint32_t x)
+EE_INLINE s32 ee_first_bit_u32(u32 x)
 {
 #if defined(__BMI__)
 	return _tzcnt_u32(x);
@@ -142,14 +167,14 @@ EE_INLINE int32_t ee_first_bit_u32(uint32_t x)
 
 	if (_BitScanForward(&i, x))
 	{
-		return (int32_t)i;
+		return (s32)i;
 	}
 	else
 	{
 		return EE_FIND_FIRST_BIT_INVALID;
 	}
 #else
-	for (int32_t i = 0; i < 32; ++i)
+	for (s32 i = 0; i < 32; ++i)
 	{
 		if (x & (1u << i))
 		{
@@ -161,16 +186,16 @@ EE_INLINE int32_t ee_first_bit_u32(uint32_t x)
 #endif
 }
 
-EE_INLINE uint64_t ee_dict_th(uint64_t x)
+EE_INLINE u64 ee_dict_th(u64 x)
 {
 	return (x * 896) >> 10;
 }
 
-EE_INLINE uint64_t ee_hash64(uint8_t* key) 
+EE_INLINE u64 ee_hash64(u8* key) 
 {
-	uint64_t hash;
+	u64 hash;
 
-	memcpy(&hash, key, sizeof(uint64_t));
+	memcpy(&hash, key, sizeof(u64));
 
 	hash ^= hash >> 30;
 	hash *= 0xbf58476d1ce4e5b9ULL;
@@ -181,7 +206,7 @@ EE_INLINE uint64_t ee_hash64(uint8_t* key)
 	return hash;
 }
 
-EE_INLINE uint64_t ee_next_pow_2(uint64_t x)
+EE_INLINE u64 ee_next_pow_2(u64 x)
 {
 	if (x == 0)
 	{
@@ -202,7 +227,7 @@ EE_INLINE uint64_t ee_next_pow_2(uint64_t x)
 	return x;
 }
 
-EE_INLINE int ee_key_cmp(uint8_t* first, uint8_t* second)
+EE_INLINE int ee_key_cmp(u8* first, u8* second)
 {
 	return memcmp(first, second, EE_KEY_SIZE) == 0;
 }
@@ -237,7 +262,7 @@ EE_INLINE Dict ee_dict_new(size_t size, Allocator* allocator)
 	size_t cap = ee_next_pow_2(size);
 
 	out.slots = (Slot*)out.allocator.alloc_fn(&out.allocator, sizeof(Slot) * cap);
-	out.ctrls = (uint8_t*)out.allocator.alloc_fn(&out.allocator, cap);
+	out.ctrls = (u8*)out.allocator.alloc_fn(&out.allocator, cap);
 
 	out.count = 0;
 	out.cap = cap;
@@ -245,11 +270,11 @@ EE_INLINE Dict ee_dict_new(size_t size, Allocator* allocator)
 	out.th = ee_dict_th(out.cap);
 
 	EE_ASSERT(out.slots != NULL, "Unable to allocate (%zu) bytes for Dict.slots", sizeof(Slot) * cap);
-	EE_ASSERT(out.ctrls != NULL, "Unable to allocate (%zu) bytes for Dict.ctrls", sizeof(uint8_t) * cap);
+	EE_ASSERT(out.ctrls != NULL, "Unable to allocate (%zu) bytes for Dict.ctrls", sizeof(u8) * cap);
 
 	if (out.ctrls != NULL)
 	{
-		memset(out.ctrls, EE_SLOT_EMPTY, sizeof(uint8_t) * cap);
+		memset(out.ctrls, EE_SLOT_EMPTY, sizeof(u8) * cap);
 	}
 
 	return out;
@@ -267,13 +292,13 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	memset(dict, 0, sizeof(Dict));
 }
 
-EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
+EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	uint64_t hash = ee_hash64(key);
-	uint64_t base_index = (hash >> 7) & dict->mask;
-	uint8_t  hash_sign = hash & 0x7F;
+	u64 hash = ee_hash64(key);
+	u64 base_index = (hash >> 7) & dict->mask;
+	u8  hash_sign = hash & 0x7F;
 
 	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
 	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
@@ -295,11 +320,11 @@ EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 		
-		int32_t match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = _mm_movemask_epi8(match);
 
 		while (match_mask)
 		{
-			int32_t first = ee_first_bit_u32(match_mask);
+			s32 first = ee_first_bit_u32(match_mask);
 
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
@@ -313,7 +338,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, uint8_t* key, uint8_t* val)
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);
 		__m128i deleted = _mm_cmpeq_epi8(group, deleted128);
 
-		int32_t free_mask = _mm_movemask_epi8(_mm_or_si128(empty, deleted));
+		s32 free_mask = _mm_movemask_epi8(_mm_or_si128(empty, deleted));
 
 		if (free_mask)
 		{
@@ -353,7 +378,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 	*dict = out;
 }
 
-EE_INLINE void ee_dict_set(Dict* dict, uint8_t* key, uint8_t* val)
+EE_INLINE void ee_dict_set(Dict* dict, u8* key, u8* val)
 {
 	ee_dict_insert(dict, key, val);
 
@@ -363,13 +388,13 @@ EE_INLINE void ee_dict_set(Dict* dict, uint8_t* key, uint8_t* val)
 	}
 }
 
-EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
+EE_INLINE void ee_dict_remove(Dict* dict, u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	uint64_t hash = ee_hash64(key);
-	uint64_t base_index = (hash >> 7) & dict->mask;
-	uint8_t  hash_sign = hash & 0x7F;
+	u64 hash = ee_hash64(key);
+	u64 base_index = (hash >> 7) & dict->mask;
+	u8  hash_sign = hash & 0x7F;
 
 	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
 	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
@@ -390,11 +415,11 @@ EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 
-		int32_t match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = _mm_movemask_epi8(match);
 
 		while (match_mask)
 		{
-			int32_t first = ee_first_bit_u32(match_mask);
+			s32 first = ee_first_bit_u32(match_mask);
 
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
@@ -409,7 +434,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
 
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);
 
-		int32_t empty_mask = _mm_movemask_epi8(empty);
+		s32 empty_mask = _mm_movemask_epi8(empty);
 
 		if (empty_mask)
 		{
@@ -421,13 +446,13 @@ EE_INLINE void ee_dict_remove(Dict* dict, uint8_t* key)
 	}
 }
 
-EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
+EE_INLINE u8* ee_dict_at(Dict* dict, u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	uint64_t hash = ee_hash64(key);
-	uint64_t base_index = (hash >> 7) & dict->mask;
-	uint8_t  hash_sign = hash & 0x7F;
+	u64 hash = ee_hash64(key);
+	u64 base_index = (hash >> 7) & dict->mask;
+	u8  hash_sign = hash & 0x7F;
 
 	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
 	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
@@ -448,11 +473,11 @@ EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
 		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
 		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
 
-		int32_t match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = _mm_movemask_epi8(match);
 		
 		while (match_mask)
 		{
-			int32_t first = ee_first_bit_u32(match_mask);
+			s32 first = ee_first_bit_u32(match_mask);
 
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
@@ -464,7 +489,7 @@ EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
 
 		__m128i empty = _mm_cmpeq_epi8(group, empty128);
 
-		int32_t empty_mask = _mm_movemask_epi8(empty);
+		s32 empty_mask = _mm_movemask_epi8(empty);
 
 		if (empty_mask)
 		{
@@ -478,11 +503,11 @@ EE_INLINE uint8_t* ee_dict_at(Dict* dict, uint8_t* key)
 	return NULL;
 }
 
-EE_INLINE int ee_dict_contains(Dict* dict, uint8_t* key)
+EE_INLINE int ee_dict_contains(Dict* dict, u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to check NULL Dict");
 
-	uint8_t* val = ee_dict_at(dict, key);
+	u8* val = ee_dict_at(dict, key);
 
 	return val != NULL;
 }
@@ -506,11 +531,11 @@ EE_INLINE void ee_dict_iter_reset(DictIter* it)
 	it->index = 0;
 }
 
-EE_INLINE int ee_dict_iter_next(DictIter* it, uint8_t** key, uint8_t** val)
+EE_INLINE int ee_dict_iter_next(DictIter* it, u8** key, u8** val)
 {
 	EE_ASSERT(it != NULL && it->dict != NULL, "Trying to iterate over NULL Dict");
-	EE_ASSERT(key != NULL, "Trying to dereference NULL uint8_t*");
-	EE_ASSERT(val != NULL, "Trying to dereference NULL uint8_t*");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL u8*");
+	EE_ASSERT(val != NULL, "Trying to dereference NULL u8*");
 
 	while (it->index < it->dict->cap)
 	{

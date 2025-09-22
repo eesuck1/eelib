@@ -655,12 +655,27 @@ EE_INLINE void ee_str_set(Str* str, size_t i, u8 symbol)
 	str->buffer[i] = symbol;
 }
 
-EE_INLINE u8 ee_str_get(Str* str, size_t i)
+EE_INLINE u8 ee_str_get(const Str* str, size_t i)
 {
 	EE_ASSERT(str != NULL, "Trying to get from NULL string");
 	EE_ASSERT(i < str->top, "Invalid get index (%zu) for string with length (%zu)", i, str->top);
 
 	return str->buffer[i];
+}
+
+EE_INLINE u8* ee_str_at(const Str* str, size_t i)
+{
+	EE_ASSERT(str != NULL, "Trying to get from NULL string");
+	EE_ASSERT(i < str->top, "Invalid get index (%zu) for string with length (%zu)", i, str->top);
+
+	return &str->buffer[i];
+}
+
+EE_INLINE size_t ee_str_len(const Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to get length of the NULL string");
+
+	return str->top;
 }
 
 EE_INLINE s32 ee_str_lev_m64(const Str* a, const Str* b)
@@ -909,6 +924,38 @@ EE_INLINE Str ee_str_copy(const Str* str, Allocator* allocator)
 	memcpy(out.buffer, str->buffer, out.cap);
 
 	return out;
+}
+
+EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
+{
+	EE_ASSERT(str != NULL, "Trying to grow NULL string");
+	EE_ASSERT(str->buffer != NULL, "Trying to grow NULL string buffer");
+
+	size_t new_cap = new_size;
+	u8* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+
+	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
+
+	str->cap = new_cap;
+	str->buffer = new_buffer;
+}
+
+EE_INLINE void ee_str_push_bytes(Str* str, const u8* data, size_t len)
+{
+	EE_ASSERT(str != NULL, "Trying to push into NULL string");
+	EE_ASSERT(data != NULL, "Trying to push NULL bytes");
+
+	size_t new_cap = str->cap;
+
+	while (str->top + len > new_cap)
+	{
+		new_cap = new_cap + (new_cap >> 1);
+	}
+
+	ee_str_grow_to(str, new_cap);
+
+	memcpy(&str->buffer[str->top], data, len);
+	str->top += len;
 }
 
 #endif // EE_STRING_H

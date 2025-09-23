@@ -6,7 +6,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
-#include "immintrin.h"
 
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
@@ -154,7 +153,7 @@ EE_INLINE int ee_is_pow2(u64 x)
 }
 
 #if defined(_MSC_VER)
-	#include "intrin.h"
+#include "intrin.h"
 #endif
 
 EE_INLINE s32 ee_array_first_bit_u32(u32 x)

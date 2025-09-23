@@ -314,7 +314,7 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	memset(dict, 0, sizeof(Dict));
 }
 
-EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
+EE_INLINE s32 ee_dict_insert(Dict* dict, u8* key, u8* val)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
@@ -327,6 +327,7 @@ EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 	eed_simd_i deleted128 = eed_set1_epi8(EE_SLOT_DELETED);
 
 	size_t probe_step = 0;
+	size_t first_deleted = (size_t)-1;
 
 	while (probe_step < dict->cap)
 	{
@@ -340,43 +341,60 @@ EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
-		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
-		
-		s32 match_mask = eed_movemask_epi8(match);
 
+		s32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
+		
 		while (match_mask)
 		{
 			s32 first = ee_first_bit_u32(match_mask);
-
+		
 			if (ee_key_cmp(dict->slots[group_index + first].key, key))
 			{
 				memcpy(&dict->slots[group_index + first].val, val, EE_VAL_SIZE);
-				return;
+			
+				return EE_TRUE;
 			}
-
+			
 			match_mask &= match_mask - 1;
 		}
 
-		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
-		eed_simd_i deleted = eed_cmpeq_epi8(group, deleted128);
-
-		s32 free_mask = eed_movemask_epi8(eed_or_si(empty, deleted));
-
-		if (free_mask)
+		s32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, deleted128));
+		
+		if (deleted_mask && first_deleted == (size_t)-1)
 		{
-			size_t slot_index = group_index + (size_t)ee_first_bit_u32(free_mask);
+			first_deleted = group_index + (size_t)ee_first_bit_u32(deleted_mask);
+		}
 
-			memcpy(&dict->slots[slot_index].key, key, EE_KEY_SIZE);
-			memcpy(&dict->slots[slot_index].val, val, EE_VAL_SIZE);
-
-			dict->ctrls[slot_index] = hash_sign;
+		s32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
+		
+		if (empty_mask)
+		{
+			size_t place = (first_deleted != (size_t)-1) ? first_deleted : (group_index + (size_t)ee_first_bit_u32(empty_mask));
+			
+			memcpy(&dict->slots[place].key, key, EE_KEY_SIZE);
+			memcpy(&dict->slots[place].val, val, EE_VAL_SIZE);
+			
+			dict->ctrls[place] = hash_sign;
 			dict->count++;
-
-			return;
+			
+			return EE_TRUE;
 		}
 
 		probe_step = next_probe_step;
 		base_index = next_base_index;
+	}
+
+	if (first_deleted != (size_t)-1)
+	{
+		size_t place = first_deleted;
+
+		memcpy(&dict->slots[place].key, key, EE_KEY_SIZE);
+		memcpy(&dict->slots[place].val, val, EE_VAL_SIZE);
+		
+		dict->ctrls[place] = hash_sign;
+		dict->count++;
+		
+		return EE_TRUE;
 	}
 }
 
@@ -400,14 +418,24 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 	*dict = out;
 }
 
-EE_INLINE void ee_dict_set(Dict* dict, u8* key, u8* val)
+EE_INLINE s32 ee_dict_set(Dict* dict, u8* key, u8* val)
 {
-	ee_dict_insert(dict, key, val);
+	s32 result = ee_dict_insert(dict, key, val);
+
+	if (!result)
+	{
+		ee_dict_grow(dict);
+		result = ee_dict_insert(dict, key, val);
+
+		EE_ASSERT(result == EE_TRUE, "Unable to insert after grow");
+	}
 
 	if (dict->count > dict->th)
 	{
 		ee_dict_grow(dict);
 	}
+
+	return result;
 }
 
 EE_INLINE void ee_dict_remove(Dict* dict, u8* key)

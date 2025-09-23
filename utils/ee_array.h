@@ -389,10 +389,11 @@ EE_INLINE void ee_array_pop(Array* array, u8* out_val)
 	}
 }
 
-EE_INLINE void ee_array_set(Array* array, size_t i, u8* val)
+EE_INLINE void ee_array_set(Array* array, size_t i, const u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to set into NULL Array");
-	EE_ASSERT(array->top >= i * array->elem_size, "Invalid setting index (%zu) Array.top at position (%zu)", i, array->top / array->elem_size);
+	EE_ASSERT(val != NULL, "Trying to set NULL value");
+	EE_ASSERT(i < ee_array_len(array), "Index (%zu) out of bounds for set, len (%zu)", i, ee_array_len(array));
 
 	memcpy(&array->buffer[i * array->elem_size], val, array->elem_size);
 }
@@ -773,29 +774,20 @@ EE_INLINE void ee_array_swap_n_pop(Array* array, size_t i, u8* out_val)
 	EE_ASSERT(!ee_array_empty(array), "Trying to pop from empty array");
 	EE_ASSERT(i < ee_array_len(array), "Invalid swap and pop index (%zu) for array with len (%zu)", i, ee_array_len(array));
 
-	size_t len = ee_array_len(array);
+	size_t last_idx = ee_array_len(array) - 1;
 
-	if (len == 1)
+	if (out_val != NULL) 
 	{
-		ee_array_pop(array, out_val);
-		return;
+		memcpy(out_val, &array->buffer[i * array->elem_size], array->elem_size);
 	}
 
-	if (out_val != NULL)
+	if (i != last_idx) 
 	{
-		memcpy(out_val, array->buffer[i * array->elem_size], array->elem_size);
+		memcpy(&array->buffer[i * array->elem_size], &array->buffer[last_idx * array->elem_size], array->elem_size);
 	}
 
 	array->top -= array->elem_size;
-
-	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
-	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) on stack", array->elem_size);
-
-	memcpy(temp, &array->buffer[i * array->elem_size], array->elem_size);
-	memcpy(&array->buffer[i * array->elem_size], &array->buffer[array->top], array->elem_size);
-	memcpy(&array->buffer[array->top], temp, array->elem_size);
-	
-	EE_FREEA(temp);
 }
+
 
 #endif // EE_ARRAY_H

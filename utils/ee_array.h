@@ -10,36 +10,54 @@
 
 #ifndef EE_NO_ASSERT
 #ifndef EE_ASSERT
-	#include "stdio.h"
+#include "stdio.h"
 
-	#define EE_ASSERT(cond, fmt, ...) do {                                    \
-		if (!(cond)) {                                                        \
-			fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-			fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-			exit(1);                                                          \
-		}                                                                     \
-	} while (0)
+#define EE_ASSERT(cond, fmt, ...) do {                                    \
+	if (!(cond)) {                                                        \
+		fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
+		fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
+		exit(1);                                                          \
+	}                                                                     \
+} while (0)
 #endif // EE_ASSERT
 #else
-	#define EE_ASSERT(cond, fmt, ...)    ((void)0)
+#define EE_ASSERT(cond, fmt, ...)    ((void)0)
 #endif // EE_NO_ASSERT
 
 #ifndef EE_INLINE
-	#define EE_INLINE    static inline
+#define EE_INLINE    static inline
 #endif // EE_INLINE
 
 #ifndef EE_TRUE
-	#define EE_TRUE     (1)
+#define EE_TRUE     (1)
 #endif // EE_TRUE
 
 #ifndef EE_FALSE
-	#define EE_FALSE    (0)
+#define EE_FALSE    (0)
 #endif // EE_FALSE
 
 #ifndef EE_FIND_FIRST_BIT_INVALID
-	#define EE_FIND_FIRST_BIT_INVALID    (32)
+#define EE_FIND_FIRST_BIT_INVALID    (32)
 #endif // EE_FIND_FIRST_BIT_INVALID
 
+#ifndef EE_ALLOCA
+#ifdef _MSC_VER
+
+#ifdef EE_USE_MALLOCA
+#define EE_ALLOCA(size)    (_malloca(size))
+#define EE_FREEA(ptr)      (_freea(ptr))
+#else
+#define EE_ALLOCA(size)    (alloca(size))
+#define EE_FREEA(ptr)      ((void)(ptr))
+#endif // EE_USE_MALLOCA
+
+#else
+
+#define EE_ALLOCA(size)    (alloca(size))
+#define EE_FREEA(ptr)      ((void)(ptr))
+
+#endif // _MSC_VER
+#endif // EE_ALLOCA
 
 #ifndef EE_TYPES
 #define EE_TYPES
@@ -430,11 +448,13 @@ EE_INLINE void ee_array_swap(Array* array, size_t i, size_t j)
 	EE_ASSERT(array != NULL, "Trying to swap an elements in NULL Array");
 	EE_ASSERT(ee_array_size(array) >= 2, "Trying to swap Array with number of elements (%zu), minimum is 2", ee_array_size(array));
 
-	u8* temp = (u8*)alloca(array->elem_size);
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
 
 	memcpy(temp, ee_array_at(array, i), array->elem_size);
 	memcpy(ee_array_at(array, i), ee_array_at(array, j), array->elem_size);
 	memcpy(ee_array_at(array, j), temp, array->elem_size);
+
+	EE_FREEA(temp);
 }
 
 EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
@@ -447,7 +467,7 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
 		return;
 	}
 
-	u8* temp = (u8*)alloca(array->elem_size);
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
 	for (s64 i = low; i <= high; i += array->elem_size)
@@ -464,6 +484,8 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
 
 		memcpy(&array->buffer[j], temp, array->elem_size);
 	}
+
+	EE_FREEA(temp);
 }
 
 EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
@@ -477,8 +499,8 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	u8* temp = (u8*)alloca(array->elem_size);
-	u8* pivot = (u8*)alloca(array->elem_size);
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
+	u8* pivot = (u8*)EE_ALLOCA(array->elem_size);
 	
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 	EE_ASSERT(pivot != NULL, "Unable to allocate (%zu) for pivot", array->elem_size);
@@ -508,6 +530,9 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
 		memcpy(&array->buffer[j], temp, array->elem_size);
 	}
 
+	EE_FREEA(temp);
+	EE_FREEA(pivot);
+
 	ee_array_quicksort(array, cmp, low, j);
 	ee_array_quicksort(array, cmp, j + array->elem_size, high);
 }
@@ -523,7 +548,7 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	u8* temp = (u8*)alloca(array->elem_size);
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
 	s64 count = (high - low) / array->elem_size + 1;
@@ -570,6 +595,8 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 			}
 		}
 	}
+
+	EE_FREEA(temp);
 }
 
 EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s32 max_depth)
@@ -595,8 +622,11 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s
 	}
 	else
 	{
-		u8* temp = (u8*)alloca(array->elem_size);
-		u8* pivot = (u8*)alloca(array->elem_size);
+		u8* temp = (u8*)EE_ALLOCA(array->elem_size);
+		u8* pivot = (u8*)EE_ALLOCA(array->elem_size);
+		
+		EE_ASSERT(temp != NULL, "Unable to allocate (%zu) on stack", array->elem_size);
+		EE_ASSERT(pivot != NULL, "Unable to allocate (%zu) on stack", array->elem_size);
 
 		size_t low_index = low / array->elem_size;
 		size_t high_index = high / array->elem_size;
@@ -622,6 +652,9 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s
 			memcpy(&array->buffer[i], &array->buffer[j], array->elem_size);
 			memcpy(&array->buffer[j], temp, array->elem_size);
 		}
+
+		EE_FREEA(temp);
+		EE_FREEA(pivot);
 
 		ee_array_introsort(array, cmp, low, j, max_depth - 1);
 		ee_array_introsort(array, cmp, j + array->elem_size, high, max_depth - 1);
@@ -717,7 +750,9 @@ EE_INLINE void ee_array_reverse(Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to reverse NULL Array");
 
-	u8* temp = (u8*)alloca(array->elem_size);
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
+	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) on stack", array->elem_size);
+
 	size_t len = ee_array_len(array);
 
 	for (size_t i = 0; i < (len >> 1); ++i)
@@ -728,6 +763,39 @@ EE_INLINE void ee_array_reverse(Array* array)
 		memcpy(ee_array_at(array, i), ee_array_at(array, j), array->elem_size);
 		memcpy(ee_array_at(array, j), temp, array->elem_size);
 	}
+
+	EE_FREEA(temp);
+}
+
+EE_INLINE void ee_array_swap_n_pop(Array* array, size_t i, u8* out_val)
+{
+	EE_ASSERT(array != NULL, "Trying to pop from NULL array");
+	EE_ASSERT(!ee_array_empty(array), "Trying to pop from empty array");
+	EE_ASSERT(i < ee_array_len(array), "Invalid swap and pop index (%zu) for array with len (%zu)", i, ee_array_len(array));
+
+	size_t len = ee_array_len(array);
+
+	if (len == 1)
+	{
+		ee_array_pop(array, out_val);
+		return;
+	}
+
+	if (out_val != NULL)
+	{
+		memcpy(out_val, array->buffer[i * array->elem_size], array->elem_size);
+	}
+
+	array->top -= array->elem_size;
+
+	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
+	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) on stack", array->elem_size);
+
+	memcpy(temp, &array->buffer[i * array->elem_size], array->elem_size);
+	memcpy(&array->buffer[i * array->elem_size], &array->buffer[array->top], array->elem_size);
+	memcpy(&array->buffer[array->top], temp, array->elem_size);
+	
+	EE_FREEA(temp);
 }
 
 #endif // EE_ARRAY_H

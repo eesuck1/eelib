@@ -6,7 +6,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdint.h"
-#include "immintrin.h"
 
 #if defined(_MSC_VER)
 	#include "intrin.h"
@@ -73,15 +72,40 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 
 #endif // EE_TYPES
 
+#ifndef EE_NO_SSE2
+
+#include "immintrin.h"
+
+#define EED_SIMD_BYTES         (16)
+#define EED_SIMD_BITS          (EED_SIMD_BYTES * 8)
+#define EED_SIMD_U64X_PARTS    (2) 
+
+#define eed_loadu_si           _mm_loadu_si128
+#define eed_load_si            _mm_load_si128
+#define eed_set1_epi8          _mm_set1_epi8
+#define eed_cmpeq_epi8         _mm_cmpeq_epi8
+#define eed_movemask_epi8      _mm_movemask_epi8
+#define eed_or_si              _mm_or_si128
+#define eed_prefetch           _mm_prefetch
+
+typedef __m128i eed_simd_i;
+
+#else
+#error "SIMD does not supported on your machine!"
+#endif // EE_SIMD
+
 static const u64 EE_ZERO_U64 = 0;
 static const u64 EE_ONE_U64  = 1;
 static const u64 EE_MAX_U64  = 0xffffffffffffffff;
 
-static const f64   EE_ZERO_F64 = 0.0;
-static const f64   EE_ONE_F64  = 1.0;
+static const f64 EE_ZERO_F64 = 0.0;
+static const f64 EE_ONE_F64  = 1.0;
 
-#define EE_GROUP_SIZE                (16)
+#ifndef EE_DICT_START_SIZE
 #define EE_DICT_START_SIZE           (32)
+#endif
+
+#define EE_GROUP_SIZE                (EED_SIMD_BYTES)
 #define EE_KEY_SIZE                  (8)
 #define EE_VAL_SIZE                  (8)
 
@@ -236,11 +260,9 @@ EE_INLINE Dict ee_dict_new(size_t size, Allocator* allocator)
 {
 	Dict out = { 0 };
 
-	EE_ASSERT(size >= EE_DICT_START_SIZE, "size value (%zu) for Dict should be greater or equal to (%d)", size, EE_DICT_START_SIZE);
-
 	if (size < EE_DICT_START_SIZE)
 	{
-		return out;
+		size = EE_DICT_START_SIZE;
 	}
 
 	if (allocator == NULL)
@@ -300,9 +322,9 @@ EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
-	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
-	__m128i deleted128 = _mm_set1_epi8(EE_SLOT_DELETED);
+	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
+	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i deleted128 = eed_set1_epi8(EE_SLOT_DELETED);
 
 	size_t probe_step = 0;
 
@@ -317,10 +339,10 @@ EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 		
-		s32 match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = eed_movemask_epi8(match);
 
 		while (match_mask)
 		{
@@ -335,10 +357,10 @@ EE_INLINE void ee_dict_insert(Dict* dict, u8* key, u8* val)
 			match_mask &= match_mask - 1;
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, empty128);
-		__m128i deleted = _mm_cmpeq_epi8(group, deleted128);
+		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
+		eed_simd_i deleted = eed_cmpeq_epi8(group, deleted128);
 
-		s32 free_mask = _mm_movemask_epi8(_mm_or_si128(empty, deleted));
+		s32 free_mask = eed_movemask_epi8(eed_or_si(empty, deleted));
 
 		if (free_mask)
 		{
@@ -396,8 +418,8 @@ EE_INLINE void ee_dict_remove(Dict* dict, u8* key)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
-	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
+	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
 
 	size_t probe_step = 0;
 
@@ -412,10 +434,10 @@ EE_INLINE void ee_dict_remove(Dict* dict, u8* key)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
-		s32 match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = eed_movemask_epi8(match);
 
 		while (match_mask)
 		{
@@ -432,9 +454,9 @@ EE_INLINE void ee_dict_remove(Dict* dict, u8* key)
 			match_mask &= match_mask - 1;
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, empty128);
+		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
 
-		s32 empty_mask = _mm_movemask_epi8(empty);
+		s32 empty_mask = eed_movemask_epi8(empty);
 
 		if (empty_mask)
 		{
@@ -454,8 +476,8 @@ EE_INLINE u8* ee_dict_at(Dict* dict, u8* key)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	__m128i hash_sign128 = _mm_set1_epi8(hash_sign);
-	__m128i empty128 = _mm_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
+	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
 
 	size_t probe_step = 0;
 
@@ -470,10 +492,10 @@ EE_INLINE u8* ee_dict_at(Dict* dict, u8* key)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		__m128i group = _mm_loadu_si128((__m128i*)&dict->ctrls[group_index]);
-		__m128i match = _mm_cmpeq_epi8(group, hash_sign128);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
-		s32 match_mask = _mm_movemask_epi8(match);
+		s32 match_mask = eed_movemask_epi8(match);
 		
 		while (match_mask)
 		{
@@ -487,9 +509,9 @@ EE_INLINE u8* ee_dict_at(Dict* dict, u8* key)
 			match_mask &= match_mask - 1;
 		}
 
-		__m128i empty = _mm_cmpeq_epi8(group, empty128);
+		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
 
-		s32 empty_mask = _mm_movemask_epi8(empty);
+		s32 empty_mask = eed_movemask_epi8(empty);
 
 		if (empty_mask)
 		{

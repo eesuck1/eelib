@@ -130,7 +130,7 @@ typedef struct ee_u64x
 } ee_u64x;
 
 #else
-#error "SIMD does not supported on your machine!"
+#error SIMD does not supported on your machine
 #endif // EE_SIMD
 
 #ifndef EE_TYPES
@@ -515,7 +515,7 @@ EE_INLINE size_t ee_str_find_b(const Str* str, const Str* target, size_t low, si
 
 	for (; i < upper; i += EE_SIMD_BYTES)
 	{
-		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i group = ee_load_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		s32 match_mask = ee_movemask_epi8(match);
 
@@ -577,7 +577,7 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 
 	for (; i < upper; i += EE_SIMD_BYTES)
 	{
-		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i group = ee_load_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		
 		s32 match_mask = ee_movemask_epi8(match);
@@ -930,6 +930,12 @@ EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
 {
 	EE_ASSERT(str != NULL, "Trying to grow NULL string");
 	EE_ASSERT(str->buffer != NULL, "Trying to grow NULL string buffer");
+	EE_ASSERT(str->cap <= new_size, "Trying to shrink string");
+
+	if (new_size == str->cap)
+	{
+		return;
+	}
 
 	size_t new_cap = new_size;
 	u8* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
@@ -940,10 +946,10 @@ EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
 	str->buffer = new_buffer;
 }
 
-EE_INLINE void ee_str_push_bytes(Str* str, const u8* data, size_t len)
+EE_INLINE void ee_str_push_bytes(Str* str, const u8* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to push into NULL string");
-	EE_ASSERT(data != NULL, "Trying to push NULL bytes");
+	EE_ASSERT(bytes != NULL, "Trying to push NULL bytes");
 
 	size_t new_cap = str->cap;
 
@@ -954,8 +960,95 @@ EE_INLINE void ee_str_push_bytes(Str* str, const u8* data, size_t len)
 
 	ee_str_grow_to(str, new_cap);
 
-	memcpy(&str->buffer[str->top], data, len);
+	memcpy(&str->buffer[str->top], bytes, len);
 	str->top += len;
+}
+
+EE_INLINE void ee_str_fill_free(Str* str, u8 val)
+{
+	EE_ASSERT(str != NULL, "Trying to fill NULL string");
+
+	if (ee_str_full(str))
+	{
+		return;
+	}
+
+	memset(&str->buffer[str->top], val, str->cap - str->top);
+	str->top = str->cap;
+}
+
+EE_INLINE void ee_str_clear_free(Str* str, u8 val)
+{
+	EE_ASSERT(str != NULL, "Trying to clear NULL string");
+
+	if (ee_str_full(str))
+	{
+		return;
+	}
+
+	memset(&str->buffer[str->top], val, str->cap - str->top);
+}
+
+EE_INLINE void ee_str_clear(Str* str, u8 val)
+{
+	EE_ASSERT(str != NULL, "Trying to clear NULL string");
+
+	memset(str->buffer, val, str->cap);
+}
+
+EE_INLINE void ee_str_clear_zero(Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to clear NULL string");
+
+	memset(str->buffer, 0, str->cap);
+}
+
+EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const u8* bytes, size_t len)
+{
+	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
+	EE_ASSERT(bytes != NULL, "Trying to insert NULL bytes");
+	EE_ASSERT(i <= str->top, "Invalid position (%zu) for string with top (%zu)", i, str->top);
+
+	if (i == str->top)
+	{
+		ee_str_push_bytes(str, bytes, len);
+	}
+
+	size_t new_cap = str->cap;
+
+	while (str->top + len > new_cap)
+	{
+		new_cap = new_cap + (new_cap >> 1);
+	}
+
+	ee_str_grow_to(str, new_cap);
+
+	memmove(&str->buffer[i + len], &str->buffer[i], len);
+	memcpy(&str->buffer[i], bytes, len);
+	str->top += len;
+}
+
+EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const u8* bytes, size_t len)
+{
+	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
+	EE_ASSERT(bytes != NULL, "Trying to insert NULL bytes");
+	EE_ASSERT(i <= str->top, "Invalid position (%zu) for string with top (%zu)", i, str->top);
+
+	size_t new_cap = str->cap;
+
+	while (i + len > new_cap)
+	{
+		new_cap = new_cap + (new_cap >> 1);
+	}
+
+	ee_str_grow_to(str, new_cap);
+
+	memcpy(&str->buffer[i], bytes, len);
+	
+	if (i + len > str->top)
+	{
+		str->top = i + len;
+	}
 }
 
 #endif // EE_STRING_H

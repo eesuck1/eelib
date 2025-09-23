@@ -326,22 +326,24 @@ EE_INLINE Str ee_str_from_cstr(const u8* c_str, const Allocator* allocator)
 EE_INLINE Str ee_str_from_file(const u8* file_path, const u8* mode, const Allocator* allocator)
 {
 	EE_ASSERT(file_path != NULL, "Trying to open NULL file path");
-	EE_ASSERT(mode == EE_STR_FILE_READ || mode == EE_STR_FILE_READ_BYTES, "Invalid mode for reading from file (%s)", mode);
 
 	if (mode == NULL)
 	{
 		mode = EE_STR_FILE_READ_BYTES;
 	}
 
-	FILE* file = fopen(file_path, mode);
+	EE_ASSERT(strcmp((const char*)mode, EE_STR_FILE_READ) == 0 || strcmp((const char*)mode, EE_STR_FILE_READ_BYTES) == 0, "Invalid mode for reading from file (%s)", mode);
+
+	FILE* file = fopen((const char*)file_path, (const char*)mode);
 
 	EE_ASSERT(file != NULL, "Unable to open file (%s)", file_path);
 
 	fseek(file, 0, SEEK_END);
-	s32 file_size = ftell(file);
+	long file_size_l = ftell(file);
+	EE_ASSERT(file_size_l >= 0, "Unable to get file size");
 	fseek(file, 0, SEEK_SET);
 
-	EE_ASSERT(file_size > 0, "Unable to get file size");
+	size_t file_size = (size_t)file_size_l;
 
 	Str out = { 0 };
 
@@ -364,8 +366,7 @@ EE_INLINE Str ee_str_from_file(const u8* file_path, const u8* mode, const Alloca
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
 
 	size_t bytes_read = fread(out.buffer, 1, file_size, file);
-	
-	EE_ASSERT(bytes_read == file_size, "Unable to read (%d) bytes from file", file_size);
+	EE_ASSERT(bytes_read == file_size, "Unable to read (%zu) bytes from file", file_size);
 
 	fclose(file);
 
@@ -391,17 +392,15 @@ EE_INLINE void ee_str_to_file(Str* str, const u8* file_path, const u8* mode)
 {
 	EE_ASSERT(str != NULL, "Trying to write a NULL string to file");
 	EE_ASSERT(file_path != NULL, "Trying to write to a NULL file path");
-	EE_ASSERT(mode == EE_STR_FILE_WRITE || mode == EE_STR_FILE_WRITE_BYTES ||
-		mode == EE_STR_FILE_APPEND || mode == EE_STR_FILE_APPEND_BYTES, "Invalid mode for writing to file (%s)", mode);
 
 	if (mode == NULL)
 	{
 		mode = EE_STR_FILE_APPEND_BYTES;
 	}
 
-	FILE* file = NULL;
+	EE_ASSERT(strcmp((const char*)mode, EE_STR_FILE_WRITE) == 0 || strcmp((const char*)mode, EE_STR_FILE_WRITE_BYTES) == 0 || strcmp((const char*)mode, EE_STR_FILE_APPEND) == 0 || strcmp((const char*)mode, EE_STR_FILE_APPEND_BYTES) == 0, "Invalid mode for writing to file (%s)", mode);
 
-	file = fopen(file_path, mode);
+	FILE* file = fopen((const char*)file_path, (const char*)mode);
 
 	EE_ASSERT(file != NULL, "Unable to open file (%s)", file_path);
 
@@ -411,6 +410,7 @@ EE_INLINE void ee_str_to_file(Str* str, const u8* file_path, const u8* mode)
 
 	fclose(file);
 }
+
 
 EE_INLINE void ee_str_free(Str* str)
 {
@@ -515,7 +515,7 @@ EE_INLINE size_t ee_str_find_b(const Str* str, const Str* target, size_t low, si
 
 	for (; i < upper; i += EE_SIMD_BYTES)
 	{
-		ee_simd_i group = ee_load_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		s32 match_mask = ee_movemask_epi8(match);
 
@@ -577,7 +577,7 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 
 	for (; i < upper; i += EE_SIMD_BYTES)
 	{
-		ee_simd_i group = ee_load_si((const ee_simd_i*)&str->buffer[i]);
+		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		
 		s32 match_mask = ee_movemask_epi8(match);
@@ -891,7 +891,7 @@ EE_INLINE s32 ee_str_lev(const Str* a, const Str* b)
 
 EE_INLINE void ee_str_print(const Str* str)
 {
-	fwrite(str->buffer, 1, str->cap, stdout);
+	fwrite(str->buffer, 1, str->top, stdout);
 }
 
 EE_INLINE Str ee_str_copy(const Str* str, Allocator* allocator)
@@ -951,14 +951,19 @@ EE_INLINE void ee_str_push_bytes(Str* str, const u8* bytes, size_t len)
 	EE_ASSERT(str != NULL, "Trying to push into NULL string");
 	EE_ASSERT(bytes != NULL, "Trying to push NULL bytes");
 
-	size_t new_cap = str->cap;
+	size_t need = str->top + len;
 
-	while (str->top + len > new_cap)
+	if (need > str->cap)
 	{
-		new_cap = new_cap + (new_cap >> 1);
-	}
+		size_t new_cap = str->cap ? str->cap : 1;
+		
+		while (new_cap < need) 
+		{ 
+			new_cap = new_cap + (new_cap >> 1); 
+		}
 
-	ee_str_grow_to(str, new_cap);
+		ee_str_grow_to(str, new_cap);
+	}
 
 	memcpy(&str->buffer[str->top], bytes, len);
 	str->top += len;
@@ -1002,7 +1007,6 @@ EE_INLINE void ee_str_clear_zero(Str* str)
 
 	memset(str->buffer, 0, str->cap);
 }
-
 EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const u8* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
@@ -1012,19 +1016,26 @@ EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const u8* bytes, size_t l
 	if (i == str->top)
 	{
 		ee_str_push_bytes(str, bytes, len);
+		return;
 	}
 
-	size_t new_cap = str->cap;
+	size_t need = str->top + len;
 
-	while (str->top + len > new_cap)
+	if (need > str->cap)
 	{
-		new_cap = new_cap + (new_cap >> 1);
+		size_t new_cap = str->cap ? str->cap : 1;
+		
+		while (new_cap < need) 
+		{ 
+			new_cap = new_cap + (new_cap >> 1); 
+		}
+
+		ee_str_grow_to(str, new_cap);
 	}
 
-	ee_str_grow_to(str, new_cap);
-
-	memmove(&str->buffer[i + len], &str->buffer[i], len);
+	memmove(&str->buffer[i + len], &str->buffer[i], str->top - i);
 	memcpy(&str->buffer[i], bytes, len);
+
 	str->top += len;
 }
 

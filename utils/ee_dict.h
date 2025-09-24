@@ -340,7 +340,7 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, u8* key, u8* val)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
 
 		s32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
 		
@@ -462,7 +462,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, u8* key)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
 		s32 match_mask = eed_movemask_epi8(match);
@@ -520,7 +520,7 @@ EE_INLINE u8* ee_dict_at(Dict* dict, u8* key)
 		_mm_prefetch((const char*)&dict->ctrls[next_group_index], _MM_HINT_T0);
 		_mm_prefetch((const char*)&dict->slots[next_group_index], _MM_HINT_T0);
 
-		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
 		s32 match_mask = eed_movemask_epi8(match);

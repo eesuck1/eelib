@@ -5,10 +5,6 @@
 
 #include "ee_core.h"
 
-#if defined(_MSC_VER)
-#include "intrin.h"
-#endif
-
 static const u64 EE_ZERO_U64 = 0;
 static const u64 EE_ONE_U64  = 1;
 static const u64 EE_MAX_U64  = 0xffffffffffffffff;

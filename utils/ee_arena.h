@@ -3,98 +3,12 @@
 #ifndef EE_ARENA_H
 #define EE_ARENA_H
 
-#include "stdlib.h"
-#include "string.h"
-#include "stdint.h"
-
-#ifndef EE_NO_ASSERT
-#ifndef EE_ASSERT
-
-#include "stdio.h"
-
-#define EE_ASSERT(cond, fmt, ...) do {                                    \
-	if (!(cond)) {                                                        \
-		fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-		fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-		exit(1);                                                          \
-	}                                                                     \
-} while (0)
-
-#endif // EE_ASSERT
-#else  // EE_NO_ASSERT
-
-#define EE_ASSERT(cond, fmt, ...)    ((void)0)
-
-#endif // EE_NO_ASSERT
-
-#ifndef EE_INLINE
-#define EE_INLINE    static inline
-#endif // EE_INLINE
-
-
-#ifndef EE_TYPES
-#define EE_TYPES
-
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
-typedef uint64_t    u64;
-
-typedef int8_t      s8;
-typedef int16_t     s16;
-typedef int32_t     s32;
-typedef int64_t     s64;
-
-typedef float       f32;
-typedef double      f64;
-typedef long double f80;
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
-_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
-#endif
-
-#endif // EE_TYPES
+#include "ee_core.h"
 
 // TODO(eesuck): better max_align
 #define EE_MAX_ALIGN     (16)
 #define EE_ALIGN_MASK    (~(EE_MAX_ALIGN - 1))
 #define EE_NO_REWIND     (0)
-
-#ifndef EE_ALLOCATOR
-#define EE_ALLOCATOR
-
-typedef struct Allocator
-{
-	void* (*alloc_fn)(struct Allocator* self, size_t size);
-	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
-	void  (*free_fn)(struct Allocator* self, void* buffer);
-	void* context;
-} Allocator;
-
-EE_INLINE void* ee_default_alloc(Allocator* allocator, size_t size)
-{
-	(void)allocator;
-
-	return malloc(size);
-}
-
-EE_INLINE void* ee_default_realloc(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
-{
-	(void)allocator;
-	(void)old_size;
-
-	return realloc(buffer, new_size);
-}
-
-EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
-{
-	(void)allocator;
-
-	free(buffer);
-}
-
-#endif // EE_ALLOCATOR
 
 typedef struct Arena
 {

@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="utils\ee_arena.h" />
     <ClInclude Include="utils\ee_array.h" />
+    <ClInclude Include="utils\ee_core.h" />
     <ClInclude Include="utils\ee_dict.h" />
     <ClInclude Include="utils\ee_grid.h" />
     <ClInclude Include="utils\ee_heap.h" />

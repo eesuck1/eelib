@@ -3,96 +3,11 @@
 #ifndef EE_DICT_H
 #define EE_DICT_H
 
-#include "stdlib.h"
-#include "string.h"
-#include "stdint.h"
+#include "ee_core.h"
 
 #if defined(_MSC_VER)
-	#include "intrin.h"
+#include "intrin.h"
 #endif
-
-#ifndef EE_NO_ASSERT
-#ifndef EE_ASSERT
-
-#include "stdio.h"
-
-#define EE_ASSERT(cond, fmt, ...) do {                                    \
-	if (!(cond)) {                                                        \
-		fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-		fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-		exit(1);                                                          \
-	}                                                                     \
-} while (0)
-
-#endif // EE_ASSERT
-#else  // EE_NO_ASSERT
-
-#define EE_ASSERT(cond, fmt, ...)    ((void)0)
-
-#endif // EE_NO_ASSERT
-
-#ifndef EE_INLINE
-	#define EE_INLINE    static inline
-#endif // EE_INLINE
-
-#ifndef EE_FIND_FIRST_BIT_INVALID
-	#define EE_FIND_FIRST_BIT_INVALID    (32)
-#endif // EE_FIND_FIRST_BIT_INVALID
-
-#ifndef EE_TRUE
-	#define EE_TRUE            (1)
-#endif // EE_TRUE
-
-#ifndef EE_FALSE
-	#define EE_FALSE           (0)
-#endif // EE_FALSE
-
-
-#ifndef EE_TYPES
-#define EE_TYPES
-
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
-typedef uint64_t    u64;
-
-typedef int8_t      s8;
-typedef int16_t     s16;
-typedef int32_t     s32;
-typedef int64_t     s64;
-
-typedef float       f32;
-typedef double      f64;
-typedef long double f80;
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
-_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
-#endif
-
-#endif // EE_TYPES
-
-#ifndef EE_NO_SSE2
-
-#include "immintrin.h"
-
-#define EED_SIMD_BYTES         (16)
-#define EED_SIMD_BITS          (EED_SIMD_BYTES * 8)
-#define EED_SIMD_U64X_PARTS    (2) 
-
-#define eed_loadu_si           _mm_loadu_si128
-#define eed_load_si            _mm_load_si128
-#define eed_set1_epi8          _mm_set1_epi8
-#define eed_cmpeq_epi8         _mm_cmpeq_epi8
-#define eed_movemask_epi8      _mm_movemask_epi8
-#define eed_or_si              _mm_or_si128
-#define eed_prefetch           _mm_prefetch
-
-typedef __m128i eed_simd_i;
-
-#else
-#error "SIMD does not supported on your machine!"
-#endif // EE_SIMD
 
 static const u64 EE_ZERO_U64 = 0;
 static const u64 EE_ONE_U64  = 1;
@@ -120,41 +35,6 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_CONST_ZERO_F64            (EE_DICT_DT(EE_ZERO_F64))
 #define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
-#ifndef EE_ALLOCATOR
-#define EE_ALLOCATOR
-
-typedef struct Allocator
-{
-	void* (*alloc_fn)(struct Allocator* self, size_t size);
-	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
-	void  (*free_fn)(struct Allocator* self, void* buffer);
-	void* context;
-} Allocator;
-
-EE_INLINE void* ee_default_alloc(Allocator* allocator, size_t size)
-{
-	(void)allocator;
-
-	return malloc(size);
-}
-
-EE_INLINE void* ee_default_realloc(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
-{
-	(void)allocator;
-	(void)old_size;
-
-	return realloc(buffer, new_size);
-}
-
-EE_INLINE void ee_default_free(Allocator* allocator, void* buffer)
-{
-	(void)allocator;
-
-	free(buffer);
-}
-
-#endif // EE_ALLOCATOR
-
 typedef struct Slot
 {
 	u8 key[EE_KEY_SIZE];
@@ -180,36 +60,6 @@ typedef struct DictIter
 	size_t index;
 } DictIter;
 
-EE_INLINE s32 ee_first_bit_u32(u32 x)
-{
-#if defined(__BMI__)
-	return _tzcnt_u32(x);
-#elif defined(__GNUC__) || defined(__clang__)
-	return x ? __builtin_ctz(x) : EE_FIND_FIRST_BIT_INVALID;
-#elif defined(_MSC_VER)
-	unsigned long i;
-
-	if (_BitScanForward(&i, x))
-	{
-		return (s32)i;
-	}
-	else
-	{
-		return EE_FIND_FIRST_BIT_INVALID;
-	}
-#else
-	for (s32 i = 0; i < 32; ++i)
-	{
-		if (x & (1u << i))
-		{
-			return i;
-		}
-	}
-
-	return EE_FIND_FIRST_BIT_INVALID;
-#endif
-}
-
 EE_INLINE u64 ee_dict_th(u64 x)
 {
 	return (x * 896) >> 10;
@@ -228,27 +78,6 @@ EE_INLINE u64 ee_hash64(u8* key)
 	hash ^= hash >> 31;
 
 	return hash;
-}
-
-EE_INLINE u64 ee_next_pow_2(u64 x)
-{
-	if (x == 0)
-	{
-		return 1;
-	}
-
-	x--;
-
-	x |= x >> 1;
-	x |= x >> 2;
-	x |= x >> 4;
-	x |= x >> 8;
-	x |= x >> 16;
-	x |= x >> 32;
-
-	x++;
-
-	return x;
 }
 
 EE_INLINE int ee_key_cmp(u8* first, u8* second)

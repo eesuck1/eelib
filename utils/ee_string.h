@@ -1,161 +1,11 @@
 #ifndef EE_STRING_H
 #define EE_STRING_H
 
-#ifdef _WIN32
-#define _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_WARNINGS
-#pragma warning (disable : 4996)
-#endif
-
-#include "stdlib.h"
-#include "string.h"
-#include "stdint.h"
 #include "stdio.h"
+#include "ee_core.h"
 
-#ifndef EE_NO_ASSERT
-#ifndef EE_ASSERT
-
-#define EE_ASSERT(cond, fmt, ...) do {                                    \
-	if (!(cond)) {                                                        \
-		fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-		fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-		exit(1);                                                          \
-	}                                                                     \
-} while (0)
-
-#endif // EE_ASSERT
-#else  // EE_NO_ASSERT
-
-#define EE_ASSERT(cond, fmt, ...)    ((void)0)
-
-#endif // EE_NO_ASSERT
-
-#ifndef EE_INLINE
-#define EE_INLINE    static inline
-#endif // EE_INLINE
-
-#define EE_SS_LEN           (16)
-#define EE_LS_PREFIX_LEN    (4)
-
-#ifndef EE_TRUE
-#define EE_TRUE             (1)
-#endif // EE_TRUE
-
-#ifndef EE_FALSE
-#define EE_FALSE            (0)
-#endif // EE_FALSE
-
-#ifndef EE_FIND_FIRST_BIT_INVALID
-#define EE_FIND_FIRST_BIT_INVALID    (32)
-#endif // EE_FIND_FIRST_BIT_INVALID
-
-#if !defined(EE_NO_AVX2)
-
-#include "immintrin.h"
-
-#define EE_SIMD_BYTES         (32)
-#define EE_SIMD_BITS          (EE_SIMD_BYTES * 8)
-#define EE_SIMD_U64X_PARTS    (4) 
-
-#define ee_loadu_si           _mm256_loadu_si256
-#define ee_load_si            _mm256_load_si256
-#define ee_set1_epi8          _mm256_set1_epi8
-#define ee_set1_epi64x        _mm256_set1_epi64x
-#define ee_cmpeq_epi8         _mm256_cmpeq_epi8
-#define ee_movemask_epi8      _mm256_movemask_epi8
-#define ee_and_si             _mm256_and_si256
-#define ee_or_si              _mm256_or_si256
-#define ee_xor_si             _mm256_xor_si256
-#define ee_slli_epi32         _mm256_slli_epi32
-#define ee_srli_epi32         _mm256_srli_epi32
-#define ee_slli_epi64         _mm256_slli_epi64
-#define ee_srli_epi64         _mm256_srli_epi64
-#define ee_add_epi64          _mm256_add_epi64
-
-typedef __m256i ee_simd_i;
-
-typedef struct ee_u64x
-{
-	union
-	{
-		struct
-		{
-			u64 part_0;
-			u64 part_1;
-			u64 part_2;
-			u64 part_3;
-		};
-
-		u64 parts[EE_SIMD_U64X_PARTS];
-	};
-} ee_u64x;
-
-#elif !defined(EE_NO_SSE2)
-
-#include "immintrin.h"
-
-#define EE_SIMD_BYTES         (16)
-#define EE_SIMD_BITS          (EE_SIMD_BYTES * 8)
-#define EE_SIMD_U64X_PARTS    (2) 
-
-#define ee_loadu_si           _mm_loadu_si128
-#define ee_load_si            _mm_load_si128
-#define ee_set1_epi8          _mm_set1_epi8
-#define ee_set1_epi64x        _mm_set1_epi64x
-#define ee_cmpeq_epi8         _mm_cmpeq_epi8
-#define ee_movemask_epi8      _mm_movemask_epi8
-#define ee_and_si             _mm_and_si128
-#define ee_or_si              _mm_or_si128
-#define ee_xor_si             _mm_xor_si128
-#define ee_slli_epi32         _mm_slli_epi32
-#define ee_srli_epi32         _mm_srli_epi32
-#define ee_slli_epi64         _mm_slli_epi64
-#define ee_srli_epi64         _mm_srli_epi64
-#define ee_add_epi64          _mm_add_epi64
-
-typedef __m128i ee_simd_i;
-
-typedef struct ee_u64x
-{
-	union
-	{
-		struct
-		{
-			u64 part_0;
-			u64 part_1;
-		};
-
-		u64 parts[EE_SIMD_U64X_PARTS];
-	};
-} ee_u64x;
-
-#else
-#error SIMD does not supported on your machine
-#endif // EE_SIMD
-
-#ifndef EE_TYPES
-#define EE_TYPES
-
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
-typedef uint64_t    u64;
-
-typedef int8_t      s8;
-typedef int16_t     s16;
-typedef int32_t     s32;
-typedef int64_t     s64;
-
-typedef float       f32;
-typedef double      f64;
-typedef long double f80;
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
-_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
-#endif
-
-#endif // EE_TYPES
+#define EE_SS_LEN                   (16)
+#define EE_LS_PREFIX_LEN            (4)
 
 #define EE_STR_LEV_BLOCK_SIZE       (64)
 #define EE_STR_CHARS_MASK_LEN       (0xFF)
@@ -172,41 +22,6 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 #define EE_UINT64_MASK              ((1ull << EE_UINT64_SHIFT) - 1)
 #define EE_UINT64_INV_MASK          (~EE_UINT64_MASK)
 
-#ifndef EE_ALLOCATOR
-#define EE_ALLOCATOR
-
-typedef struct Allocator
-{
-	void* (*alloc_fn)(struct Allocator* self, size_t size);
-	void* (*realloc_fn)(struct Allocator* self, void* buffer, size_t old_size, size_t new_size);
-	void  (*free_fn)(struct Allocator* self, void* buffer);
-	void* context;
-} Allocator;
-
-EE_INLINE void* ee_default_alloc(Allocator * allocator, size_t size)
-{
-	(void)allocator;
-
-	return malloc(size);
-}
-
-EE_INLINE void* ee_default_realloc(Allocator * allocator, void* buffer, size_t old_size, size_t new_size)
-{
-	(void)allocator;
-	(void)old_size;
-
-	return realloc(buffer, new_size);
-}
-
-EE_INLINE void ee_default_free(Allocator * allocator, void* buffer)
-{
-	(void)allocator;
-
-	free(buffer);
-}
-
-#endif // EE_ALLOCATOR
-
 typedef struct Str
 {
 	size_t top;
@@ -214,55 +29,6 @@ typedef struct Str
 	u8* buffer;
 	Allocator allocator;
 } Str;
-
-EE_INLINE s32 ee_str_first_bit_u32(u32 x)
-{
-#if defined(__BMI__)
-	return _tzcnt_u32(x);
-#elif defined(__GNUC__) || defined(__clang__)
-	return x ? __builtin_ctz(x) : EE_FIND_FIRST_BIT_INVALID;
-#elif defined(_MSC_VER)
-	unsigned long i;
-
-	if (_BitScanForward(&i, x))
-	{
-		return (s32)i;
-	}
-	else
-	{
-		return EE_FIND_FIRST_BIT_INVALID;
-	}
-#else
-	for (s32 i = 0; i < 32; ++i)
-	{
-		if (x & (1u << i))
-		{
-			return i;
-		}
-	}
-
-	return EE_FIND_FIRST_BIT_INVALID;
-#endif
-}
-
-EE_INLINE s32 ee_str_popcnt_u32(u32 x)
-{
-#if defined(__GNUC__) || defined(__clang__)
-	return __builtin_popcount(x);
-#elif defined(_MSC_VER)
-	return __popcnt(x);
-#else
-	s32 count = 0;
-
-	while (x) 
-	{
-		x &= x - 1;
-		count++;
-	}
-
-	return count;
-#endif
-}
 
 EE_INLINE u64 ee_min_u64(u64 a, u64 b)
 {
@@ -521,7 +287,7 @@ EE_INLINE size_t ee_str_find_b(const Str* str, const Str* target, size_t low, si
 
 		while (match_mask)
 		{
-			s32 first = ee_str_first_bit_u32(match_mask);
+			s32 first = ee_first_bit_u32(match_mask);
 
 			if ((i + first + target_len <= high) &&
 				memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
@@ -584,7 +350,7 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 
 		while (match_mask)
 		{
-			s32 first = ee_str_first_bit_u32(match_mask);
+			s32 first = ee_first_bit_u32(match_mask);
 
 			if ((i + first + target_len <= high) && memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
 			{

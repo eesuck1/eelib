@@ -1,61 +1,8 @@
 #ifndef EE_RANDOM_H
 #define EE_RANDOM_H
 
-#include "stdlib.h"
-#include "stdint.h"
+#include "ee_core.h"
 #include "math.h"
-
-#ifndef EE_NO_ASSERT
-#ifndef EE_ASSERT
-#include "stdio.h"
-
-#define EE_ASSERT(cond, fmt, ...) do {                                    \
-		if (!(cond)) {                                                        \
-			fprintf(stderr, "[%s][%d][%s] ", __FILE__, __LINE__, __func__);   \
-			fprintf(stderr, fmt "\n", ##__VA_ARGS__);                         \
-			exit(1);                                                          \
-		}                                                                     \
-	} while (0)
-#endif // EE_ASSERT
-#else
-#define EE_ASSERT(cond, fmt, ...)    ((void)0)
-#endif // EE_NO_ASSERT
-
-#ifndef EE_INLINE
-#define EE_INLINE    static inline
-#endif // EE_INLINE
-
-#ifndef EE_TRUE
-#define EE_TRUE     (1)
-#endif // EE_TRUE
-
-#ifndef EE_FALSE
-#define EE_FALSE    (0)
-#endif // EE_FALSE
-
-#ifndef EE_TYPES
-#define EE_TYPES
-
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
-typedef uint64_t    u64;
-
-typedef int8_t      s8;
-typedef int16_t     s16;
-typedef int32_t     s32;
-typedef int64_t     s64;
-
-typedef float       f32;
-typedef double      f64;
-typedef long double f80;
-
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-_Static_assert(sizeof(float) == 4, "f32: sizeof(float) != 4");
-_Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
-#endif
-
-#endif // EE_TYPES
 
 #define EE_RNG_STATE_LEN    (2)
 #define EE_RNG_EPS          (1e-16)

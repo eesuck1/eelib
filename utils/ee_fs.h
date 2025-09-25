@@ -24,6 +24,8 @@ typedef struct FsReader
 	Allocator allocator;
 } FsReader;
 
+EE_EXTERN_C_START
+
 EE_INLINE FsReader ee_fs_new(size_t size, Allocator* allocator)
 {
 	FsReader out = { 0 };
@@ -155,5 +157,7 @@ EE_INLINE const u8* ee_fs_cstr_get(FsReader* fs, size_t i)
 
 	return ee_str_at(&fs->slab, offset);
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_FS_H

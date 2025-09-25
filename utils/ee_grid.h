@@ -51,6 +51,8 @@ typedef struct GridNode
 	f32 cost;
 } GridNode;
 
+EE_EXTERN_C_START
+
 typedef f32 (*GridCost)(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1);
 
 static const s32 EE_SEARCH_NEIGHS[EE_SEARCH_NEIGHS_COUNT][2] = {
@@ -203,9 +205,9 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 	Array out_path = ee_array_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
 	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp, &grid->allocator);
 
-	Dict score = ee_dict_new(start_size, &grid->allocator);
-	Dict parent = ee_dict_new(start_size, &grid->allocator);
-	Dict closed = ee_dict_new(start_size, &grid->allocator);
+	Dict score = ee_dict_new(start_size, 8, 8, &grid->allocator);
+	Dict parent = ee_dict_new(start_size, 8, 8, &grid->allocator);
+	Dict closed = ee_dict_new(start_size, 8, 8, &grid->allocator);
 
 	GridPos start_pos = { x_0, y_0 };
 	GridNode start_node = { start_pos, dist };
@@ -387,5 +389,7 @@ EE_INLINE void ee_grid_set_zero(Grid* grid, s32 x, s32 y)
 {
 	memset(ee_grid_at(grid, x, y), 0, grid->elem_size);
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_GRID_H

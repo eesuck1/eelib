@@ -37,6 +37,8 @@ typedef struct Set
 	Array colors;
 };
 
+EE_EXTERN_C_START
+
 EE_INLINE Node ee_node_new(s64 prev, u8 data[EE_NODE_PL_SIZE])
 {
 	Node out = { 0 };
@@ -86,5 +88,7 @@ EE_INLINE void ee_set_insert(Set* set, u8 data[EE_NODE_PL_SIZE])
 		ee_array_push(&set->colors, EE_ARRAY_DT(EE_BLACK));
 	}
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_SET_H

@@ -30,10 +30,7 @@ typedef struct Str
 	Allocator allocator;
 } Str;
 
-EE_INLINE u64 ee_min_u64(u64 a, u64 b)
-{
-	return a < b ? a : b;
-}
+EE_EXTERN_C_START
 
 EE_INLINE Str ee_str_new(size_t size, const Allocator* allocator)
 {
@@ -827,5 +824,7 @@ EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const u8* bytes, size_t len)
 		str->top = i + len;
 	}
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_STRING_H

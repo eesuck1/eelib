@@ -15,6 +15,8 @@ typedef struct Rng
 	s32 have_spare;
 } Rng;
 
+EE_EXTERN_C_START
+
 EE_INLINE u64 ee_rotl_u64(u64 x, s32 k)
 {
 	return (x << k) | (x >> (64 - k));
@@ -253,5 +255,7 @@ EE_INLINE f32 ee_randn_f32(Rng* rng, f32 mean, f32 std)
 
 	return mean + std * z_0;
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_RANDOM_H

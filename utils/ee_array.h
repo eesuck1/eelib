@@ -29,6 +29,8 @@ typedef enum ArraySortType
 	EE_SORT_INTRO   = 4,
 } ArraySortType;
 
+EE_EXTERN_C_START
+
 EE_INLINE Array ee_array_new(size_t size, size_t elem_size, Allocator* allocator)
 {
 	EE_ASSERT(size > 0, "Invalid arraytor size (%zu)", size);
@@ -603,5 +605,6 @@ EE_INLINE void ee_array_swap_n_pop(Array* array, size_t i, u8* out_val)
 	array->top -= array->elem_size;
 }
 
+EE_EXTERN_C_END
 
 #endif // EE_ARRAY_H

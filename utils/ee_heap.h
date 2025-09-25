@@ -16,6 +16,8 @@ typedef struct Heap
 	BinCmp cmp;
 } Heap;
 
+EE_EXTERN_C_START
+
 EE_INLINE Heap ee_heap_new(size_t size, size_t elem_size, BinCmp cmp, Allocator* allocator)
 {
 	EE_ASSERT(cmp != NULL, "Trying to set NULL comparator");
@@ -143,5 +145,7 @@ EE_INLINE u8* ee_heap_at(Heap* heap, size_t i)
 
 	return ee_array_at(&heap->items, i);
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_Heap_H

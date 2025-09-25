@@ -51,6 +51,18 @@
 #endif
 
 //
+// Extern C
+//
+
+#ifdef __cplusplus
+#define EE_EXTERN_C_START    extern "C" {
+#define EE_EXTERN_C_END      }
+#else
+#define EE_EXTERN_C_START
+#define EE_EXTERN_C_END
+#endif
+
+//
 // Types
 //
 
@@ -114,6 +126,8 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 #endif
 #endif
 
+EE_EXTERN_C_START
+
 #ifndef EE_SIMD
 #define EE_SIMD
 
@@ -124,6 +138,7 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 typedef __m256i ee_simd_i;
 
 #define EE_SIMD_BYTES         (32)
+#define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm256_loadu_si256
 #define ee_load_si            _mm256_load_si256
@@ -140,6 +155,7 @@ typedef __m256i ee_simd_i;
 typedef __m128i ee_simd_i;
 
 #define EE_SIMD_BYTES         (16)
+#define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm_loadu_si128
 #define ee_load_si            _mm_load_si128
@@ -154,6 +170,7 @@ typedef __m128i ee_simd_i;
 typedef u64 ee_simd_i;
 
 #define EE_SIMD_BYTES         (8)
+#define EE_SIMD_PREFETCH_T0   (0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
 _Static_assert(sizeof(ee_simd_i) == EE_SIMD_BYTES, "ee_simd_i size mismatch");
@@ -238,6 +255,7 @@ EE_INLINE void _ee_prefetch(const void* p, s32 sel)
 typedef __m256i eed_simd_i;
 
 #define EED_SIMD_BYTES         (32)
+#define EED_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define eed_loadu_si           _mm256_loadu_si256
 #define eed_load_si            _mm256_load_si256
@@ -254,6 +272,7 @@ typedef __m256i eed_simd_i;
 typedef __m128i eed_simd_i;
 
 #define EED_SIMD_BYTES         (16)
+#define EED_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define eed_loadu_si           _mm_loadu_si128
 #define eed_load_si            _mm_load_si128
@@ -268,6 +287,7 @@ typedef __m128i eed_simd_i;
 typedef u64 eed_simd_i;
 
 #define EED_SIMD_BYTES         (8)
+#define EED_SIMD_PREFETCH_T0   (0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
 _Static_assert(sizeof(eed_simd_i) == EED_SIMD_BYTES, "eed_simd_i size mismatch");
@@ -519,6 +539,12 @@ EE_INLINE int ee_log2_u32(u32 x)
 #endif
 }
 
+EE_INLINE u64 ee_min_u64(u64 a, u64 b)
+{
+    return a < b ? a : b;
+}
+
+EE_EXTERN_C_END
 
 //
 // End

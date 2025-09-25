@@ -22,6 +22,8 @@ typedef struct Arena
     Allocator allocator;
 } Arena;
 
+EE_EXTERN_C_START
+
 EE_INLINE size_t ee_round_up(size_t x, size_t align)
 {
     EE_ASSERT(align != 0, "Invalid alignment value (0)");
@@ -184,5 +186,7 @@ EE_INLINE Allocator ee_arena_allocator(Arena* arena)
 
     return out;
 }
+
+EE_EXTERN_C_END
 
 #endif // EE_ARENA_H

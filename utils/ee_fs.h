@@ -48,6 +48,128 @@ EE_INLINE FsReader ee_fs_new(size_t size, Allocator* allocator)
 	return out;
 }
 
+EE_INLINE s32 ee_is_sep(char val)
+{
+	return val == '\\' || val == '/';
+}
+
+EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
+{
+	EE_ASSERT(str != NULL, "Trying to match NULL path");
+	EE_ASSERT(pattern != NULL, "Trying to match NULL pattern");
+
+	if (pattern[0] == '*' && pattern[1] == '\0')
+	{
+		return EE_TRUE;
+	}
+
+	if (pattern[0] == '*' && pattern[1] == '.' && pattern[2] == '*' && pattern[3] == '\0')
+	{
+		return EE_TRUE;
+	}
+
+	const u8* s = str;
+	const u8* p = pattern;
+
+	const u8* star_p = NULL;
+	const u8* star_s = NULL;
+
+	while (*s != '\0')
+	{
+		if (*p == '*')
+		{
+			star_p = p;
+			star_s = s;
+			p++;
+			continue;
+		}
+		else if (*p == '?')
+		{
+			if (*s == '\0' || ee_is_sep(*s))
+			{
+				if (star_p != NULL)
+				{
+					star_s++;
+					s = star_s;
+					p = star_p + 1;
+
+					if (*star_s == '\0' || ee_is_sep(*star_s))
+					{
+						return EE_FALSE;
+					}
+
+					continue;
+				}
+
+				return EE_FALSE;
+			}
+
+			s++;
+			p++;
+			continue;
+		}
+		else if (ee_is_sep(*p))
+		{
+			if (!ee_is_sep(*s))
+			{
+				if (star_p != NULL)
+				{
+					star_s++;
+					s = star_s;
+					p = star_p + 1;
+
+					if (*star_s == '\0' || ee_is_sep(*star_s))
+					{
+						return EE_FALSE;
+					}
+
+					continue;
+				}
+
+				return EE_FALSE;
+			}
+
+			s++;
+			p++;
+
+			star_p = NULL;
+			star_s = NULL;
+			continue;
+		}
+		else if (*p == *s)
+		{
+			s++;
+			p++;
+			continue;
+		}
+		else if (star_p != NULL)
+		{
+			star_s++;
+			s = star_s;
+			p = star_p + 1;
+
+			if (*star_s == '\0' || ee_is_sep(*star_s))
+			{
+				return EE_FALSE;
+			}
+
+			continue;
+		}
+		else
+		{
+			return EE_FALSE;
+		}
+	}
+
+	while (*p == '*')
+	{
+		p++;
+	}
+
+
+	return EE_TRUE;
+}
+
 EE_INLINE s32 ee_fs_isdir(const u8* dir_path)
 {
 	EE_ASSERT(dir_path != NULL, "Trying to dereference NULL path");

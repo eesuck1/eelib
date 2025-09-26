@@ -192,9 +192,9 @@ EE_INLINE void ee_fs_format_dir_path(u8* out_path, const u8* dir_path, const u8*
 	const u8* mask_val = mask == NULL ? "" : mask;
 	size_t len = strnlen(dir_path, EE_MAX_PATH_LEN);
 
-	if (dir_path[len] != '/' || dir_path[len] != '\\')
+	if (dir_path[len] != '/' && dir_path[len] != '\\')
 	{
-		snprintf(out_path, EE_MAX_PATH_LEN, "%s/%s", dir_path, mask_val);
+		snprintf(out_path, EE_MAX_PATH_LEN, "%s\\%s", dir_path, mask_val);
 	}
 	else
 	{
@@ -202,16 +202,17 @@ EE_INLINE void ee_fs_format_dir_path(u8* out_path, const u8* dir_path, const u8*
 	}
 }
 
-EE_INLINE void ee_fs_listdir_mask_rec(FsReader* fs, const u8* dir_path, const u8* mask, s32 max_depth)
+EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask, s32 max_depth)
 {
-	if (max_depth <= 0)
-	{
-		return;
-	}
-
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL file reader");
 	EE_ASSERT(ee_fs_path_exists(dir_path), "Directory path does not exist (%s)", dir_path);
 	EE_ASSERT(ee_fs_isdir(dir_path), "Path is not a directory (%s)", dir_path);
+
+	if (max_depth <= 0 || GetFileAttributesA(dir_path) == INVALID_FILE_ATTRIBUTES ||
+		!(GetFileAttributesA(dir_path) & FILE_ATTRIBUTE_DIRECTORY))
+	{
+		return;
+	}
 
 	u8 orig_path[EE_MAX_PATH_LEN] = { 0 };
 	u8 base_path[EE_MAX_PATH_LEN] = { 0 };
@@ -220,14 +221,18 @@ EE_INLINE void ee_fs_listdir_mask_rec(FsReader* fs, const u8* dir_path, const u8
 	WIN32_FIND_DATAA finder = { 0 };
 	HANDLE handle = INVALID_HANDLE_VALUE;
 
-	ee_fs_format_dir_path(orig_path, dir_path, mask == NULL ? "*" : mask);
+	ee_fs_format_dir_path(orig_path, dir_path, "*");
 	ee_fs_format_dir_path(base_path, dir_path, NULL);
 
 	size_t base_len = strnlen(base_path, EE_MAX_PATH_LEN);
-
 	handle = FindFirstFileExA(orig_path, FindExInfoBasic, &finder, FindExSearchNameMatch, NULL, FIND_FIRST_EX_LARGE_FETCH);
 
 	EE_ASSERT(handle != INVALID_HANDLE_VALUE, "Unable to list directory (%s)", orig_path);
+	
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		return;
+	}
 
 	do
 	{
@@ -249,10 +254,15 @@ EE_INLINE void ee_fs_listdir_mask_rec(FsReader* fs, const u8* dir_path, const u8
 
 		if (finder.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			ee_fs_listdir_mask_rec(fs, full_path, mask, max_depth - 1);
+			ee_fs_listdir_ex(fs, full_path, mask, max_depth - 1);
 		}
 		else
 		{
+			if (!ee_fs_wildcard(full_path, mask))
+			{
+				continue;
+			}
+
 			size_t offset = fs->slab.top;
 
 			ee_str_push_bytes(&fs->slab, full_path, base_len + file_len + 1);

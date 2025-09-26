@@ -1,10 +1,6 @@
 #ifndef EE_FS_H
 #define EE_FS_H
 
-#ifndef WIN32
-#error File system header works only with Windows by now
-#endif
-
 #include "windows.h"
 #include "ee_array.h"
 #include "ee_string.h"
@@ -63,111 +59,50 @@ EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
 		return EE_TRUE;
 	}
 
-	if (pattern[0] == '*' && pattern[1] == '.' && pattern[2] == '*' && pattern[3] == '\0')
+	u8* last_s = NULL;
+	u8* last_p = NULL;
+
+	while (*str != '\0')
 	{
-		return EE_TRUE;
-	}
+		char s = *str;
+		char p = *pattern;
 
-	const u8* s = str;
-	const u8* p = pattern;
-
-	const u8* star_p = NULL;
-	const u8* star_s = NULL;
-
-	while (*s != '\0')
-	{
-		if (*p == '*')
+		if (p == '*')
 		{
-			star_p = p;
-			star_s = s;
-			p++;
-			continue;
-		}
-		else if (*p == '?')
-		{
-			if (*s == '\0' || ee_is_sep(*s))
+			last_s = str;
+			last_p = ++pattern;
+
+			if (*pattern == '\0')
 			{
-				if (star_p != NULL)
-				{
-					star_s++;
-					s = star_s;
-					p = star_p + 1;
-
-					if (*star_s == '\0' || ee_is_sep(*star_s))
-					{
-						return EE_FALSE;
-					}
-
-					continue;
-				}
-
-				return EE_FALSE;
-			}
-
-			s++;
-			p++;
-			continue;
-		}
-		else if (ee_is_sep(*p))
-		{
-			if (!ee_is_sep(*s))
-			{
-				if (star_p != NULL)
-				{
-					star_s++;
-					s = star_s;
-					p = star_p + 1;
-
-					if (*star_s == '\0' || ee_is_sep(*star_s))
-					{
-						return EE_FALSE;
-					}
-
-					continue;
-				}
-
-				return EE_FALSE;
-			}
-
-			s++;
-			p++;
-
-			star_p = NULL;
-			star_s = NULL;
-			continue;
-		}
-		else if (*p == *s)
-		{
-			s++;
-			p++;
-			continue;
-		}
-		else if (star_p != NULL)
-		{
-			star_s++;
-			s = star_s;
-			p = star_p + 1;
-
-			if (*star_s == '\0' || ee_is_sep(*star_s))
-			{
-				return EE_FALSE;
+				return EE_TRUE;
 			}
 
 			continue;
 		}
-		else
+
+		if (p != s && p != '?')
 		{
-			return EE_FALSE;
+			if (last_p == NULL)
+			{
+				return EE_FALSE;
+			}
+
+			str = ++last_s;
+			pattern = last_p;
+
+			continue;
 		}
-	}
 
-	while (*p == '*')
+		str++;
+		pattern++;
+	}
+	
+	while (*pattern == '*')
 	{
-		p++;
+		pattern++;
 	}
 
-
-	return EE_TRUE;
+	return *pattern == '\0';
 }
 
 EE_INLINE s32 ee_fs_isdir(const u8* dir_path)
@@ -280,7 +215,7 @@ EE_INLINE size_t ee_fs_len(FsReader* fs)
 	return ee_array_len(&fs->offsets);
 }
 
-EE_INLINE const u8* ee_fs_cstr_get(FsReader* fs, size_t i)
+EE_INLINE const u8* ee_fs_cstr_at(FsReader* fs, size_t i)
 {
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL reader");
 	EE_ASSERT(i < ee_array_len(&fs->offsets), "Invalid offset index (%zu) for array with length (%zu)", i, ee_array_len(&fs->offsets));

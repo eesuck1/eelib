@@ -27,6 +27,9 @@
 	}                                                                     \
 } while (0)
 
+#define EE_PRINT(fmt, ...)    fprintf(stdout, fmt, ##__VA_ARGS__)
+#define EE_PRINTLN(fmt, ...)    fprintf(stdout, fmt "\n", ##__VA_ARGS__)
+
 #endif
 #else
 

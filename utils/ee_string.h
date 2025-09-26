@@ -825,6 +825,13 @@ EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const u8* bytes, size_t len)
 	}
 }
 
+EE_INLINE void ee_str_reset(Str* str)
+{
+	EE_ASSERT(str != NULL, "Trying to reset NULL string");
+
+	str->top = 0;
+}
+
 EE_EXTERN_C_END
 
 #endif // EE_STRING_H

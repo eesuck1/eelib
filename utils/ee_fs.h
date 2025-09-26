@@ -137,7 +137,15 @@ EE_INLINE void ee_fs_format_dir_path(u8* out_path, const u8* dir_path, const u8*
 	}
 }
 
-EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask, s32 max_depth)
+EE_INLINE void ee_fs_reset(FsReader* fs)
+{
+	EE_ASSERT(fs != NULL, "Trying to clear NULL fs");
+
+	ee_array_reset(&fs->offsets);
+	ee_str_reset(&fs->slab);
+}
+
+EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask, s32 max_depth, s32 reset_fs)
 {
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL file reader");
 	EE_ASSERT(ee_fs_path_exists(dir_path), "Directory path does not exist (%s)", dir_path);
@@ -147,6 +155,11 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 		!(GetFileAttributesA(dir_path) & FILE_ATTRIBUTE_DIRECTORY))
 	{
 		return;
+	}
+
+	if (reset_fs)
+	{
+		ee_fs_reset(fs);
 	}
 
 	u8 orig_path[EE_MAX_PATH_LEN] = { 0 };
@@ -189,7 +202,7 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 
 		if (finder.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			ee_fs_listdir_ex(fs, full_path, mask, max_depth - 1);
+			ee_fs_listdir_ex(fs, full_path, mask, max_depth - 1, EE_FALSE);
 		}
 		else
 		{

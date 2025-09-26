@@ -67,9 +67,9 @@ EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
 	
 	out.cmp    = cmp;
 
-	out.nodes  = ee_array_new(size, sizeof(Node));
-	out.free   = ee_array_new(size, sizeof(s64));
-	out.colors = ee_array_new(size, sizeof(u8));
+	out.nodes  = ee_array_new(size, sizeof(Node), NULL);
+	out.free   = ee_array_new(size, sizeof(s64), NULL);
+	out.colors = ee_array_new(size, sizeof(u8), NULL);
 
 	ee_array_fill(&out.colors, EE_ARRAY_DT(EE_RED), 0, size);
 

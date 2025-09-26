@@ -605,6 +605,13 @@ EE_INLINE void ee_array_swap_n_pop(Array* array, size_t i, u8* out_val)
 	array->top -= array->elem_size;
 }
 
+EE_INLINE void ee_array_reset(Array* array)
+{
+	EE_ASSERT(array != NULL, "Trying to reset NULL array");
+
+	array->top = 0;
+}
+
 EE_EXTERN_C_END
 
 #endif // EE_ARRAY_H

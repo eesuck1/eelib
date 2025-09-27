@@ -162,9 +162,9 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 		ee_fs_reset(fs);
 	}
 
-	u8 orig_path[EE_MAX_PATH_LEN] = { 0 };
-	u8 base_path[EE_MAX_PATH_LEN] = { 0 };
-	u8 full_path[EE_MAX_PATH_LEN] = { 0 };
+	u8 orig_path[EE_KB] = { 0 };
+	u8 base_path[EE_KB] = { 0 };
+	u8 full_path[EE_KB] = { 0 };
 
 	WIN32_FIND_DATAA finder = { 0 };
 	HANDLE handle = INVALID_HANDLE_VALUE;
@@ -236,6 +236,22 @@ EE_INLINE const u8* ee_fs_cstr_at(FsReader* fs, size_t i)
 	size_t offset = EE_ARRAY_GET(&fs->offsets, i, size_t);
 
 	return ee_str_at(&fs->slab, offset);
+}
+
+EE_INLINE s32 ee_fs_move(const u8* old_path, const u8* new_path, s32 replace_existing)
+{
+	EE_ASSERT(old_path != NULL, "Trying to move NULL path");
+	EE_ASSERT(new_path != NULL, "Trying to move to NULL new path");
+	EE_ASSERT(ee_fs_path_exists(old_path), "Source file does not exist");
+
+	DWORD flags = replace_existing ? MOVEFILE_REPLACE_EXISTING : 0;
+
+	return MoveFileExA(old_path, new_path, flags) == 0;
+}
+
+EE_INLINE s32 ee_fs_rename(const u8* old_name, const u8* new_name)
+{
+	return ee_fs_move(old_name, new_name, EE_FALSE);
 }
 
 EE_EXTERN_C_END

@@ -53,6 +53,21 @@
 #define EE_FALSE    (0)
 #endif
 
+#ifndef EE_MEM_SIZES
+#define EE_MEM_SIZES
+
+#define EE_KB        (1 << 10)
+#define EE_MB        (1 << 20)
+#define EE_GB        (1 << 30)
+#define EE_TB        (1ull << 40)
+
+#define EE_NKB(n)    (n * EE_KB)
+#define EE_NMB(n)    (n * EE_MB)
+#define EE_NGB(n)    (n * EE_GB)
+#define EE_NTB(n)    ((u64)n * EE_TB)
+
+#endif // EE_MEM_SIZES
+
 //
 // Extern C
 //

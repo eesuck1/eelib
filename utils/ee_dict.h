@@ -30,7 +30,6 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
 // #define EE_DICT_TOMBS_REHASH
-// #define EE_DICT_PROB_LINEARY
 
 typedef struct Dict
 {
@@ -47,8 +46,10 @@ typedef struct Dict
 	size_t val_len;
 	size_t slot_len;
 
+#ifdef EE_DICT_TOMBS_REHASH
 	size_t tombs;
 	size_t tombs_th;
+#endif
 
 	Allocator allocator;
 } Dict;
@@ -60,10 +61,12 @@ EE_INLINE u64 ee_dict_th(u64 cap)
 	return (cap * 896) >> 10;
 }
 
+#ifdef EE_DICT_TOMBS_REHASH
 EE_INLINE u64 ee_tombs_th(u64 cap)
 {
 	return cap >> 3;
 }
+#endif
 
 EE_INLINE u64 ee_hash64(const u8* key) 
 {
@@ -117,7 +120,64 @@ EE_INLINE u64 ee_hash(const u8* key, size_t len)
 
 EE_INLINE int ee_key_cmp(const u8* first, const u8* second, size_t len)
 {
-	return memcmp(first, second, len) == 0;
+	switch (len)
+	{
+	case 1:
+	{
+		return first[0] == second[0];
+	}
+	case 2:
+	{
+		u16 a, b;
+
+		memcpy(&a, first, sizeof(a));
+		memcpy(&b, second, sizeof(b));
+
+		return a == b;
+	}
+	case 4:
+	{
+		u32 a, b;
+
+		memcpy(&a, first, sizeof(a));
+		memcpy(&b, second, sizeof(b));
+
+		return a == b;
+	}
+	case 8:
+	{
+		u64 a, b;
+
+		memcpy(&a, first, sizeof(a));
+		memcpy(&b, second, sizeof(b));
+
+		return a == b;
+	}
+#if EE_SIMD_MAX_LEVEL >= EE_SIMD_LEVEL_SSE2
+	case 16:
+	{
+		__m128i a = _mm_loadu_si128((const __m128i*)first);
+		__m128i b = _mm_loadu_si128((const __m128i*)second);
+		__m128i cmp = _mm_cmpeq_epi8(a, b);
+
+		return _mm_movemask_epi8(cmp) == 0xFFFF;
+	}
+#endif
+#if EE_SIMD_MAX_LEVEL >= EE_SIMD_LEVEL_AVX2
+	case 32:
+	{
+		__m256i a = _mm256_loadu_si256((const __m256i*)first);
+		__m256i b = _mm256_loadu_si256((const __m256i*)second);
+		__m256i cmp = _mm256_cmpeq_epi8(a, b);
+
+		return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
+	}
+#endif
+	default:
+	{
+		return memcmp(first, second, len) == 0;
+	}
+	}
 }
 
 EE_INLINE u8* ee_dict_slot_at(const Dict* dict, size_t i)
@@ -193,8 +253,10 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Al
 	out.mask = out.cap - 1;
 	out.th = ee_dict_th(out.cap);
 
+#ifdef EE_DICT_TOMBS_REHASH
 	out.tombs = 0;
 	out.tombs_th = ee_tombs_th(out.cap);
+#endif
 
 	memset(out.ctrls, EE_SLOT_EMPTY, cap);
 
@@ -272,8 +334,10 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 		{
 			size_t place = (first_deleted != (size_t)-1) ? first_deleted : (group_index + (size_t)ee_first_bit_u32(empty_mask));
 			
-			memcpy(ee_dict_key_at(dict, place), key, dict->key_len);
-			memcpy(ee_dict_val_at(dict, place), val, dict->val_len);
+			u8* slot_at = ee_dict_slot_at(dict, place);
+
+			memcpy(slot_at, key, dict->key_len);
+			memcpy(&slot_at[dict->key_len], val, dict->val_len);
 			
 			dict->ctrls[place] = hash_sign;
 			dict->count++;
@@ -289,8 +353,10 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 	{
 		size_t place = first_deleted;
 
-		memcpy(ee_dict_key_at(dict, place), key, dict->key_len);
-		memcpy(ee_dict_val_at(dict, place), val, dict->val_len);
+		u8* slot_at = ee_dict_slot_at(dict, place);
+
+		memcpy(slot_at, key, dict->key_len);
+		memcpy(&slot_at[dict->key_len], val, dict->val_len);
 
 		dict->ctrls[place] = hash_sign;
 		dict->count++;

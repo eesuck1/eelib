@@ -44,9 +44,9 @@ EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* alloca
     EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
     EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
 
-    size_t aligned_payload = ee_round_up(size, EE_MAX_ALIGN);
+    size_t aligned_payload = ee_round_up_pow2(size, EE_MAX_ALIGN);
     size_t marks_size = rewind_depth * sizeof(size_t);
-    size_t marks_align = ee_round_up(aligned_payload, sizeof(size_t));
+    size_t marks_align = ee_round_up_pow2(aligned_payload, sizeof(size_t));
     size_t total_size = marks_align + marks_size;
 
     size_t alloc_size = total_size + (EE_MAX_ALIGN - 1);
@@ -91,7 +91,7 @@ EE_INLINE void* ee_arena_alloc(Arena* arena, size_t size)
 {
     EE_ASSERT(arena != NULL, "Trying to alloc from NULL arena");
 
-    size_t offset_aligned = ee_round_up(arena->offset, EE_MAX_ALIGN);
+    size_t offset_aligned = ee_round_up_pow2(arena->offset, EE_MAX_ALIGN);
 
     if (offset_aligned + size > arena->size)
     {

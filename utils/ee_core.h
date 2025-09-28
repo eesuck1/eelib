@@ -365,7 +365,7 @@ EE_INLINE void _eed_prefetch(const void* p, s32 sel)
     (void)sel;
 }
 
-#define eed_loadu_si           _eed_load_si
+#define eed_load_si           _eed_load_si
 #define eed_load_si            _eed_load_si
 #define eed_set1_epi8          _eed_set1_epi8
 #define eed_cmpeq_epi8         _eed_cmpeq_epi8
@@ -562,9 +562,14 @@ EE_INLINE u64 ee_min_u64(u64 a, u64 b)
     return a < b ? a : b;
 }
 
-EE_INLINE size_t ee_round_up(size_t x, size_t align)
+EE_INLINE size_t ee_round_up_pow2(size_t x, size_t r)
 {
-    return (x + align - 1) & ~(align - 1);
+    return (x + r - 1) & ~(r - 1);
+}
+
+EE_INLINE size_t ee_round_down_pow2(size_t x, size_t r)
+{
+    return x & (~(r - 1));
 }
 
 EE_EXTERN_C_END

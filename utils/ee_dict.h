@@ -29,10 +29,14 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_CONST_ZERO_F64            (EE_DICT_DT(EE_ZERO_F64))
 #define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
+// #define EE_DICT_TOMBS_REHASH
+// #define EE_DICT_PROB_LINEARY
+
 typedef struct Dict
 {
 	u8* slots;
 	u8* ctrls;
+	void* ctrls_buffer;
 
 	size_t count;
 	size_t cap;
@@ -43,14 +47,22 @@ typedef struct Dict
 	size_t val_len;
 	size_t slot_len;
 
+	size_t tombs;
+	size_t tombs_th;
+
 	Allocator allocator;
 } Dict;
 
 EE_EXTERN_C_START
 
-EE_INLINE u64 ee_dict_th(u64 x)
+EE_INLINE u64 ee_dict_th(u64 cap)
 {
-	return (x * 896) >> 10;
+	return (cap * 896) >> 10;
+}
+
+EE_INLINE u64 ee_tombs_th(u64 cap)
+{
+	return cap >> 3;
 }
 
 EE_INLINE u64 ee_hash64(const u8* key) 
@@ -87,8 +99,6 @@ EE_INLINE u64 ee_hash(const u8* key, size_t len)
 		hash ^= hash >> 30;
 		hash *= 0xbf58476d1ce4e5b9ULL;
 		hash ^= hash >> 27;
-		hash *= 0x94d049bb133111ebULL;
-		hash ^= hash >> 31;
 	}
 
 	if (len > i)
@@ -100,8 +110,6 @@ EE_INLINE u64 ee_hash(const u8* key, size_t len)
 		hash ^= hash >> 30;
 		hash *= 0xbf58476d1ce4e5b9ULL;
 		hash ^= hash >> 27;
-		hash *= 0x94d049bb133111ebULL;
-		hash ^= hash >> 31;
 	}
 
 	return hash;
@@ -171,20 +179,24 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Al
 	out.slot_len = key_len + val_len;
 
 	out.slots = (u8*)out.allocator.alloc_fn(&out.allocator, out.slot_len * cap);
-	out.ctrls = (u8*)out.allocator.alloc_fn(&out.allocator, cap);
+	out.ctrls_buffer = out.allocator.alloc_fn(&out.allocator, cap + EED_SIMD_BYTES - 1);
+
+	EE_ASSERT(out.ctrls_buffer != NULL, "Unable to allocate (%zu) bytes for Dict.ctrls", cap + EED_SIMD_BYTES - 1);
+	EE_ASSERT(out.slots != NULL, "Unable to allocate (%zu) bytes for Dict.slots", out.slot_len * cap);
+
+	uintptr_t aligned_ctrls = ((uintptr_t)out.ctrls_buffer + EED_SIMD_BYTES - 1) & ~((uintptr_t)(EED_SIMD_BYTES - 1));
+
+	out.ctrls = (u8*)aligned_ctrls;
 
 	out.count = 0;
 	out.cap = cap;
 	out.mask = out.cap - 1;
 	out.th = ee_dict_th(out.cap);
 
-	EE_ASSERT(out.slots != NULL, "Unable to allocate (%zu) bytes for Dict.slots", out.slot_len * cap);
-	EE_ASSERT(out.ctrls != NULL, "Unable to allocate (%zu) bytes for Dict.ctrls", cap);
+	out.tombs = 0;
+	out.tombs_th = ee_tombs_th(out.cap);
 
-	if (out.ctrls != NULL)
-	{
-		memset(out.ctrls, EE_SLOT_EMPTY, cap);
-	}
+	memset(out.ctrls, EE_SLOT_EMPTY, cap);
 
 	return out;
 }
@@ -195,7 +207,7 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	EE_ASSERT(dict->ctrls != NULL, "Trying to free NULL Dict.ctrls");
 	EE_ASSERT(dict->slots != NULL, "Trying to free NULL Dict.slots");
 
-	dict->allocator.free_fn(&dict->allocator, dict->ctrls);
+	dict->allocator.free_fn(&dict->allocator, dict->ctrls_buffer);
 	dict->allocator.free_fn(&dict->allocator, dict->slots);
 
 	memset(dict, 0, sizeof(Dict));
@@ -203,7 +215,9 @@ EE_INLINE void ee_dict_free(Dict* dict)
 
 EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 {
-	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL value");
 
 	u64 hash = ee_hash(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
@@ -224,10 +238,10 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
-		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 
 		s32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
 		
@@ -301,7 +315,27 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 		}
 	}
 
-	dict->allocator.free_fn(&dict->allocator, dict->ctrls);
+	dict->allocator.free_fn(&dict->allocator, dict->ctrls_buffer);
+	dict->allocator.free_fn(&dict->allocator, dict->slots);
+
+	*dict = out;
+}
+
+EE_INLINE void ee_dict_rehash(Dict* dict)
+{
+	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
+
+	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, &dict->allocator);
+
+	for (size_t i = 0; i < dict->cap; ++i)
+	{
+		if (dict->ctrls[i] != EE_SLOT_EMPTY && dict->ctrls[i] != EE_SLOT_DELETED)
+		{
+			ee_dict_insert(&out, ee_dict_key_at(dict, i), ee_dict_val_at(dict, i));
+		}
+	}
+
+	dict->allocator.free_fn(&dict->allocator, dict->ctrls_buffer);
 	dict->allocator.free_fn(&dict->allocator, dict->slots);
 
 	*dict = out;
@@ -329,7 +363,8 @@ EE_INLINE s32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 
 EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 {
-	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
 
 	u64 hash = ee_hash(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
@@ -348,10 +383,10 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
-		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
 		s32 match_mask = eed_movemask_epi8(match);
@@ -364,6 +399,15 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 			{
 				dict->ctrls[group_index + first] = EE_SLOT_DELETED;
 				dict->count--;
+
+				#ifdef EE_DICT_TOMBS_REHASH
+				dict->tombs++;
+
+				if (dict->tombs >= dict->tombs_th)
+				{
+					ee_dict_rehash(dict);
+				}
+				#endif
 
 				return;
 			}
@@ -387,7 +431,8 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 
 EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 {
-	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
 
 	u64 hash = ee_hash(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
@@ -406,10 +451,10 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
-		eed_simd_i group = eed_loadu_si((eed_simd_i*)&dict->ctrls[group_index]);
+		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
 		s32 match_mask = eed_movemask_epi8(match);
@@ -445,6 +490,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 EE_INLINE int ee_dict_contains(const Dict* dict, const u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to check NULL Dict");
+	EE_ASSERT(key != NULL, "Trying to check NULL key");
 
 	u8* val = ee_dict_at(dict, key);
 

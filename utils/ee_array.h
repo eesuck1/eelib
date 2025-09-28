@@ -65,24 +65,24 @@ EE_INLINE Array ee_array_new(size_t size, size_t elem_size, Allocator* allocator
 	return out;
 }
 
-EE_INLINE int ee_array_full(Array* array)
+EE_INLINE int ee_array_full(const Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to check NULL Array");
 
 	return array->top >= array->cap;
 }
 
-EE_INLINE int ee_array_empty(Array* array)
+EE_INLINE int ee_array_empty(const Array* array)
 {
 	return array->top < array->elem_size;
 }
 
-EE_INLINE size_t ee_array_len(Array* array)
+EE_INLINE size_t ee_array_len(const Array* array)
 {
 	return array->top / array->elem_size;
 }
 
-EE_INLINE size_t ee_array_size(Array* array)
+EE_INLINE size_t ee_array_size(const Array* array)
 {
 	return array->top;
 }
@@ -136,7 +136,7 @@ EE_INLINE void ee_array_grow(Array* array)
 	array->buffer = new_buffer;
 }
 
-EE_INLINE void ee_array_push(Array* array, u8* val)
+EE_INLINE void ee_array_push(Array* array, const u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to push into NULL Array");
 	EE_ASSERT(val != NULL, "Trying to push NULL value");
@@ -177,7 +177,7 @@ EE_INLINE void ee_array_push_nothing(Array* array)
 	array->top += array->elem_size;
 }
 
-EE_INLINE u8* ee_array_top(Array* array)
+EE_INLINE u8* ee_array_top(const Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to get NULL Array top");
 	EE_ASSERT(array->top >= array->elem_size, "Trying to get top element of empty Array");
@@ -185,7 +185,7 @@ EE_INLINE u8* ee_array_top(Array* array)
 	return &array->buffer[array->top - array->elem_size];
 }
 
-EE_INLINE u8* ee_array_at(Array* array, size_t i)
+EE_INLINE u8* ee_array_at(const Array* array, size_t i)
 {
 	EE_ASSERT(array != NULL, "Trying to get NULL Array element");
 	EE_ASSERT(i * array->elem_size < array->top, "Index (%zu) is out of bounds for arraytor with top (%zu)", i, array->top / array->elem_size);
@@ -215,7 +215,7 @@ EE_INLINE void ee_array_set(Array* array, size_t i, const u8* val)
 	memcpy(&array->buffer[i * array->elem_size], val, array->elem_size);
 }
 
-EE_INLINE size_t ee_array_find(Array* array, u8* target)
+EE_INLINE size_t ee_array_find(const Array* array, const u8* target)
 {
 	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
@@ -231,7 +231,7 @@ EE_INLINE size_t ee_array_find(Array* array, u8* target)
 	return EE_ARRAY_INVALID;
 }
 
-EE_INLINE void ee_array_insert(Array* array, size_t i, u8* val)
+EE_INLINE void ee_array_insert(Array* array, size_t i, const u8* val)
 {
 	EE_ASSERT(array != NULL, "Trying to insert into NULL Array");
 	EE_ASSERT(i <= array->top / array->elem_size, "Index out of bounds");
@@ -511,7 +511,7 @@ EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)
 	}
 }
 
-EE_INLINE void ee_array_fill(Array* array, u8* val, size_t a, size_t b)
+EE_INLINE void ee_array_fill(Array* array, const u8* val, size_t a, size_t b)
 {
 	EE_ASSERT(array != NULL, "Trying to fill a NULL Array");
 	EE_ASSERT(val != NULL, "Trying to fill a Array with a NULL value");

@@ -35,7 +35,7 @@ typedef struct Set
 	Array nodes;
 	Array free;
 	Array colors;
-};
+} Set;
 
 EE_EXTERN_C_START
 

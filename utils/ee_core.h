@@ -562,6 +562,11 @@ EE_INLINE u64 ee_min_u64(u64 a, u64 b)
     return a < b ? a : b;
 }
 
+EE_INLINE size_t ee_round_up(size_t x, size_t align)
+{
+    return (x + align - 1) & ~(align - 1);
+}
+
 EE_EXTERN_C_END
 
 //

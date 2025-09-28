@@ -5,11 +5,12 @@
 
 #include "ee_core.h"
 
-#define EE_ARRAY_DT(x)                   ((u8*)(&(x)))
-#define EE_ARRAY_INVALID                 (0xffffffffffffffffull)
-#define EE_ARRAY_SORT_TH                 (16)
-#define EE_ARRAY_AT(v_ptr, i, dtype)     ((dtype*)ee_array_at(v_ptr, i))
-#define EE_ARRAY_GET(v_ptr, i, dtype)    (*(dtype*)ee_array_at(v_ptr, i))
+#define EE_ARRAY_DT(x)                           ((u8*)(&(x)))
+#define EE_ARRAY_INVALID                         (0xffffffffffffffffull)
+#define EE_ARRAY_SORT_TH                         (16)
+#define EE_ARRAY_RECAST(v_ptr, i, dtype)         ((dtype*)ee_array_at(v_ptr, i))
+#define EE_ARRAY_PTR_GET(v_ptr, i, d_ptr)        (memcpy(d_ptr, ee_array_at(v_ptr, i), v_ptr->elem_size))
+#define EE_ARRAY_GET(v, i, d)                    (memcpy(&d, ee_array_at(&v, i), v.elem_size))
 
 typedef struct Array
 {

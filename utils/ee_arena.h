@@ -24,14 +24,6 @@ typedef struct Arena
 
 EE_EXTERN_C_START
 
-EE_INLINE size_t ee_round_up(size_t x, size_t align)
-{
-    EE_ASSERT(align != 0, "Invalid alignment value (0)");
-    EE_ASSERT((align & (align - 1)) == 0, "Alignment (%zu) must be power-of-two", align);
-
-    return (x + align - 1) & ~(align - 1);
-}
-
 EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* allocator)
 {
     Arena out = { 0 };

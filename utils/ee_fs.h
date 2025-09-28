@@ -59,8 +59,8 @@ EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
 		return EE_TRUE;
 	}
 
-	u8* last_s = NULL;
-	u8* last_p = NULL;
+	const u8* last_s = NULL;
+	const u8* last_p = NULL;
 
 	while (*str != '\0')
 	{
@@ -233,7 +233,8 @@ EE_INLINE const u8* ee_fs_cstr_at(FsReader* fs, size_t i)
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL reader");
 	EE_ASSERT(i < ee_array_len(&fs->offsets), "Invalid offset index (%zu) for array with length (%zu)", i, ee_array_len(&fs->offsets));
 
-	size_t offset = EE_ARRAY_GET(&fs->offsets, i, size_t);
+	size_t offset;
+	EE_ARRAY_GET(fs->offsets, i, offset);
 
 	return ee_str_at(&fs->slab, offset);
 }

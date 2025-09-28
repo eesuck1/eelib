@@ -300,8 +300,8 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 
@@ -449,8 +449,8 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
@@ -517,8 +517,8 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		size_t next_base_index = (base_index + EE_GROUP_SIZE * next_probe_step) & dict->mask;
 		size_t next_group_index = next_base_index & EE_GROUP_MASK;
 
-		eed_prefetch((const u8*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
-		eed_prefetch((const u8*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)&dict->ctrls[next_group_index], EED_SIMD_PREFETCH_T0);
+		eed_prefetch((const char*)ee_dict_slot_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);

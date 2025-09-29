@@ -64,7 +64,6 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 > [!IMPORTANT]  
 > Some headers depend on others, so make sure you copy all required files.
 
-<<<<<<< HEAD
 [//]: # (```mermaid)
 
 [//]: # (graph TD)
@@ -148,8 +147,6 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 [//]: # ()
 [//]: # (```)
 
-=======
->>>>>>> 719c01c7edfc33acd301596e26581d5a6ef90f59
 | Header        | Description                                                                                       | Dependencies                          |
 |---------------|---------------------------------------------------------------------------------------------------|---------------------------------------|
 | [`ee_arena.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h)  | Provides a fast, linear memory allocator.                                                         | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |

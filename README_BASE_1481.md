@@ -1,4 +1,3 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 # ee — Lightweight C Utility Library
 
 **eelib** is a header-only C library providing common data structures and utilities. 
@@ -30,10 +29,11 @@ The library provides a set of building blocks:
     - ```ee_fs.h``` for filesystem traversal and file utilities (Windows support).
     - ```ee_random.h``` for uniform and normal random distributions.  
 
-### **Supported platforms/compilers**
-
-*   Minimum C standard: **C99**
-*   Tested with **MSVC**, **GCC** on **Windows**
+### **Use cases**:  
+- Game engines and real-time simulations  
+- Embedded systems and firmware  
+- High-performance tools and utilities  
+- Prototyping and small C projects
 
 ### **Installation**:
 
@@ -64,92 +64,51 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 > [!IMPORTANT]  
 > Some headers depend on others, so make sure you copy all required files.
 
-<<<<<<< HEAD
-[//]: # (```mermaid)
+```mermaid
+graph TD
 
-[//]: # (graph TD)
+    subgraph Independent
+        core[ee_core.h]
+    end
 
-[//]: # ()
-[//]: # (    subgraph Independent)
+    subgraph Dependent
+        arena[ee_arena.h]
+        array[ee_array.h]
+        dict[ee_dict.h]
+        fs[ee_fs.h]
+        grid[ee_grid.h]
+        heap[ee_heap.h]
+        random[ee_random.h]
+        set[ee_set.h]
+        string[ee_string.h]
+    end
 
-[//]: # (        core[ee_core.h])
+    grid --> array
+    grid --> dict
+    grid --> heap
+    heap --> array
+    set --> array
+    arena --> core
+    array --> core
+    dict --> core
+    fs --> array
+    fs --> string
+    random --> core
+    string --> core
 
-[//]: # (    end)
+    click arena "https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h" "Open ee_arena.h"
+    click dict "https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h" "Open ee_dict.h"
+    click string "https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h" "Open ee_string.h"
+    click array "https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h" "Open ee_array.h"
+    click grid "https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h" "Open ee_grid.h"
+    click heap "https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h" "Open ee_heap.h"
+    click set "https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h" "Open ee_set.h"
+    click core "https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h" "Open ee_core.h"
+    click fs "https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h" "Open ee_fs.h"
+    click random "https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h" "Open ee_random.h"
 
-[//]: # ()
-[//]: # (    subgraph Dependent)
+```
 
-[//]: # (        arena[ee_arena.h])
-
-[//]: # (        array[ee_array.h])
-
-[//]: # (        dict[ee_dict.h])
-
-[//]: # (        fs[ee_fs.h])
-
-[//]: # (        grid[ee_grid.h])
-
-[//]: # (        heap[ee_heap.h])
-
-[//]: # (        random[ee_random.h])
-
-[//]: # (        set[ee_set.h])
-
-[//]: # (        string[ee_string.h])
-
-[//]: # (    end)
-
-[//]: # ()
-[//]: # (    grid --> array)
-
-[//]: # (    grid --> dict)
-
-[//]: # (    grid --> heap)
-
-[//]: # (    heap --> array)
-
-[//]: # (    set --> array)
-
-[//]: # (    arena --> core)
-
-[//]: # (    array --> core)
-
-[//]: # (    dict --> core)
-
-[//]: # (    fs --> array)
-
-[//]: # (    fs --> string)
-
-[//]: # (    random --> core)
-
-[//]: # (    string --> core)
-
-[//]: # ()
-[//]: # (    click arena "https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h" "Open ee_arena.h")
-
-[//]: # (    click dict "https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h" "Open ee_dict.h")
-
-[//]: # (    click string "https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h" "Open ee_string.h")
-
-[//]: # (    click array "https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h" "Open ee_array.h")
-
-[//]: # (    click grid "https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h" "Open ee_grid.h")
-
-[//]: # (    click heap "https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h" "Open ee_heap.h")
-
-[//]: # (    click set "https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h" "Open ee_set.h")
-
-[//]: # (    click core "https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h" "Open ee_core.h")
-
-[//]: # (    click fs "https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h" "Open ee_fs.h")
-
-[//]: # (    click random "https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h" "Open ee_random.h")
-
-[//]: # ()
-[//]: # (```)
-
-=======
->>>>>>> 719c01c7edfc33acd301596e26581d5a6ef90f59
 | Header        | Description                                                                                       | Dependencies                          |
 |---------------|---------------------------------------------------------------------------------------------------|---------------------------------------|
 | [`ee_arena.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h)  | Provides a fast, linear memory allocator.                                                         | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |

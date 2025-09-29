@@ -39,7 +39,8 @@ The library provides a set of building blocks:
 ### **Supported platforms/compilers**
 
 *   Minimum C standard: **C99**
-*   Tested with **MSVC**, **GCC** on **Windows**
+*   Tested with **MSVC**, **GCC**
+* Works on **Windows**, **macOS**, **Linux** 
 
 ### **Installation**:
 

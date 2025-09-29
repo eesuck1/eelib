@@ -29,11 +29,10 @@ The library provides a set of building blocks:
     - ```ee_fs.h``` for filesystem traversal and file utilities (Windows support).
     - ```ee_random.h``` for uniform and normal random distributions.
 
-### **Use cases**:
-- Game engines and real-time simulations
-- Embedded systems and firmware
-- High-performance tools and utilities
-- Prototyping and small C projects
+### **Supported platforms/compilers**
+
+*   Minimum C standard: **C99**
+*   Tested with **MSVC**, **GCC** on **Windows**
 
 ### **Installation**:
 

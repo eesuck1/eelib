@@ -64,50 +64,88 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 > [!IMPORTANT]  
 > Some headers depend on others, so make sure you copy all required files.
 
-```mermaid
-graph TD
+[//]: # (```mermaid)
 
-    subgraph Independent
-        core[ee_core.h]
-    end
+[//]: # (graph TD)
 
-    subgraph Dependent
-        arena[ee_arena.h]
-        array[ee_array.h]
-        dict[ee_dict.h]
-        fs[ee_fs.h]
-        grid[ee_grid.h]
-        heap[ee_heap.h]
-        random[ee_random.h]
-        set[ee_set.h]
-        string[ee_string.h]
-    end
+[//]: # ()
+[//]: # (    subgraph Independent)
 
-    grid --> array
-    grid --> dict
-    grid --> heap
-    heap --> array
-    set --> array
-    arena --> core
-    array --> core
-    dict --> core
-    fs --> array
-    fs --> string
-    random --> core
-    string --> core
+[//]: # (        core[ee_core.h])
 
-    click arena "https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h" "Open ee_arena.h"
-    click dict "https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h" "Open ee_dict.h"
-    click string "https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h" "Open ee_string.h"
-    click array "https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h" "Open ee_array.h"
-    click grid "https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h" "Open ee_grid.h"
-    click heap "https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h" "Open ee_heap.h"
-    click set "https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h" "Open ee_set.h"
-    click core "https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h" "Open ee_core.h"
-    click fs "https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h" "Open ee_fs.h"
-    click random "https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h" "Open ee_random.h"
+[//]: # (    end)
 
-```
+[//]: # ()
+[//]: # (    subgraph Dependent)
+
+[//]: # (        arena[ee_arena.h])
+
+[//]: # (        array[ee_array.h])
+
+[//]: # (        dict[ee_dict.h])
+
+[//]: # (        fs[ee_fs.h])
+
+[//]: # (        grid[ee_grid.h])
+
+[//]: # (        heap[ee_heap.h])
+
+[//]: # (        random[ee_random.h])
+
+[//]: # (        set[ee_set.h])
+
+[//]: # (        string[ee_string.h])
+
+[//]: # (    end)
+
+[//]: # ()
+[//]: # (    grid --> array)
+
+[//]: # (    grid --> dict)
+
+[//]: # (    grid --> heap)
+
+[//]: # (    heap --> array)
+
+[//]: # (    set --> array)
+
+[//]: # (    arena --> core)
+
+[//]: # (    array --> core)
+
+[//]: # (    dict --> core)
+
+[//]: # (    fs --> array)
+
+[//]: # (    fs --> string)
+
+[//]: # (    random --> core)
+
+[//]: # (    string --> core)
+
+[//]: # ()
+[//]: # (    click arena "https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h" "Open ee_arena.h")
+
+[//]: # (    click dict "https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h" "Open ee_dict.h")
+
+[//]: # (    click string "https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h" "Open ee_string.h")
+
+[//]: # (    click array "https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h" "Open ee_array.h")
+
+[//]: # (    click grid "https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h" "Open ee_grid.h")
+
+[//]: # (    click heap "https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h" "Open ee_heap.h")
+
+[//]: # (    click set "https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h" "Open ee_set.h")
+
+[//]: # (    click core "https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h" "Open ee_core.h")
+
+[//]: # (    click fs "https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h" "Open ee_fs.h")
+
+[//]: # (    click random "https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h" "Open ee_random.h")
+
+[//]: # ()
+[//]: # (```)
 
 | Header        | Description                                                                                       | Dependencies                          |
 |---------------|---------------------------------------------------------------------------------------------------|---------------------------------------|

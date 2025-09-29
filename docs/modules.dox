@@ -1,0 +1,40 @@
+/** @defgroup arena Memory Arena
+ *  Provides a fast, linear memory allocator.
+ *  Independent module, no dependencies.
+ */
+
+/** @defgroup dict Hash Map
+ *  Open-addressing hash map for fixed-size keys and values.
+ *  Independent module, no dependencies.
+ */
+
+/** @defgroup string String Utilities
+ *  String types for C, supporting dynamic allocation,
+ *  fixed-size strings, and string views.
+ *  Independent module, no dependencies.
+ */
+
+/** @defgroup vec Dynamic Vector
+ *  Dynamic contiguous array for arbitrary element sizes.
+ *  Provides fast insertion, deletion, and random access.
+ *  Automatically grows capacity when needed.
+ *  Independent module, no dependencies.
+ */
+
+/** @defgroup grid Grid
+ *  Provides a 2D grid structure with utilities for subregions
+ *  and pathfinding.
+ *  Depends on @ref vec, @ref dict, and @ref heap.
+ */
+
+/** @defgroup heap Binary Heap
+ *  Implements a priority queue (binary heap) on top of the dynamic vector
+ *  with custom comparison functions.
+ *  Depends on @ref vec.
+ */
+
+/** @defgroup set Set
+ *  Implements a set data structure using nodes and vectors,
+ *  supporting a Red-Black tree layout.
+ *  Depends on @ref vec.
+ */

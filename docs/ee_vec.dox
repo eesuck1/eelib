@@ -1,0 +1,69 @@
+/** @file eelib/lib/ee_vec.h
+ * @brief Vector (dynamic array) module.
+ *
+ * This header provides the API for a generic dynamic array implementation
+ * in the **ee_lib** library.
+ * The detailed documentation is located in this `.dox` file in order
+ * to keep the source code clean.
+ */
+
+/** @page ee_vec Vector Module
+ *
+ * @tableofcontents
+ *
+ * @section intro Introduction
+ * `ee_vec.h` implements a generic dynamic array (vector) similar to C++ `std::vector`,
+ * but written entirely in C. It uses simple structures and inline functions
+ * to provide both flexibility and performance.
+ *
+ * @section features Features
+ * - Generic container for arbitrary element sizes;
+ * - Automatic buffer growth when capacity is exceeded;
+ * - Safe access through macros (@ref EE_VEC_AT, @ref EE_VEC_GET);
+ * - Memory management helpers (@ref ee_vec_reserve, @ref ee_vec_grow, @ref ee_vec_clear);
+ * - Multiple sorting algorithms available: insertion sort, quicksort, heapsort, introsort.
+ *
+ * @section types Types
+ * - @ref Vec — main structure representing the vector;
+ * - @ref BinCmp — comparator function used for sorting;
+ * - @ref VecSortType — enumeration of available sorting algorithms.
+ *
+ * @section macros Macros
+ * - @ref EE_VEC_DT — raw pointer to the data buffer (`uint8_t*`);
+ * - @ref EE_VEC_AT — access an element by index as a pointer;
+ * - @ref EE_VEC_GET — access an element by index as a value;
+ * - @ref EE_VEC_INVALID — return code for "not found";
+ * - @ref EE_VEC_SORT_TH — threshold for insertion sort in introsort.
+ *
+ * @section api API Functions
+ * - @ref ee_vec_new — create a new vector;
+ * - @ref ee_vec_free — free allocated memory;
+ * - @ref ee_vec_push — append an element to the end;
+ * - @ref ee_vec_pop — remove the last element;
+ * - @ref ee_vec_insert — insert an element at given index;
+ * - @ref ee_vec_erase — remove an element at given index;
+ * - @ref ee_vec_find — find an element by comparator;
+ * - @ref ee_vec_swap — swap two elements by index;
+ * - @ref ee_vec_clear — clear elements without freeing memory;
+ * - @ref ee_vec_reserve — reserve memory capacity;
+ * - @ref ee_vec_grow — increase buffer capacity;
+ * - @ref ee_vec_insertsort — insertion sort;
+ * - @ref ee_vec_quicksort — quicksort;
+ * - @ref ee_vec_heapsort — heapsort;
+ * - @ref ee_vec_introsort — introsort.
+ *
+ * @section example Example
+ * @code{.c}
+ * #include "ee_vec.h"
+ *
+ * int main() {
+ *     Vec v = ee_vec_new(4, sizeof(int));
+ *     int x = 42;
+ *     ee_vec_push(&v, (uint8_t*)&x);
+ *     printf("First element = %d\n", EE_VEC_GET(&v, 0, int));
+ *     ee_vec_free(&v);
+ * }
+ * @endcode
+ *
+ * @see lib/ee_vec.h
+ */

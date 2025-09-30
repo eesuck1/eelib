@@ -30,6 +30,7 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
 
 // #define EE_DICT_TOMBS_REHASH
+typedef u64 (*DictHash)(const u8* key, size_t len);
 
 typedef struct Dict
 {
@@ -52,6 +53,7 @@ typedef struct Dict
 #endif
 
 	Allocator allocator;
+	DictHash  hash_fn;
 } Dict;
 
 EE_EXTERN_C_START
@@ -204,7 +206,7 @@ EE_INLINE u8* ee_dict_val_at(const Dict* dict, size_t i)
 	return &dict->slots[i * dict->slot_len + dict->key_len];
 }
 
-EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Allocator* allocator)
+EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Allocator* allocator, DictHash hash_fn)
 {
 	EE_ASSERT(key_len > 0, "Invalid key_len (%zu)", key_len);
 	EE_ASSERT(val_len > 0, "Invalid val_len (%zu)", val_len);
@@ -252,6 +254,8 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Al
 	out.cap = cap;
 	out.mask = out.cap - 1;
 	out.th = ee_dict_th(out.cap);
+	
+	out.hash_fn = hash_fn == NULL ? ee_hash : hash_fn;
 
 #ifdef EE_DICT_TOMBS_REHASH
 	out.tombs = 0;
@@ -281,7 +285,7 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL value");
 
-	u64 hash = ee_hash(key, dict->key_len);
+	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
@@ -371,7 +375,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, &dict->allocator);
+	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, &dict->allocator, dict->hash_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -391,7 +395,7 @@ EE_INLINE void ee_dict_rehash(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, &dict->allocator);
+	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, &dict->allocator, dict->hash_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -427,12 +431,12 @@ EE_INLINE s32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 	return result;
 }
 
-EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
+EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
 
-	u64 hash = ee_hash(key, dict->key_len);
+	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
@@ -475,7 +479,7 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 				}
 				#endif
 
-				return;
+				return EE_TRUE;
 			}
 
 			match_mask &= match_mask - 1;
@@ -487,12 +491,14 @@ EE_INLINE void ee_dict_remove(Dict* dict, const u8* key)
 
 		if (empty_mask)
 		{
-			return;
+			return EE_FALSE;
 		}
 
 		probe_step = next_probe_step;
 		base_index = next_base_index;
 	}
+
+	return EE_FALSE;
 }
 
 EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
@@ -500,7 +506,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
 
-	u64 hash = ee_hash(key, dict->key_len);
+	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 

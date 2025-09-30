@@ -130,6 +130,7 @@
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="examples\ee_dict_example.h" />
     <ClInclude Include="utils\ee_arena.h" />
     <ClInclude Include="utils\ee_array.h" />
     <ClInclude Include="utils\ee_core.h" />

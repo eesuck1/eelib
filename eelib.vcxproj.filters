@@ -47,5 +47,8 @@
     <ClInclude Include="utils\ee_core.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="examples\ee_dict_example.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

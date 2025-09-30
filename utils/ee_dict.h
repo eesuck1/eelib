@@ -282,8 +282,8 @@ EE_INLINE void ee_dict_free(Dict* dict)
 EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
-	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
-	EE_ASSERT(dict != NULL, "Trying to dereference NULL value");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(val != NULL, "Trying to dereference NULL value");
 
 	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
@@ -434,7 +434,7 @@ EE_INLINE s32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
-	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL key");
 
 	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;
@@ -504,7 +504,7 @@ EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
-	EE_ASSERT(dict != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(key != NULL, "Trying to dereference NULL key");
 
 	u64 hash = dict->hash_fn(key, dict->key_len);
 	u64 base_index = (hash >> 7) & dict->mask;

@@ -3,7 +3,6 @@
 
 #include "ee_core.h"
 
-// TODO(eesuck): better max_align, must be power-of-two
 #define EE_MAX_ALIGN     (16)
 #define EE_ALIGN_MASK    (~(EE_MAX_ALIGN - 1))
 #define EE_NO_REWIND     (0)

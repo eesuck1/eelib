@@ -1,4 +1,11 @@
 # ee — Lightweight C Utility Library
+![Version](https://img.shields.io/badge/Version-0.0.1-3DA9FC)
+![License: MIT](https://img.shields.io/badge/License-MIT-264653)
+![C Standard](https://img.shields.io/badge/C-C99-F4A261)
+![Platform: Windows](https://img.shields.io/badge/Platform-Windows-2ECC71)
+![Platform: Linux](https://img.shields.io/badge/Platform-Linux-E9C46A)
+![Platform: MacOS](https://img.shields.io/badge/Platform-MacOS-9B5DE5)
+[![Author](https://img.shields.io/badge/Author-eesuck1-3F37C9)](https://github.com/eesuck1)
 
 **eelib** is a header-only C library providing common data structures and utilities. 
 
@@ -29,11 +36,11 @@ The library provides a set of building blocks:
     - ```ee_fs.h``` for filesystem traversal and file utilities (Windows support).
     - ```ee_random.h``` for uniform and normal random distributions.  
 
-### **Use cases**:  
-- Game engines and real-time simulations  
-- Embedded systems and firmware  
-- High-performance tools and utilities  
-- Prototyping and small C projects
+### **Supported platforms/compilers**
+
+*   Minimum C standard: **C99**
+*   Tested with **MSVC**, **GCC**
+* Works on **Windows**, **macOS**, **Linux** 
 
 ### **Installation**:
 
@@ -64,61 +71,16 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 > [!IMPORTANT]  
 > Some headers depend on others, so make sure you copy all required files.
 
-```mermaid
-graph TD
-
-    subgraph Independent
-        core[ee_core.h]
-    end
-
-    subgraph Dependent
-        arena[ee_arena.h]
-        array[ee_array.h]
-        dict[ee_dict.h]
-        fs[ee_fs.h]
-        grid[ee_grid.h]
-        heap[ee_heap.h]
-        random[ee_random.h]
-        set[ee_set.h]
-        string[ee_string.h]
-    end
-
-    grid --> array
-    grid --> dict
-    grid --> heap
-    heap --> array
-    set --> array
-    arena --> core
-    array --> core
-    dict --> core
-    fs --> array
-    fs --> string
-    random --> core
-    string --> core
-
-    click arena "https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h" "Open ee_arena.h"
-    click dict "https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h" "Open ee_dict.h"
-    click string "https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h" "Open ee_string.h"
-    click array "https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h" "Open ee_array.h"
-    click grid "https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h" "Open ee_grid.h"
-    click heap "https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h" "Open ee_heap.h"
-    click set "https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h" "Open ee_set.h"
-    click core "https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h" "Open ee_core.h"
-    click fs "https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h" "Open ee_fs.h"
-    click random "https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h" "Open ee_random.h"
-
-```
-
-| Header        | Description                                                                                       | Dependencies                          |
-|---------------|---------------------------------------------------------------------------------------------------|---------------------------------------|
-| [`ee_arena.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h)  | Provides a fast, linear memory allocator.                                                         | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |
-| [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h)  | A dynamic, contiguous array for arbitrary element sizes. Provides fast insertion, deletion, and random access. Supports growing capacity automatically when needed. | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |
-| [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h)  | Provides core definitions, utilities, SIMD wrappers, and allocators used across the library. | Independent. |
-| [`ee_dict.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h)   | An open-addressing hash map designed for fixed-size keys and values.                              | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |
-| [`ee_fs.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h)  | Provides a filesystem reader with directory traversal, path utilities, and file operations for Windows. | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h), [`ee_string.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h). |
-| [`ee_grid.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h)   | Provides a 2D grid structure with utilities for subregions and pathfinding.                        | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h), [`ee_dict.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h), [`ee_heap.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h). |
-| [`ee_heap.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h)   | Implements a binary heap (priority queue) on top of the dynamic vector with custom comparison.     | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h). |
-| [`ee_random.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h)  | Random number generator utilities providing uniform and normal distributions for integers and floats. | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |
-| [`ee_set.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h)    | Implements a set data structure using nodes and vectors, supporting a Red-Black tree layout.       | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h). |
-| [`ee_string.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h) | Provides string types for C, supporting dynamic allocation, fixed-size strings, and string views. | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h). |
+| Header                                                                          | Description                                                                                                                                                         | Dependencies                                                                                                                                                                                                                                        |
+|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ee_arena.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_arena.h)   | Provides a fast, linear memory allocator.                                                                                                                           | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
+| [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h)   | A dynamic, contiguous array for arbitrary element sizes. Provides fast insertion, deletion, and random access. Supports growing capacity automatically when needed. | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
+| [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h)     | Provides core definitions, utilities, SIMD wrappers, and allocators used across the library.                                                                        | Independent.                                                                                                                                                                                                                                        |
+| [`ee_dict.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h)     | An open-addressing hash map designed for fixed-size keys and values.                                                                                                | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
+| [`ee_fs.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_fs.h)         | Provides a filesystem reader with directory traversal, path utilities, and file operations for Windows.                                                             | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h), [`ee_string.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h).                                                                          |
+| [`ee_grid.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_grid.h)     | Provides a 2D grid structure with utilities for subregions and pathfinding.                                                                                         | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h), [`ee_dict.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_dict.h), [`ee_heap.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h). |
+| [`ee_heap.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_heap.h)     | Implements a binary heap (priority queue) on top of the dynamic vector with custom comparison.                                                                      | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h).                                                                                                                                                           |
+| [`ee_random.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h) | Random number generator utilities providing uniform and normal distributions for integers and floats.                                                               | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
+| [`ee_set.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_set.h)       | Implements a set data structure using nodes and vectors, supporting a Red-Black tree layout.                                                                        | Depends on [`ee_array.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_array.h).                                                                                                                                                           |
+| [`ee_string.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h) | Provides string types for C, supporting dynamic allocation, fixed-size strings, and string views.                                                                   | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
 

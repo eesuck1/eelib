@@ -352,7 +352,7 @@ EE_INLINE size_t ee_array_find_pred_b(const Array* array, const u8* target, BinC
 {
 	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
-	EE_ASSERT(high < ee_array_len(array), "Invalid high value (%zu) for array with size (%zu)", high, ee_array_len(array));
+	EE_ASSERT(high <= ee_array_len(array), "Invalid high value (%zu) for array with size (%zu)", high, ee_array_len(array));
 	EE_ASSERT(low < high, "Invalid bounds (%zu, %zu)", low, high);
 
 	size_t low_b = low * array->elem_size;
@@ -372,6 +372,60 @@ EE_INLINE size_t ee_array_find_pred_b(const Array* array, const u8* target, BinC
 EE_INLINE size_t ee_array_find_pred(const Array* array, const u8* target, BinCmp predicate)
 {
 	return ee_array_find_pred_b(array, target, predicate, 0, ee_array_len(array));
+}
+
+EE_INLINE size_t ee_array_min_pred_b(const Array* array, BinCmp predicate, size_t low, size_t high)
+{
+	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
+	EE_ASSERT(high <= ee_array_len(array), "Invalid high value (%zu) for array with size (%zu)", high, ee_array_len(array));
+	EE_ASSERT(low < high, "Invalid bounds (%zu, %zu)", low, high);
+
+	size_t low_b = low * array->elem_size;
+	size_t high_b = high * array->elem_size;
+
+	size_t min_index = low_b;
+
+	for (size_t i = low_b + array->elem_size; i < high_b; i += array->elem_size)
+	{
+		if (predicate(&array->buffer[i], &array->buffer[min_index]) < 0)
+		{
+			min_index = i;
+		}
+	}
+
+	return min_index / array->elem_size;
+}
+
+EE_INLINE size_t ee_array_max_pred_b(const Array* array, BinCmp predicate, size_t low, size_t high)
+{
+	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
+	EE_ASSERT(high <= ee_array_len(array), "Invalid high value (%zu) for array with size (%zu)", high, ee_array_len(array));
+	EE_ASSERT(low < high, "Invalid bounds (%zu, %zu)", low, high);
+
+	size_t low_b = low * array->elem_size;
+	size_t high_b = high * array->elem_size;
+
+	size_t max_index = low_b;
+
+	for (size_t i = low_b + array->elem_size; i < high_b; i += array->elem_size)
+	{
+		if (predicate(&array->buffer[i], &array->buffer[max_index]) > 0)
+		{
+			max_index = i;
+		}
+	}
+
+	return max_index / array->elem_size;
+}
+
+EE_INLINE size_t ee_array_min_pred(const Array* array, BinCmp predicate)
+{
+	return ee_array_min_pred_b(array, predicate, 0, ee_array_len(array));
+}
+
+EE_INLINE size_t ee_array_max_pred(const Array* array, BinCmp predicate)
+{
+	return ee_array_max_pred_b(array, predicate, 0, ee_array_len(array));
 }
 
 EE_INLINE void ee_array_insert(Array* array, size_t i, const u8* val)

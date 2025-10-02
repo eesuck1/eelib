@@ -2,10 +2,6 @@
 ![Version](https://img.shields.io/badge/Version-0.0.1-3DA9FC)
 ![License: MIT](https://img.shields.io/badge/License-MIT-264653)
 ![C Standard](https://img.shields.io/badge/C-C99-F4A261)
-![Platform: Windows](https://img.shields.io/badge/Platform-Windows-2ECC71)
-![Platform: Linux](https://img.shields.io/badge/Platform-Linux-E9C46A)
-![Platform: MacOS](https://img.shields.io/badge/Platform-MacOS-9B5DE5)
-[![Author](https://img.shields.io/badge/Author-eesuck1-3F37C9)](https://github.com/eesuck1)
 
 **eelib** is a header-only C library providing common data structures and utilities. 
 
@@ -40,7 +36,6 @@ The library provides a set of building blocks:
 
 *   Minimum C standard: **C99**
 *   Tested with **MSVC**, **GCC**
-* Works on **Windows**, **macOS**, **Linux** 
 
 ### **Installation**:
 

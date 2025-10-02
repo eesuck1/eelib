@@ -116,20 +116,20 @@ _Static_assert(sizeof(double) == 8, "f64: sizeof(double) != 8");
 #define EE_SIMD_LEVEL_NONE    (0)
 #endif
 
-#ifndef EE_SIMD_LEVEL_SSE2
-#define EE_SIMD_LEVEL_SSE2    (1)
+#ifndef EE_SIMD_LEVEL_SSE
+#define EE_SIMD_LEVEL_SSE    (1)
 #endif
 
-#ifndef EE_SIMD_LEVEL_AVX2
-#define EE_SIMD_LEVEL_AVX2    (2)
+#ifndef EE_SIMD_LEVEL_AVX
+#define EE_SIMD_LEVEL_AVX    (2)
 #endif
 
 #ifndef EE_SIMD_MAX_LEVEL
-#define EE_SIMD_MAX_LEVEL     (EE_SIMD_LEVEL_AVX2)
+#define EE_SIMD_MAX_LEVEL     (EE_SIMD_LEVEL_AVX)
 #endif
 
 #ifndef EE_SIMD_DICT_DES_LEVEL
-#define EE_SIMD_DICT_DES_LEVEL    (EE_SIMD_LEVEL_SSE2)
+#define EE_SIMD_DICT_DES_LEVEL    (EE_SIMD_LEVEL_SSE)
 #endif
 
 #ifndef EE_SIMD_EFFECTIVE_MAX_LEVEL
@@ -149,43 +149,89 @@ EE_EXTERN_C_START
 #ifndef EE_SIMD
 #define EE_SIMD
 
-#if EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_AVX2
+//#define EE_SIMD_EFFECTIVE_MAX_LEVEL EE_SIMD_LEVEL_SSE
+//#define EE_SIMD_EFFECTIVE_MAX_LEVEL EE_SIMD_LEVEL_NONE
+
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_AVX
 
 #include "immintrin.h"
 
-typedef __m256i ee_simd_i;
+typedef __m256i  ee_simd_i; // integer
+typedef __m256   ee_simd_f; // float
+typedef __m256d  ee_simd_d; // double
 
 #define EE_SIMD_BYTES         (32)
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm256_loadu_si256
 #define ee_load_si            _mm256_load_si256
+
 #define ee_set1_epi8          _mm256_set1_epi8
+#define ee_set1_epi16         _mm256_set1_epi16
+#define ee_set1_epi32         _mm256_set1_epi32
+#define ee_set1_epi64         _mm256_set1_epi64x
+
 #define ee_cmpeq_epi8         _mm256_cmpeq_epi8
+#define ee_cmpeq_epi16        _mm256_cmpeq_epi16
+#define ee_cmpeq_epi32        _mm256_cmpeq_epi32
+#define ee_cmpeq_epi64        _mm256_cmpeq_epi64
+
+#define ee_castsi_ps          _mm256_castsi256_ps
+#define ee_castsi_pd          _mm256_castsi256_pd
+#define ee_movemask_ps        _mm256_movemask_ps
+#define ee_movemask_pd        _mm256_movemask_pd
 #define ee_movemask_epi8      _mm256_movemask_epi8
+#define ee_packs_epi16        _mm256_packs_epi16
+#define ee_setzero_si         _mm256_setzero_si256
+
 #define ee_or_si              _mm256_or_si256
+#define ee_and_si             _mm256_and_si256
+#define ee_srl_epi16          _mm256_srl_epi16
 #define ee_prefetch           _mm_prefetch
 
-#elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_SSE2
+#elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_SSE
 
 #include "immintrin.h"
 
-typedef __m128i ee_simd_i;
+typedef __m128i  ee_simd_i; // integer
+typedef __m128   ee_simd_f; // float
+typedef __m128d  ee_simd_d; // double
 
 #define EE_SIMD_BYTES         (16)
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm_loadu_si128
 #define ee_load_si            _mm_load_si128
+
 #define ee_set1_epi8          _mm_set1_epi8
+#define ee_set1_epi16         _mm_set1_epi16
+#define ee_set1_epi32         _mm_set1_epi32
+#define ee_set1_epi64         _mm_set1_epi64x
+
 #define ee_cmpeq_epi8         _mm_cmpeq_epi8
+#define ee_cmpeq_epi16        _mm_cmpeq_epi16
+#define ee_cmpeq_epi32        _mm_cmpeq_epi32
+#define ee_cmpeq_epi64        _mm_cmpeq_epi64
+
+#define ee_castsi_ps          _mm_castsi128_ps
+#define ee_castsi_pd          _mm_castsi128_pd
+#define ee_movemask_ps        _mm_movemask_ps
+#define ee_movemask_pd        _mm_movemask_pd
 #define ee_movemask_epi8      _mm_movemask_epi8
+#define ee_packs_epi16        _mm_packs_epi16
+#define ee_setzero_si         _mm_setzero_si128
+
 #define ee_or_si              _mm_or_si128
+#define ee_and_si             _mm_and_si128
+#define ee_srl_epi16          _mm_srl_epi16
+
 #define ee_prefetch           _mm_prefetch
 
 #elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_NONE
 
-typedef u64 ee_simd_i;
+typedef u64 ee_simd_i; // integer
+typedef f64 ee_simd_f; // float
+typedef f64 ee_simd_d; // double
 
 #define EE_SIMD_BYTES         (8)
 #define EE_SIMD_PREFETCH_T0   (0)
@@ -208,6 +254,37 @@ EE_INLINE ee_simd_i _ee_set1_epi8(u8 byte)
     return out;
 }
 
+EE_INLINE ee_simd_i _ee_set1_epi16(u16 val)
+{
+    ee_simd_i out = 0;
+    
+    u16* out_p = (u16*)&out;
+
+    out_p[0] = val;
+    out_p[1] = val;
+    out_p[2] = val;
+    out_p[3] = val;
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_set1_epi32(u32 val)
+{
+    ee_simd_i out = 0;    
+    
+    u32* out_p = (u32*)&out;
+
+    out_p[0] = val;
+    out_p[1] = val;
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_set1_epi64(u64 val)
+{
+    return val;
+}
+
 EE_INLINE ee_simd_i _ee_cmpeq_epi8(ee_simd_i a, ee_simd_i b)
 {
     ee_simd_i out = 0;
@@ -222,6 +299,43 @@ EE_INLINE ee_simd_i _ee_cmpeq_epi8(ee_simd_i a, ee_simd_i b)
     }
 
     return out;
+}
+
+EE_INLINE ee_simd_i _ee_cmpeq_epi16(ee_simd_i a, ee_simd_i b)
+{
+    ee_simd_i out = 0;
+
+    u16* out_u16 = (u16*)&out;
+    const u16* a_u16 = (const u16*)&a;
+    const u16* b_u16 = (const u16*)&b;
+
+    for (size_t i = 0; i < EE_SIMD_BYTES / 2; ++i)
+    {
+        out_u16[i] = (a_u16[i] == b_u16[i]) ? 0xFFFFu : 0x0000u;
+    }
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_cmpeq_epi32(ee_simd_i a, ee_simd_i b)
+{
+    ee_simd_i out = 0;
+
+    u32* out_u32 = (u32*)&out;
+    const u32* a_u32 = (const u32*)&a;
+    const u32* b_u32 = (const u32*)&b;
+
+    for (size_t i = 0; i < EE_SIMD_BYTES / 4; ++i)
+    {
+        out_u32[i] = (a_u32[i] == b_u32[i]) ? 0xFFFFFFFFu : 0x00000000u;
+    }
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_cmpeq_epi64(ee_simd_i a, ee_simd_i b)
+{
+    return a == b ? 0xFFFFFFFFFFFFFFFFu : 0x0000000000000000u;
 }
 
 EE_INLINE s32 _ee_movemask_epi8(ee_simd_i a)
@@ -248,12 +362,115 @@ EE_INLINE void _ee_prefetch(const void* p, s32 sel)
     (void)sel;
 }
 
+EE_INLINE ee_simd_i _ee_castst_ps(ee_simd_i a)
+{
+    return a;
+}
+
+EE_INLINE ee_simd_i _ee_castst_pd(ee_simd_i a)
+{
+    return a;
+}
+
+EE_INLINE s32 _ee_movemask_ps(ee_simd_i a)
+{
+    s32 m = 0;
+
+    const u32* a_u32 = (const u32*)&a;
+
+    m |= ((a_u32[0] >> 31) & 1) << 0;
+    m |= ((a_u32[1] >> 31) & 1) << 1;
+
+    return m;
+}
+
+EE_INLINE s32 _ee_movemask_pd(ee_simd_i a)
+{
+    return (a >> 63) & 1;
+}
+
+EE_INLINE ee_simd_i _ee_packs_epi16(ee_simd_i a, ee_simd_i b)
+{
+    ee_simd_i out = 0;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        s16 ai = (a >> (i * 16)) & 0xFFFF;
+
+        if (ai > 127) 
+            ai = 127;
+        else if (ai < -128) 
+            ai = -128;
+
+        out |= ((ee_simd_i)(ai & 0xFF)) << (i * 8);
+
+        s16 bi = (b >> (i * 16)) & 0xFFFF;
+
+        if (bi > 127) 
+            bi = 127;
+        else if (bi < -128) 
+            bi = -128;
+
+        out |= ((ee_simd_i)(bi & 0xFF)) << ((i + 4) * 8);
+    }
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_setzero_si()
+{
+    return 0;
+}
+
+EE_INLINE ee_simd_i _ee_srl_epi16(ee_simd_i a, ee_simd_i count)
+{
+    ee_simd_i out = 0;
+    u16* out_u16 = (u16*)&out;
+
+    const u16* a_u16 = (u16*)&a;
+
+    if (count > 15)
+    {
+        return 0;
+    }
+
+    out_u16[0] = a_u16[0] >> count;
+    out_u16[1] = a_u16[1] >> count;
+    out_u16[2] = a_u16[2] >> count;
+    out_u16[3] = a_u16[3] >> count;
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_and_si(ee_simd_i a, ee_simd_i b)
+{
+    return a & b;
+}
+
 #define ee_loadu_si           _ee_load_si
 #define ee_load_si            _ee_load_si
+
 #define ee_set1_epi8          _ee_set1_epi8
+#define ee_set1_epi16         _ee_set1_epi16
+#define ee_set1_epi32         _ee_set1_epi32
+#define ee_set1_epi64         _ee_set1_epi64
+
 #define ee_cmpeq_epi8         _ee_cmpeq_epi8
+#define ee_cmpeq_epi16        _ee_cmpeq_epi16
+#define ee_cmpeq_epi32        _ee_cmpeq_epi32
+#define ee_cmpeq_epi64        _ee_cmpeq_epi64
+
+#define ee_castsi_ps          _ee_castst_ps
+#define ee_castsi_pd          _ee_castst_pd
 #define ee_movemask_epi8      _ee_movemask_epi8
+#define ee_movemask_ps        _ee_movemask_ps
+#define ee_movemask_pd        _ee_movemask_pd
+#define ee_packs_epi16        _ee_packs_epi16
+#define ee_setzero_si         _ee_setzero_si
+
 #define ee_or_si              _ee_or_si
+#define ee_and_si             _ee_and_si
+#define ee_srl_epi16          _ee_srl_epi16
 #define ee_prefetch           _ee_prefetch
 
 #else
@@ -266,7 +483,7 @@ EE_INLINE void _ee_prefetch(const void* p, s32 sel)
 #ifndef EE_SIMD_DICT
 #define EE_SIMD_DICT
 
-#if EE_SIMD_DICT_MAX_LEVEL == EE_SIMD_LEVEL_AVX2
+#if EE_SIMD_DICT_MAX_LEVEL == EE_SIMD_LEVEL_AVX
 
 #include "immintrin.h"
 
@@ -283,7 +500,7 @@ typedef __m256i eed_simd_i;
 #define eed_or_si              _mm256_or_si256
 #define eed_prefetch           _mm_prefetch
 
-#elif EE_SIMD_DICT_MAX_LEVEL == EE_SIMD_LEVEL_SSE2
+#elif EE_SIMD_DICT_MAX_LEVEL == EE_SIMD_LEVEL_SSE
 
 #include "immintrin.h"
 
@@ -571,6 +788,69 @@ EE_INLINE size_t ee_round_down_pow2(size_t x, size_t r)
 {
     return x & (~(r - 1));
 }
+
+EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
+{
+    switch (len)
+    {
+    case 1:
+    {
+        return first[0] == second[0];
+    }
+    case 2:
+    {
+        u16 a, b;
+
+        memcpy(&a, first, sizeof(a));
+        memcpy(&b, second, sizeof(b));
+
+        return a == b;
+    }
+    case 4:
+    {
+        u32 a, b;
+
+        memcpy(&a, first, sizeof(a));
+        memcpy(&b, second, sizeof(b));
+
+        return a == b;
+    }
+    case 8:
+    {
+        u64 a, b;
+
+        memcpy(&a, first, sizeof(a));
+        memcpy(&b, second, sizeof(b));
+
+        return a == b;
+    }
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_SSE
+    case 16:
+    {
+        __m128i a = _mm_loadu_si128((const __m128i*)first);
+        __m128i b = _mm_loadu_si128((const __m128i*)second);
+        __m128i cmp = _mm_cmpeq_epi8(a, b);
+
+        return _mm_movemask_epi8(cmp) == 0xFFFF;
+    }
+#endif
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_AVX
+    case 32:
+    {
+        __m256i a = _mm256_loadu_si256((const __m256i*)first);
+        __m256i b = _mm256_loadu_si256((const __m256i*)second);
+        __m256i cmp = _mm256_cmpeq_epi8(a, b);
+
+        return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
+    }
+#endif
+    default:
+    {
+        return memcmp(first, second, len) == 0;
+    }
+    }
+}
+
 
 EE_EXTERN_C_END
 

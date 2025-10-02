@@ -7,6 +7,7 @@
 #define EE_RNG_STATE_LEN    (2)
 #define EE_RNG_EPS          (1e-16)
 #define EE_RNG_EPSF         (1e-12f)
+#define EE_RNG_SEED_DEF     (0xF23A9BC7D1E48F6Bull)
 
 typedef struct Rng
 {

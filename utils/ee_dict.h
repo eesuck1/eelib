@@ -120,68 +120,6 @@ EE_INLINE u64 ee_hash(const u8* key, size_t len)
 	return hash;
 }
 
-EE_INLINE int ee_key_cmp(const u8* first, const u8* second, size_t len)
-{
-	switch (len)
-	{
-	case 1:
-	{
-		return first[0] == second[0];
-	}
-	case 2:
-	{
-		u16 a, b;
-
-		memcpy(&a, first, sizeof(a));
-		memcpy(&b, second, sizeof(b));
-
-		return a == b;
-	}
-	case 4:
-	{
-		u32 a, b;
-
-		memcpy(&a, first, sizeof(a));
-		memcpy(&b, second, sizeof(b));
-
-		return a == b;
-	}
-	case 8:
-	{
-		u64 a, b;
-
-		memcpy(&a, first, sizeof(a));
-		memcpy(&b, second, sizeof(b));
-
-		return a == b;
-	}
-#if EE_SIMD_MAX_LEVEL >= EE_SIMD_LEVEL_SSE2
-	case 16:
-	{
-		__m128i a = _mm_loadu_si128((const __m128i*)first);
-		__m128i b = _mm_loadu_si128((const __m128i*)second);
-		__m128i cmp = _mm_cmpeq_epi8(a, b);
-
-		return _mm_movemask_epi8(cmp) == 0xFFFF;
-	}
-#endif
-#if EE_SIMD_MAX_LEVEL >= EE_SIMD_LEVEL_AVX2
-	case 32:
-	{
-		__m256i a = _mm256_loadu_si256((const __m256i*)first);
-		__m256i b = _mm256_loadu_si256((const __m256i*)second);
-		__m256i cmp = _mm256_cmpeq_epi8(a, b);
-
-		return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
-	}
-#endif
-	default:
-	{
-		return memcmp(first, second, len) == 0;
-	}
-	}
-}
-
 EE_INLINE u8* ee_dict_slot_at(const Dict* dict, size_t i)
 {
 	EE_ASSERT(dict != NULL, "Trying to acces NULL dict slot");
@@ -315,7 +253,7 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 		{
 			s32 first = ee_first_bit_u32(match_mask);
 		
-			if (ee_key_cmp(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				memcpy(ee_dict_val_at(dict, group_index + first), val, dict->val_len);
 			
@@ -465,7 +403,7 @@ EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 		{
 			s32 first = ee_first_bit_u32(match_mask);
 
-			if (ee_key_cmp(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				dict->ctrls[group_index + first] = EE_SLOT_DELETED;
 				dict->count--;
@@ -535,7 +473,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		{
 			s32 first = ee_first_bit_u32(match_mask);
 
-			if (ee_key_cmp(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				return ee_dict_val_at(dict, group_index + first);
 			}

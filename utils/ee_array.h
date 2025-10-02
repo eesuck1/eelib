@@ -215,14 +215,130 @@ EE_INLINE void ee_array_set(Array* array, size_t i, const u8* val)
 	memcpy(&array->buffer[i * array->elem_size], val, array->elem_size);
 }
 
-EE_INLINE size_t ee_array_find(const Array* array, const u8* target)
+EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t low, size_t high)
 {
 	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
 
-	for (size_t i = 0; i < array->top; i += array->elem_size)
+	size_t low_b = low * array->elem_size;
+	size_t high_b = high * array->elem_size;
+
+	EE_ASSERT(high_b <= array->top, "Invalid index (%zu) for array with size (%zu)", high, ee_array_len(array));
+
+	size_t low_tail = (low_b + EE_SIMD_BYTES - 1) & ~(EE_SIMD_BYTES - 1);
+	size_t high_tail = high_b & ~(EE_SIMD_BYTES - 1);
+	size_t i = low_b;
+
+	for (; i < low_tail; i += array->elem_size)
 	{
-		if (memcmp(target, &array->buffer[i], array->elem_size) == 0)
+		if (ee_bin_u8_eq(target, &array->buffer[i], array->elem_size))
+		{
+			return i / array->elem_size;
+		}
+	}
+
+	switch (array->elem_size)
+	{
+	case 1:
+	{
+		ee_simd_i pattern = ee_set1_epi8(target[0]);
+
+		for (; i < high_tail; i += EE_SIMD_BYTES)
+		{
+			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
+			ee_simd_i match = ee_cmpeq_epi8(pattern, group);
+
+			s32 mask = ee_movemask_epi8(match);
+
+			if (mask)
+			{
+				s32 first = ee_first_bit_u32(mask);
+
+				return i + first;
+			}
+		}
+	} break;
+	case 2:
+	{
+		u16 a;
+		memcpy(&a, target, sizeof(a));
+
+		ee_simd_i pattern = ee_set1_epi16(a);
+
+		for (; i < high_tail; i += EE_SIMD_BYTES)
+		{
+			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
+			ee_simd_i match = ee_cmpeq_epi16(pattern, group);
+
+			s32 mask = ee_movemask_epi8(match);
+
+			if (mask)
+			{
+				s32 first = ee_first_bit_u32(mask);
+
+				return (i >> 1) + (first >> 1);
+			}
+		}
+	} break;
+	case 4:
+	{
+		u32 a;
+		memcpy(&a, target, sizeof(a));
+
+		ee_simd_i pattern = ee_set1_epi32(a);
+
+		for (; i < high_tail; i += EE_SIMD_BYTES)
+		{
+			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
+			ee_simd_i match = ee_cmpeq_epi32(pattern, group);
+
+			s32 mask = ee_movemask_epi8(match);
+
+			if (mask)
+			{
+				s32 first = ee_first_bit_u32(mask);
+
+				return (i >> 2) + (first >> 2);
+			}
+		}
+	} break;
+	case 8:
+	{
+		u64 a;
+		memcpy(&a, target, sizeof(a));
+
+		ee_simd_i pattern = ee_set1_epi64(a);
+
+		for (; i < high_tail; i += EE_SIMD_BYTES)
+		{
+			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
+			ee_simd_i match = ee_cmpeq_epi64(pattern, group);
+
+			s32 mask = ee_movemask_epi8(match);
+
+			if (mask)
+			{
+				s32 first = ee_first_bit_u32(mask);
+
+				return (i >> 3) + (first >> 3);
+			}
+		}
+	} break;
+	default:
+	{
+		for (; i < high_b; i += array->elem_size)
+		{
+			if (memcmp(target, &array->buffer[i], array->elem_size) == 0)
+			{
+				return i / array->elem_size;
+			}
+		}
+	} break;
+	}
+
+	for (; i < array->top; i += array->elem_size)
+	{
+		if (ee_bin_u8_eq(target, &array->buffer[i], array->elem_size))
 		{
 			return i / array->elem_size;
 		}
@@ -247,6 +363,11 @@ EE_INLINE void ee_array_insert(Array* array, size_t i, const u8* val)
 	memcpy(&array->buffer[i * array->elem_size], val, array->elem_size);
 
 	array->top += array->elem_size;
+}
+
+EE_INLINE size_t ee_array_find(const Array* array, const u8* target)
+{
+	return ee_array_find_b(array, target, 0, ee_array_len(array));
 }
 
 EE_INLINE void ee_array_erase(Array* array, size_t i)

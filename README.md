@@ -36,7 +36,6 @@ The library provides a set of building blocks:
 
 *   Minimum C standard: **C99**
 *   Tested with **MSVC**, **GCC**
-* Works on **Windows**, **macOS**, **Linux** 
 
 ### **Installation**:
 

@@ -219,6 +219,7 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 {
 	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
 	EE_ASSERT(target != NULL, "Trying to find a NULL value");
+	EE_ASSERT(low < high, "Invalid bounds (%zu, %zu)", low, high);
 
 	size_t low_b = low * array->elem_size;
 	size_t high_b = high * array->elem_size;
@@ -345,6 +346,32 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 	}
 
 	return EE_ARRAY_INVALID;
+}
+
+EE_INLINE size_t ee_array_find_pred_b(const Array* array, const u8* target, BinCmp predicate, size_t low, size_t high)
+{
+	EE_ASSERT(array != NULL, "Trying to find in NULL Array");
+	EE_ASSERT(target != NULL, "Trying to find a NULL value");
+	EE_ASSERT(high < ee_array_len(array), "Invalid high value (%zu) for array with size (%zu)", high, ee_array_len(array));
+	EE_ASSERT(low < high, "Invalid bounds (%zu, %zu)", low, high);
+
+	size_t low_b = low * array->elem_size;
+	size_t high_b = high * array->elem_size;
+
+	for (size_t i = low_b; i < high_b; i += array->elem_size)
+	{
+		if (predicate(target, &array->buffer[i]) == 0)
+		{
+			return i / array->elem_size;
+		}
+	}
+
+	return EE_ARRAY_INVALID;
+}
+
+EE_INLINE size_t ee_array_find_pred(const Array* array, const u8* target, BinCmp predicate)
+{
+	return ee_array_find_pred_b(array, target, predicate, 0, ee_array_len(array));
 }
 
 EE_INLINE void ee_array_insert(Array* array, size_t i, const u8* val)

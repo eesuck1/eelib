@@ -134,12 +134,15 @@
     <ClInclude Include="utils\ee_arena.h" />
     <ClInclude Include="utils\ee_array.h" />
     <ClInclude Include="utils\ee_core.h" />
+    <ClInclude Include="utils\ee_core_mt.h" />
+    <ClInclude Include="utils\ee_deq.h" />
     <ClInclude Include="utils\ee_dict.h" />
     <ClInclude Include="utils\ee_grid.h" />
     <ClInclude Include="utils\ee_heap.h" />
     <ClInclude Include="utils\ee_random.h" />
     <ClInclude Include="utils\ee_set.h" />
     <ClInclude Include="utils\ee_string.h" />
+    <ClInclude Include="utils\ee_thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

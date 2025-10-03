@@ -232,7 +232,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 
 				GridNode out_node = { pos, (f32)out_score };
 
-				ee_array_push(&out_path, EE_ARRAY_DT(out_node));
+				ee_array_push(&out_path, EE_RECAST_U8(out_node));
 				pos = *(GridPos*)ee_dict_at(&parent, EE_DICT_DT(pos));
 			}
 
@@ -241,7 +241,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 
 			GridNode out_node = { start_pos, (f32)out_score };
 
-			ee_array_push(&out_path, EE_ARRAY_DT(out_node));
+			ee_array_push(&out_path, EE_RECAST_U8(out_node));
 			ee_array_reverse(&out_path);
 
 			break;

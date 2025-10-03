@@ -8,7 +8,7 @@
 #define EE_HEAP_LEFT(x)      (((x) << 1) + 1)
 #define EE_HEAP_RIGHT(x)     (((x) << 1) + 2)
 #define EE_HEAP_PARENT(x)    (((x) - 1) >> 1)
-#define EE_HEAP_DT(x)        (EE_ARRAY_DT(x))
+#define EE_HEAP_DT(x)        (EE_RECAST_U8(x))
 
 typedef struct Heap
 {	

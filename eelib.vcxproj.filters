@@ -50,5 +50,14 @@
     <ClInclude Include="examples\ee_dict_example.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\ee_thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ee_core_mt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ee_deq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

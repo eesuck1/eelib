@@ -71,7 +71,7 @@ EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
 	out.free   = ee_array_new(size, sizeof(s64), NULL);
 	out.colors = ee_array_new(size, sizeof(u8), NULL);
 
-	ee_array_fill(&out.colors, EE_ARRAY_DT(EE_RED), 0, size);
+	ee_array_fill(&out.colors, EE_RECAST_U8(EE_RED), 0, size);
 
 	return out;
 }
@@ -84,8 +84,8 @@ EE_INLINE void ee_set_insert(Set* set, u8 data[EE_NODE_PL_SIZE])
 		
 		set->root = ee_array_len(&set->nodes);
 
-		ee_array_push(&set->nodes, EE_ARRAY_DT(root));
-		ee_array_push(&set->colors, EE_ARRAY_DT(EE_BLACK));
+		ee_array_push(&set->nodes, EE_RECAST_U8(root));
+		ee_array_push(&set->colors, EE_RECAST_U8(EE_BLACK));
 	}
 }
 

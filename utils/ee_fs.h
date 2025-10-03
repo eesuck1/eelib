@@ -214,7 +214,7 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 			size_t offset = fs->slab.top;
 
 			ee_str_push_bytes(&fs->slab, full_path, base_len + file_len + 1);
-			ee_array_push(&fs->offsets, EE_ARRAY_DT(offset));
+			ee_array_push(&fs->offsets, EE_RECAST_U8(offset));
 		}
 	} while (FindNextFileA(handle, &finder));
 

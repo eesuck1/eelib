@@ -68,6 +68,10 @@
 
 #endif // EE_MEM_SIZES
 
+#ifndef EE_RECAST_U8
+#define EE_RECAST_U8(x)    ((u8*)(&(x)))
+#endif
+
 //
 // Extern C
 //
@@ -850,7 +854,6 @@ EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
     }
     }
 }
-
 
 EE_EXTERN_C_END
 

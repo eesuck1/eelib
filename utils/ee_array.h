@@ -5,7 +5,6 @@
 
 #include "ee_core.h"
 
-#define EE_ARRAY_DT(x)                           ((u8*)(&(x)))
 #define EE_ARRAY_INVALID                         (0xffffffffffffffffull)
 #define EE_ARRAY_SORT_TH                         (16)
 #define EE_ARRAY_RECAST(v_ptr, i, dtype)         ((dtype*)ee_array_at(v_ptr, i))

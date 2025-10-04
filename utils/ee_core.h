@@ -72,6 +72,24 @@
 #define EE_RECAST_U8(x)    ((u8*)(&(x)))
 #endif
 
+#ifndef EE_MAX_ALIGN
+#define EE_MAX_ALIGN     (16)
+#endif
+
+#ifndef EE_ALIGN_MASK
+#define EE_ALIGN_MASK    (~(EE_MAX_ALIGN - 1))
+#endif
+
+#ifndef EE_ALIGNOF
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#include <stdalign.h>
+#define EE_ALIGNOF(x)   alignof(x) 
+#else
+#define EE_ALIGNOF(x)   (EE_MAX_ALIGN)
+#endif
+#endif
+
+
 //
 // Extern C
 //

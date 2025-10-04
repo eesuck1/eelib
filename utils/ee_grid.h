@@ -205,9 +205,9 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 	Array out_path = ee_array_new((size_t)(dist * 2.0f), sizeof(GridNode), &grid->allocator);
 	Heap open_set = ee_heap_new(start_size, sizeof(GridNode), ee_grid_cost_cmp, &grid->allocator);
 
-	Dict score = ee_dict_new(start_size, 8, 8, &grid->allocator, NULL);
-	Dict parent = ee_dict_new(start_size, 8, 8, &grid->allocator, NULL);
-	Dict closed = ee_dict_new(start_size, 8, 8, &grid->allocator, NULL);
+	Dict score = ee_dict_new_m(start_size, GridPos, f64, &grid->allocator, NULL);
+	Dict parent = ee_dict_new_m(start_size, GridPos, GridPos, &grid->allocator, NULL);
+	Dict closed = ee_dict_new_m(start_size, GridPos, u64, &grid->allocator, NULL);
 
 	GridPos start_pos = { x_0, y_0 };
 	GridNode start_node = { start_pos, dist };

@@ -14,8 +14,12 @@ void run_dict_example_hello_world(void)
 {
 	// Creating a hash-table with starting size of 128 values, key size 16-byte and 4-byte value
 	// Default heap Allocator and default ee_hash function
+	// using 'ee_dict_new_m' macro
 
-	Dict dict = ee_dict_new(128, 16, 4, NULL, NULL);
+	Dict dict = ee_dict_new_m(128, Key, f32, NULL, NULL);
+
+	// Same as:
+	// Dict dict = ee_dict_new(128, sizeof(Key), sizeof(f32), alignof(Key), alignof(f32), NULL, NULL);
 	
 	Key key = { 1, 2 };
 	Key key_missing = { 3, 4 };

@@ -31,6 +31,8 @@ static const f64 EE_ONE_F64  = 1.0;
 // #define EE_DICT_TOMBS_REHASH
 typedef u64 (*DictHash)(const u8* key, size_t len);
 
+#define ee_dict_new_m(size, key_type, val_type, allocator, hash_fn)    ee_dict_new(size, sizeof(key_type), sizeof(val_type), EE_ALIGNOF(key_type), EE_ALIGNOF(val_type), allocator, hash_fn)
+
 typedef struct Dict
 {
 	u8* slots;
@@ -42,8 +44,11 @@ typedef struct Dict
 	size_t mask;
 	size_t th;
 
+	size_t slot_align;
 	size_t key_len;
 	size_t val_len;
+	size_t key_len_al;
+	size_t val_len_al;
 	size_t slot_len;
 
 #ifdef EE_DICT_TOMBS_REHASH
@@ -140,10 +145,10 @@ EE_INLINE u8* ee_dict_val_at(const Dict* dict, size_t i)
 	EE_ASSERT(dict != NULL, "Trying to acces NULL dict slot");
 	EE_ASSERT(i < dict->cap, "Invalid val index (%zu) for dict with cap (%zu)", i, dict->cap);
 
-	return &dict->slots[i * dict->slot_len + dict->key_len];
+	return &dict->slots[i * dict->slot_len + dict->key_len_al];
 }
 
-EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Allocator* allocator, DictHash hash_fn)
+EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, size_t key_align, size_t val_align, const Allocator* allocator, DictHash hash_fn)
 {
 	EE_ASSERT(key_len > 0, "Invalid key_len (%zu)", key_len);
 	EE_ASSERT(val_len > 0, "Invalid val_len (%zu)", val_len);
@@ -173,9 +178,12 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, const Al
 
 	size_t cap = ee_next_pow_2(size);
 
+	out.slot_align = key_align > val_align ? key_align : val_align;
 	out.key_len = key_len;
 	out.val_len = val_len;
-	out.slot_len = key_len + val_len;
+	out.key_len_al = ee_round_up_pow2(key_len, out.slot_align);
+	out.val_len_al = ee_round_up_pow2(val_len, out.slot_align);
+	out.slot_len = out.key_len_al + out.val_len_al;
 
 	out.slots = (u8*)out.allocator.alloc_fn(&out.allocator, out.slot_len * cap);
 	out.ctrls_buffer = out.allocator.alloc_fn(&out.allocator, cap + EED_SIMD_BYTES - 1);
@@ -312,7 +320,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, &dict->allocator, dict->hash_fn);
+	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -332,7 +340,7 @@ EE_INLINE void ee_dict_rehash(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, &dict->allocator, dict->hash_fn);
+	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{

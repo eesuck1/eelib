@@ -60,6 +60,12 @@ typedef struct Dict
 	DictHash  hash_fn;
 } Dict;
 
+typedef struct DictIter
+{
+	const Dict* dict;
+	size_t it;
+} DictIter;
+
 EE_EXTERN_C_START
 
 EE_INLINE u64 ee_dict_th(u64 cap)
@@ -512,6 +518,80 @@ EE_INLINE int ee_dict_contains(const Dict* dict, const u8* key)
 	u8* val = ee_dict_at(dict, key);
 
 	return val != NULL;
+}
+
+EE_INLINE DictIter ee_dict_iter_new(const Dict* dict)
+{
+	EE_ASSERT(dict != NULL, "Trying to create iterator over NULL Dict");
+
+	DictIter out = { 0 };
+
+	out.dict = dict;
+	out.it = 0;
+
+	return out;
+}
+
+EE_INLINE void ee_dict_iter_reset(DictIter* iter)
+{
+	EE_ASSERT(iter != NULL, "Trying to reset NULL DictIter");
+
+	iter->it = 0;
+}
+
+EE_INLINE s32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
+{
+	EE_ASSERT(iter != NULL, "Trying to dereference NULL DictIter");
+	EE_ASSERT(key_out != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(val_out != NULL, "Trying to dereference NULL value");
+
+	if (iter->it >= iter->dict->cap)
+	{
+		return EE_FALSE;
+	}
+
+	const u8* ctrls = (const u8*)iter->dict->ctrls;
+	size_t i = iter->it;
+	size_t high = ee_round_up_pow2(iter->it, EED_SIMD_BYTES);
+
+	for (; i < high; ++i)
+	{
+		if (ctrls[i] != EE_SLOT_EMPTY && ctrls[i] != EE_SLOT_DELETED)
+		{
+			memcpy(key_out, ee_dict_key_at(iter->dict, i), iter->dict->key_len);
+			memcpy(val_out, ee_dict_val_at(iter->dict, i), iter->dict->val_len);
+
+			iter->it = i + 1;
+
+			return EE_TRUE;
+		}
+	}
+
+	eed_simd_i p_empty = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i p_deleted = eed_set1_epi8(EE_SLOT_DELETED);
+
+	for (; i < iter->dict->cap; i += EED_SIMD_BYTES)
+	{
+		eed_simd_i group = eed_load_si(&ctrls[i]);
+		eed_simd_i match = eed_or_si(eed_cmpeq_epi8(group, p_empty), eed_cmpeq_epi8(group, p_deleted));
+		
+		s32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);
+
+		if (mask)
+		{
+			s32 first = ee_first_bit_u32(mask);
+			size_t pos = (size_t)first + i;
+
+			memcpy(key_out, ee_dict_key_at(iter->dict, pos), iter->dict->key_len);
+			memcpy(val_out, ee_dict_val_at(iter->dict, pos), iter->dict->val_len);
+
+			iter->it = pos + 1;
+
+			return EE_TRUE;
+		}
+	}
+
+	return EE_FALSE;
 }
 
 EE_EXTERN_C_END

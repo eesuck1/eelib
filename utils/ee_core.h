@@ -723,6 +723,11 @@ EE_INLINE s32 ee_first_bit_u32(u32 x)
 #endif
 }
 
+EE_INLINE s32 ee_first_zero_u32(u32 x)
+{
+    return ee_first_bit_u32(~x);
+}
+
 EE_INLINE u64 ee_next_pow_2(u64 x)
 {
     if (x == 0)

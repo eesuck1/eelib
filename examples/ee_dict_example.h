@@ -46,8 +46,7 @@ void run_dict_example_hello_world(void)
 	// Search function returns a raw u8 pointer to internal table memory location when value is stored
 	// There are two options to obtain an actual value:
 	//
-	//   1) Using reinterpreted cast to desired type: *(f32*)val_at,
-	//      potentially UB if memory address is not aligned, but fast
+	//   1) Using reinterpreted cast to desired type: *(f32*)val_at
 	// 
 	//   2) Copy memory from table buffer into local variable 
 	//      memcpy(&dest, val_at, dict.val_len);
@@ -60,7 +59,6 @@ void run_dict_example_hello_world(void)
 	EE_ASSERT(val_at != NULL, "Invalid searching result, should not be NULL");
 	EE_ASSERT(val_missing == NULL, "Invalid searching result, should be NULL");
 
-	// I am hacker so I'll choose the unsafe version
 	f32 val_search = *(f32*)val_at;
 
 	EE_ASSERT(val == val_search, "Wrong value!");

@@ -49,7 +49,7 @@ EE_INLINE s32 ee_is_sep(char val)
 	return val == '\\' || val == '/';
 }
 
-EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
+EE_INLINE s32 ee_fs_wildcard(const char* str, const char* pattern)
 {
 	EE_ASSERT(str != NULL, "Trying to match NULL path");
 	EE_ASSERT(pattern != NULL, "Trying to match NULL pattern");
@@ -59,8 +59,8 @@ EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
 		return EE_TRUE;
 	}
 
-	const u8* last_s = NULL;
-	const u8* last_p = NULL;
+	const char* last_s = NULL;
+	const char* last_p = NULL;
 
 	while (*str != '\0')
 	{
@@ -105,26 +105,26 @@ EE_INLINE s32 ee_fs_wildcard(const u8* str, const u8* pattern)
 	return *pattern == '\0';
 }
 
-EE_INLINE s32 ee_fs_isdir(const u8* dir_path)
+EE_INLINE s32 ee_fs_isdir(const char* dir_path)
 {
 	EE_ASSERT(dir_path != NULL, "Trying to dereference NULL path");
 
 	return GetFileAttributesA(dir_path) & FILE_ATTRIBUTE_DIRECTORY;
 }
 
-EE_INLINE s32 ee_fs_path_exists(const u8* path)
+EE_INLINE s32 ee_fs_path_exists(const char* path)
 {
 	EE_ASSERT(path != NULL, "Trying to dereference NULL path");
 
 	return GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES;
 }
 
-EE_INLINE void ee_fs_format_dir_path(u8* out_path, const u8* dir_path, const u8* mask)
+EE_INLINE void ee_fs_format_dir_path(char* out_path, const char* dir_path, const char* mask)
 {
 	EE_ASSERT(dir_path != NULL, "Trying to dereference NULL path");
 	EE_ASSERT(out_path != NULL, "Trying to dereference NULL path");
 
-	const u8* mask_val = mask == NULL ? "" : mask;
+	const char* mask_val = mask == NULL ? "" : mask;
 	size_t len = strnlen(dir_path, EE_MAX_PATH_LEN);
 
 	if (dir_path[len] != '/' && dir_path[len] != '\\')
@@ -145,7 +145,7 @@ EE_INLINE void ee_fs_reset(FsReader* fs)
 	ee_str_reset(&fs->slab);
 }
 
-EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask, s32 max_depth, s32 reset_fs)
+EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const char* dir_path, const char* mask, s32 max_depth, s32 reset_fs)
 {
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL file reader");
 	EE_ASSERT(ee_fs_path_exists(dir_path), "Directory path does not exist (%s)", dir_path);
@@ -162,9 +162,9 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 		ee_fs_reset(fs);
 	}
 
-	u8 orig_path[EE_KB] = { 0 };
-	u8 base_path[EE_KB] = { 0 };
-	u8 full_path[EE_KB] = { 0 };
+	char orig_path[EE_KB] = { 0 };
+	char base_path[EE_KB] = { 0 };
+	char full_path[EE_KB] = { 0 };
 
 	WIN32_FIND_DATAA finder = { 0 };
 	HANDLE handle = INVALID_HANDLE_VALUE;
@@ -184,7 +184,7 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 
 	do
 	{
-		const u8* name = finder.cFileName;
+		const char* name = finder.cFileName;
 
 		if ((name[0] == '.') && (name[1] == '\0' || (name[1] == '.' && name[2] == '\0')))
 		{
@@ -213,7 +213,7 @@ EE_INLINE void ee_fs_listdir_ex(FsReader* fs, const u8* dir_path, const u8* mask
 
 			size_t offset = fs->slab.top;
 
-			ee_str_push_bytes(&fs->slab, full_path, base_len + file_len + 1);
+			ee_str_push_bytes(&fs->slab, (const u8*)full_path, base_len + file_len + 1);
 			ee_array_push(&fs->offsets, EE_RECAST_U8(offset));
 		}
 	} while (FindNextFileA(handle, &finder));
@@ -228,7 +228,7 @@ EE_INLINE size_t ee_fs_len(FsReader* fs)
 	return ee_array_len(&fs->offsets);
 }
 
-EE_INLINE const u8* ee_fs_cstr_at(FsReader* fs, size_t i)
+EE_INLINE const char* ee_fs_cstr_at(FsReader* fs, size_t i)
 {
 	EE_ASSERT(fs != NULL, "Trying to dereference NULL reader");
 	EE_ASSERT(i < ee_array_len(&fs->offsets), "Invalid offset index (%zu) for array with length (%zu)", i, ee_array_len(&fs->offsets));
@@ -236,10 +236,10 @@ EE_INLINE const u8* ee_fs_cstr_at(FsReader* fs, size_t i)
 	size_t offset;
 	EE_ARRAY_GET(fs->offsets, i, offset);
 
-	return ee_str_at(&fs->slab, offset);
+	return (const char*)ee_str_at(&fs->slab, offset);
 }
 
-EE_INLINE s32 ee_fs_move(const u8* old_path, const u8* new_path, s32 replace_existing)
+EE_INLINE s32 ee_fs_move(const char* old_path, const char* new_path, s32 replace_existing)
 {
 	EE_ASSERT(old_path != NULL, "Trying to move NULL path");
 	EE_ASSERT(new_path != NULL, "Trying to move to NULL new path");
@@ -250,7 +250,7 @@ EE_INLINE s32 ee_fs_move(const u8* old_path, const u8* new_path, s32 replace_exi
 	return MoveFileExA(old_path, new_path, flags) == 0;
 }
 
-EE_INLINE s32 ee_fs_rename(const u8* old_name, const u8* new_name)
+EE_INLINE s32 ee_fs_rename(const char* old_name, const char* new_name)
 {
 	return ee_fs_move(old_name, new_name, EE_FALSE);
 }

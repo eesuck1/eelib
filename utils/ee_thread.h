@@ -16,12 +16,12 @@ typedef struct Dispatcher
 
 	s32* thr_load_min;
 	s32* thr_load_max;
-	s32  thr_count;
+	size_t thr_count;
 
 	Allocator allocator;
 } Dispatcher;
 
-EE_INLINE s32 ee_get_cpu_count()
+EE_INLINE s32 ee_get_cpu_count(void)
 {
 	SYSTEM_INFO info;
 	GetSystemInfo(&info);

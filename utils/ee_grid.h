@@ -213,7 +213,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 	GridNode start_node = { start_pos, dist };
 
 	ee_heap_push(&open_set, EE_HEAP_DT(start_node));
-	ee_dict_set(&score, EE_DICT_DT(start_pos), EE_CONST_ZERO_F64);
+	ee_dict_set(&score, EE_RECAST_U8(start_pos), EE_CONST_ZERO_F64);
 
 	GridNode current = { 0 };
 
@@ -225,18 +225,18 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 		{
 			GridPos pos = current.pos;
 
-			while (ee_dict_contains(&parent, EE_DICT_DT(pos)))
+			while (ee_dict_contains(&parent, EE_RECAST_U8(pos)))
 			{
-				f64* score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(pos));
+				f64* score_ptr = (f64*)ee_dict_at(&score, EE_RECAST_U8(pos));
 				f64 out_score = score_ptr == NULL ? EE_INF : *score_ptr;
 
 				GridNode out_node = { pos, (f32)out_score };
 
 				ee_array_push(&out_path, EE_RECAST_U8(out_node));
-				pos = *(GridPos*)ee_dict_at(&parent, EE_DICT_DT(pos));
+				pos = *(GridPos*)ee_dict_at(&parent, EE_RECAST_U8(pos));
 			}
 
-			f64* score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(start_pos));
+			f64* score_ptr = (f64*)ee_dict_at(&score, EE_RECAST_U8(start_pos));
 			f64 out_score = score_ptr == NULL ? EE_INF : *score_ptr;
 
 			GridNode out_node = { start_pos, (f32)out_score };
@@ -247,12 +247,12 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 			break;
 		}
 
-		if (ee_dict_contains(&closed, EE_DICT_DT(current.pos)))
+		if (ee_dict_contains(&closed, EE_RECAST_U8(current.pos)))
 		{
 			continue;
 		}
 
-		f64* current_score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(current.pos));
+		f64* current_score_ptr = (f64*)ee_dict_at(&score, EE_RECAST_U8(current.pos));
 		f32 current_score = EE_INF;
 
 		if (current_score_ptr != NULL)
@@ -268,7 +268,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 			continue;
 		}
 
-		ee_dict_set(&closed, EE_DICT_DT(current.pos), EE_CONST_ONE);
+		ee_dict_set(&closed, EE_RECAST_U8(current.pos), EE_CONST_ONE);
 
 		for (int i = 0; i < EE_SEARCH_NEIGHS_COUNT; ++i)
 		{
@@ -282,7 +282,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 
 			GridPos neigh_pos = { neigh_x, neigh_y };
 
-			if (ee_dict_contains(&closed, EE_DICT_DT(neigh_pos)))
+			if (ee_dict_contains(&closed, EE_RECAST_U8(neigh_pos)))
 			{
 				continue;
 			}
@@ -290,7 +290,7 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 			f32 step_cost = step_cost_fn(grid, current.pos.x, current.pos.y, neigh_x, neigh_y);
 			f32 tent_cost = current_score + step_cost;
 
-			f64* neigh_score_ptr = (f64*)ee_dict_at(&score, EE_DICT_DT(neigh_pos));
+			f64* neigh_score_ptr = (f64*)ee_dict_at(&score, EE_RECAST_U8(neigh_pos));
 			f32 neigh_score = EE_INF;
 
 			if (neigh_score_ptr != NULL)
@@ -305,8 +305,8 @@ EE_INLINE Array ee_grid_search(Grid* grid, s32 x_0, s32 y_0, s32 x_1, s32 y_1, G
 				
 				GridNode next_node = { neigh_pos , f_score };
 
-				ee_dict_set(&score, EE_DICT_DT(neigh_pos), EE_DICT_DT(neigh_score_f64));
-				ee_dict_set(&parent, EE_DICT_DT(neigh_pos), EE_DICT_DT(current.pos));
+				ee_dict_set(&score, EE_RECAST_U8(neigh_pos), EE_RECAST_U8(neigh_score_f64));
+				ee_dict_set(&parent, EE_RECAST_U8(neigh_pos), EE_RECAST_U8(current.pos));
 				ee_heap_push(&open_set, EE_HEAP_DT(next_node));
 			}
 		}

@@ -57,7 +57,7 @@ EE_INLINE Str ee_str_new(size_t size, const Allocator* allocator)
 	return out;
 }
 
-EE_INLINE Str ee_str_from_cstr(const u8* c_str, const Allocator* allocator)
+EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
 {
 	Str out = { 0 };
 
@@ -73,7 +73,7 @@ EE_INLINE Str ee_str_from_cstr(const u8* c_str, const Allocator* allocator)
 		memcpy(&out.allocator, allocator, sizeof(Allocator));
 	}
 
-	size_t size = strlen(c_str);
+	size_t size = strlen((const char*)c_str);
 
 	out.cap = size;
 	out.top = size;
@@ -86,7 +86,7 @@ EE_INLINE Str ee_str_from_cstr(const u8* c_str, const Allocator* allocator)
 	return out;
 }
 
-EE_INLINE Str ee_str_from_file(const u8* file_path, const u8* mode, const Allocator* allocator)
+EE_INLINE Str ee_str_from_file(const char* file_path, const char* mode, const Allocator* allocator)
 {
 	EE_ASSERT(file_path != NULL, "Trying to open NULL file path");
 
@@ -136,22 +136,22 @@ EE_INLINE Str ee_str_from_file(const u8* file_path, const u8* mode, const Alloca
 	return out;
 }
 
-EE_INLINE const u8* ee_str_to_cstr(Str* str)
+EE_INLINE const char* ee_str_to_cstr(Str* str)
 {
 	EE_ASSERT(str != NULL, "Trying to get c string from NULL string");
 
 	size_t c_str_len = str->top + 1;
-	u8* c_str = str->allocator.alloc_fn(&str->allocator, c_str_len);
+	char* c_str = (char*)str->allocator.alloc_fn(&str->allocator, c_str_len);
 
 	EE_ASSERT(c_str != NULL, "Unable to allocate (%zu) bytes for C string buffer", c_str_len);
 
 	memcpy(c_str, str->buffer, str->top);
 	c_str[c_str_len - 1] = '\0';
 
-	return (const u8*)c_str;
+	return (const char*)c_str;
 }
 
-EE_INLINE void ee_str_to_file(Str* str, const u8* file_path, const u8* mode)
+EE_INLINE void ee_str_to_file(Str* str, const char* file_path, const char* mode)
 {
 	EE_ASSERT(str != NULL, "Trying to write a NULL string to file");
 	EE_ASSERT(file_path != NULL, "Trying to write to a NULL file path");

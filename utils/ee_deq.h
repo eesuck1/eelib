@@ -59,7 +59,7 @@ EE_INLINE void ee_deq_free(Deq* deq)
 	memset(deq, 0, sizeof(Deq));
 }
 
-EE_INLINE s32 ee_deq_size(const Deq* deq)
+EE_INLINE size_t ee_deq_size(const Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
@@ -184,7 +184,7 @@ EE_INLINE u8* ee_deq_at(Deq* deq, size_t i)
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 	
 	size_t i_b = i * deq->elem_size;
-	EE_ASSERT((deq->head - deq->tail) & deq->mask > i_b, "Invalid index (%zu) for deq with size (%zu)", i, ((deq->head - deq->tail) & deq->mask) / deq->elem_size);
+	EE_ASSERT(((deq->head - deq->tail) & deq->mask) > i_b, "Invalid index (%zu) for deq with size (%zu)", i, ((deq->head - deq->tail) & deq->mask) / deq->elem_size);
 
 	return &deq->buffer[(deq->tail + i_b) & deq->mask];
 }

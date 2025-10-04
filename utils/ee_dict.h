@@ -22,12 +22,11 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_SLOT_DELETED              (0xFE)
 #define EE_GROUP_MASK                (~(EE_GROUP_SIZE - 1))
 
-#define EE_DICT_DT(x)                ((u8*)(&(x)))
-#define EE_CONST_ZERO                (EE_DICT_DT(EE_ZERO_U64))
-#define EE_CONST_ONE                 (EE_DICT_DT(EE_ONE_U64))
-#define EE_CONST_MAX_U64             (EE_DICT_DT(EE_MAX_U64))
-#define EE_CONST_ZERO_F64            (EE_DICT_DT(EE_ZERO_F64))
-#define EE_CONST_ONE_F64             (EE_DICT_DT(EE_ONE_F64))
+#define EE_CONST_ZERO                (EE_RECAST_U8(EE_ZERO_U64))
+#define EE_CONST_ONE                 (EE_RECAST_U8(EE_ONE_U64))
+#define EE_CONST_MAX_U64             (EE_RECAST_U8(EE_MAX_U64))
+#define EE_CONST_ZERO_F64            (EE_RECAST_U8(EE_ZERO_F64))
+#define EE_CONST_ONE_F64             (EE_RECAST_U8(EE_ONE_F64))
 
 // #define EE_DICT_TOMBS_REHASH
 typedef u64 (*DictHash)(const u8* key, size_t len);

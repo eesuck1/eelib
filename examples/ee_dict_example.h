@@ -12,7 +12,7 @@ typedef struct
 
 void run_dict_example_hello_world(void)
 {
-	// Creating a hash-table with starting size of 128 values, key size 16-byte and 4-byte value
+	// Creating a hash-table with starting size of 128 values, 16-byte key and 4-byte value
 	// Default heap Allocator and default ee_hash function
 	// using 'ee_dict_new_m' macro
 
@@ -32,7 +32,7 @@ void run_dict_example_hello_world(void)
 
 	i32 set_res = ee_dict_set(&dict, EE_RECAST_U8(key), EE_RECAST_U8(val));
 
-	// Practically it will fail only if Dict ran out of memory
+	// Practically it will fail only if Dict ran out of memory (either entire RAM or some pull if custom Allocator is used)
 	EE_ASSERT(set_res == EE_TRUE, "Failed to insert (%f) into hash table", val);
 	EE_PRINTLN("Inserted (%f) successfully", val);
 
@@ -69,6 +69,75 @@ void run_dict_example_hello_world(void)
 
 	EE_ASSERT(del_res == EE_TRUE, "Failed to remove (%f) into hash table", val);
 	EE_PRINTLN("Removed (%f) successfully", val);
+
+	// Clear the table
+	ee_dict_free(&dict);
+}
+
+void run_dict_iter_example(void)
+{
+	// Creating a hash-table with starting size of 128 values, 4-byte key and 4-byte value
+	// Default heap Allocator and default ee_hash function
+	// using 'ee_dict_new_m' macro
+
+	Dict dict = ee_dict_new_m(128, u32, f32, NULL, NULL);
+
+	// Same as:
+	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), NULL, NULL);
+
+	// Inserting 'pairs_count' random values wuth random keys
+	i32 pairs_count = 8;
+	
+	for (i32 i = 0; i < pairs_count; ++i)
+	{
+		u32 key = (u32)i;
+		f32 val = (f32)i * i;
+
+		EE_PRINTLN("[%d]: (%u, %.1f) inserted", i, key, val);
+
+		// EE_RECAST_U8 is a helper macro to cast any type pointer to u8* for ee_dict API
+		i32 set_res = ee_dict_set(&dict, EE_RECAST_U8(key), EE_RECAST_U8(val));
+
+		// Practically it will fail only if Dict ran out of memory (either entire RAM or some pull if custom Allocator is used)
+		EE_ASSERT(set_res == EE_TRUE, "Failed to insert (%f) into hash table", val);
+	}
+
+	EE_PRINTLN();
+
+	// Create iterator over dict
+	DictIter iter = ee_dict_iter_new(&dict);
+
+	u32 current_key = 0;
+	f32 current_val = 0.0f;
+	i32 count = 0;
+
+	// 'ee_dict_iter_next' returns EE_FALSE when next (key, value) pair can not be obtained
+	while (ee_dict_iter_next(&iter, EE_RECAST_U8(current_key), EE_RECAST_U8(current_val)))
+	{
+		EE_PRINTLN("(%u, %.1f) obtained via iterator", current_key, current_val);
+		count++;
+
+		// Do something with key and value
+		// Note that the values are not obtained in the order in which they were inserted
+	}
+
+	EE_ASSERT(count == pairs_count, "Invalid iteration result");
+	EE_PRINTLN("\nFirst loop over dict completed successfully\n");
+
+	// Reset the iterator to repeat
+	ee_dict_iter_reset(&iter);
+
+	// Iterating again
+	while (ee_dict_iter_next(&iter, EE_RECAST_U8(current_key), EE_RECAST_U8(current_val)))
+	{
+		EE_PRINTLN("(%u, %.1f) obtained via iterator again", current_key, current_val);
+		count++;
+
+		// Do something with key and value
+	}
+
+	EE_ASSERT(count == 2 * pairs_count, "Invalid iteration result");
+	EE_PRINTLN("\nSecond loop over dict completed successfully");
 
 	// Clear the table
 	ee_dict_free(&dict);

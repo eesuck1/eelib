@@ -30,15 +30,15 @@ void run_dict_example_hello_world(void)
 	// The key and value would be copied so it's okay to modify them afterwards
 	// The function returns an EE_TRUE value on success
 
-	s32 set_res = ee_dict_set(&dict, EE_RECAST_U8(key), EE_RECAST_U8(val));
+	i32 set_res = ee_dict_set(&dict, EE_RECAST_U8(key), EE_RECAST_U8(val));
 
 	// Practically it will fail only if Dict ran out of memory
 	EE_ASSERT(set_res == EE_TRUE, "Failed to insert (%f) into hash table", val);
 	EE_PRINTLN("Inserted (%f) successfully", val);
 
 	// Check if the value is contained within table
-	s32 key_there = ee_dict_contains(&dict, EE_RECAST_U8(key));
-	s32 key_not_there = ee_dict_contains(&dict, EE_RECAST_U8(key_missing));
+	i32 key_there = ee_dict_contains(&dict, EE_RECAST_U8(key));
+	i32 key_not_there = ee_dict_contains(&dict, EE_RECAST_U8(key_missing));
 
 	EE_ASSERT(key_there == EE_TRUE, "Invalid contains result, should be true");
 	EE_ASSERT(key_not_there == EE_FALSE, "Invalid contains result, should be false");
@@ -65,7 +65,7 @@ void run_dict_example_hello_world(void)
 	EE_PRINTLN("Found (%f) successfully", val);
 
 	// Remove the value from the table
-	s32 del_res = ee_dict_remove(&dict, EE_RECAST_U8(key));
+	i32 del_res = ee_dict_remove(&dict, EE_RECAST_U8(key));
 
 	EE_ASSERT(del_res == EE_TRUE, "Failed to remove (%f) into hash table", val);
 	EE_PRINTLN("Removed (%f) successfully", val);

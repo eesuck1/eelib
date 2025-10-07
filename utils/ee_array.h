@@ -179,7 +179,11 @@ EE_INLINE void ee_array_push_nothing(Array* array)
 EE_INLINE u8* ee_array_top(const Array* array)
 {
 	EE_ASSERT(array != NULL, "Trying to get NULL Array top");
-	EE_ASSERT(array->top >= array->elem_size, "Trying to get top element of empty Array");
+	
+	if (ee_array_empty(array))
+	{
+		return NULL;
+	}
 
 	return &array->buffer[array->top - array->elem_size];
 }
@@ -248,11 +252,11 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
 			ee_simd_i match = ee_cmpeq_epi8(pattern, group);
 
-			s32 mask = ee_movemask_epi8(match);
+			i32 mask = ee_movemask_epi8(match);
 
 			if (mask)
 			{
-				s32 first = ee_first_bit_u32(mask);
+				i32 first = ee_first_bit_u32(mask);
 
 				return i + first;
 			}
@@ -270,11 +274,11 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
 			ee_simd_i match = ee_cmpeq_epi16(pattern, group);
 
-			s32 mask = ee_movemask_epi8(match);
+			i32 mask = ee_movemask_epi8(match);
 
 			if (mask)
 			{
-				s32 first = ee_first_bit_u32(mask);
+				i32 first = ee_first_bit_u32(mask);
 
 				return (i >> 1) + (first >> 1);
 			}
@@ -292,11 +296,11 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
 			ee_simd_i match = ee_cmpeq_epi32(pattern, group);
 
-			s32 mask = ee_movemask_epi8(match);
+			i32 mask = ee_movemask_epi8(match);
 
 			if (mask)
 			{
-				s32 first = ee_first_bit_u32(mask);
+				i32 first = ee_first_bit_u32(mask);
 
 				return (i >> 2) + (first >> 2);
 			}
@@ -314,11 +318,11 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 			ee_simd_i group = ee_loadu_si((const ee_simd_i*)&array->buffer[i]);
 			ee_simd_i match = ee_cmpeq_epi64(pattern, group);
 
-			s32 mask = ee_movemask_epi8(match);
+			i32 mask = ee_movemask_epi8(match);
 
 			if (mask)
 			{
-				s32 first = ee_first_bit_u32(mask);
+				i32 first = ee_first_bit_u32(mask);
 
 				return (i >> 3) + (first >> 3);
 			}
@@ -476,7 +480,7 @@ EE_INLINE void ee_array_swap(Array* array, size_t i, size_t j)
 	EE_FREEA(temp);
 }
 
-EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
+EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, i64 low, i64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -489,11 +493,11 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
 	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
-	for (s64 i = low; i <= high; i += array->elem_size)
+	for (i64 i = low; i <= high; i += array->elem_size)
 	{
 		memcpy(temp, &array->buffer[i], array->elem_size);
 
-		s64 j = i;
+		i64 j = i;
 
 		while (j > low && cmp(&array->buffer[j - array->elem_size], temp) > 0)
 		{
@@ -507,7 +511,7 @@ EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, s64 low, s64 high)
 	EE_FREEA(temp);
 }
 
-EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
+EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, i64 low, i64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -530,8 +534,8 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
 	
 	memcpy(pivot, &array->buffer[mid_index * array->elem_size], array->elem_size);
 
-	s64 i = low - array->elem_size;
-	s64 j = high + array->elem_size;
+	i64 i = low - array->elem_size;
+	i64 j = high + array->elem_size;
 
 	while (EE_TRUE)
 	{
@@ -556,7 +560,7 @@ EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, s64 low, s64 high)
 	ee_array_quicksort(array, cmp, j + array->elem_size, high);
 }
 
-EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
+EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, i64 low, i64 high)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -570,9 +574,9 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 	u8* temp = (u8*)EE_ALLOCA(array->elem_size);
 	EE_ASSERT(temp != NULL, "Unable to allocate (%zu) for sorting temporary buffer", array->elem_size);
 
-	s64 count = (high - low) / array->elem_size + 1;
-	s64 start = (count >> 1) * array->elem_size;
-	s64 end = count * array->elem_size;
+	i64 count = (high - low) / array->elem_size + 1;
+	i64 start = (count >> 1) * array->elem_size;
+	i64 end = count * array->elem_size;
 
 	while ((size_t)end > array->elem_size)
 	{
@@ -589,11 +593,11 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 			memcpy(&array->buffer[low + end], temp, array->elem_size);
 		}
 
-		s64 root = start;
+		i64 root = start;
 
 		while ((2 * root + array->elem_size) < (size_t)end)
 		{
-			s64 child = 2 * root + array->elem_size;
+			i64 child = 2 * root + array->elem_size;
 
 			if ((child + array->elem_size < (size_t)end) && cmp(&array->buffer[low + child], &array->buffer[low + child + array->elem_size]) < 0)
 			{
@@ -618,7 +622,7 @@ EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, s64 low, s64 high)
 	EE_FREEA(temp);
 }
 
-EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s32 max_depth)
+EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, i64 low, i64 high, i32 max_depth)
 {
 	EE_ASSERT(array != NULL, "Trying to sort a NULL Array");
 	EE_ASSERT(cmp != NULL, "Trying to sort with a NULL BinCmp");
@@ -629,7 +633,7 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s
 	if (low < 0 || high < 0 || low >= high)
 		return;
 
-	s64 len = (high - low) / array->elem_size + 1;
+	i64 len = (high - low) / array->elem_size + 1;
 
 	if (len <= EE_ARRAY_SORT_TH)
 	{
@@ -653,8 +657,8 @@ EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, s64 low, s64 high, s
 
 		memcpy(pivot, &array->buffer[mid_index * array->elem_size], array->elem_size);
 
-		s64 i = low - array->elem_size;
-		s64 j = high + array->elem_size;
+		i64 i = low - array->elem_size;
+		i64 j = high + array->elem_size;
 
 		while (EE_TRUE)
 		{
@@ -700,7 +704,7 @@ EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)
 	case EE_SORT_INTRO:
 		{
 		u32 len = (u32)ee_array_len(array); // TODO(eesuck): log2 for numbers greater than max u32
-		s32 max_depth = ee_log2_u32(len) * 2;
+		i32 max_depth = ee_log2_u32(len) * 2;
 
 		ee_array_introsort(array, cmp, 0, (len - 1) * array->elem_size, max_depth);
 		} break;

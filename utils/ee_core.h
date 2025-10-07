@@ -80,15 +80,40 @@
 #define EE_ALIGN_MASK    (~(EE_MAX_ALIGN - 1))
 #endif
 
+#ifndef EE_UNUSED
+
+#define EE_UNUSED_1(a, ...)                ((void)(a))
+#define EE_UNUSED_2(a, b, ...)             EE_UNUSED_1(a); EE_UNUSED_1(b)
+#define EE_UNUSED_3(a, b, c, ...)          EE_UNUSED_1(a); EE_UNUSED_1(b); EE_UNUSED_1(c)
+#define EE_UNUSED_4(a, b, c, d, ...)       EE_UNUSED_1(a); EE_UNUSED_1(b); EE_UNUSED_1(c); EE_UNUSED_1(d)
+#define EE_UNUSED_5(a, b, c, d, e)         EE_UNUSED_1(a); EE_UNUSED_1(b); EE_UNUSED_1(c); EE_UNUSED_1(d); EE_UNUSED_1(e)
+
+#define EE_UNUSED_IMPL(_1, _2, _3, _4, _5, NAME, ...)    NAME(_1, _2, _3, _4, _5)
+#define EE_UNUSED(...)    EE_UNUSED_IMPL(__VA_ARGS__, EE_UNUSED_5, EE_UNUSED_4, EE_UNUSED_3, EE_UNUSED_2, EE_UNUSED_1)
+
+#endif
+
 #ifndef EE_ALIGNOF
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
-#include <stdalign.h>
+#include "stdalign.h"
 #define EE_ALIGNOF(x)   alignof(x) 
 #else
 #define EE_ALIGNOF(x)   (EE_MAX_ALIGN)
 #endif
 #endif
 
+#ifndef EE_ALIGNAS
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#include "stdalign.h"
+#define EE_ALIGNAS(x)    alignas(x)
+#elif defined(__GNUC__) || defined(__clang__)
+#define EE_ALIGNAS(x)    __attribute__((aligned(x)))
+#elif defined(_MSC_VER)
+#define EE_ALIGNAS(x)    __declspec(align(x))
+#else
+#error "EE_ALIGNAS: unknown compiler, cannot set alignment"
+#endif
+#endif
 
 //
 // Extern C
@@ -113,6 +138,11 @@ typedef uint8_t     u8;
 typedef uint16_t    u16;
 typedef uint32_t    u32;
 typedef uint64_t    u64;
+
+typedef int8_t      i8;
+typedef int16_t     i16;
+typedef int32_t     i32;
+typedef int64_t     i64;
 
 typedef int8_t      s8;
 typedef int16_t     s16;
@@ -211,6 +241,9 @@ typedef __m256d  ee_simd_d; // double
 #define ee_srl_epi16          _mm256_srl_epi16
 #define ee_prefetch           _mm_prefetch
 
+#define ee_min_epi32          _mm256_min_epi32
+#define ee_max_epi32          _mm256_max_epi32
+
 #elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_SSE
 
 #include "immintrin.h"
@@ -246,8 +279,10 @@ typedef __m128d  ee_simd_d; // double
 #define ee_or_si              _mm_or_si128
 #define ee_and_si             _mm_and_si128
 #define ee_srl_epi16          _mm_srl_epi16
-
 #define ee_prefetch           _mm_prefetch
+
+#define ee_min_epi32          _mm_min_epi32
+#define ee_max_epi32          _mm_max_epi32
 
 #elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_NONE
 
@@ -360,9 +395,9 @@ EE_INLINE ee_simd_i _ee_cmpeq_epi64(ee_simd_i a, ee_simd_i b)
     return a == b ? 0xFFFFFFFFFFFFFFFFu : 0x0000000000000000u;
 }
 
-EE_INLINE s32 _ee_movemask_epi8(ee_simd_i a)
+EE_INLINE i32 _ee_movemask_epi8(ee_simd_i a)
 {
-    s32 m = 0;
+    i32 m = 0;
     const u8* a_u8 = (const u8*)&a;
 
     for (size_t i = 0; i < EE_SIMD_BYTES; ++i)
@@ -378,7 +413,7 @@ EE_INLINE ee_simd_i _ee_or_si(ee_simd_i a, ee_simd_i b)
     return a | b;
 }
 
-EE_INLINE void _ee_prefetch(const void* p, s32 sel)
+EE_INLINE void _ee_prefetch(const void* p, i32 sel)
 {
     (void)p;
     (void)sel;
@@ -394,9 +429,9 @@ EE_INLINE ee_simd_i _ee_castst_pd(ee_simd_i a)
     return a;
 }
 
-EE_INLINE s32 _ee_movemask_ps(ee_simd_i a)
+EE_INLINE i32 _ee_movemask_ps(ee_simd_i a)
 {
-    s32 m = 0;
+    i32 m = 0;
 
     const u32* a_u32 = (const u32*)&a;
 
@@ -406,7 +441,7 @@ EE_INLINE s32 _ee_movemask_ps(ee_simd_i a)
     return m;
 }
 
-EE_INLINE s32 _ee_movemask_pd(ee_simd_i a)
+EE_INLINE i32 _ee_movemask_pd(ee_simd_i a)
 {
     return (a >> 63) & 1;
 }
@@ -417,7 +452,7 @@ EE_INLINE ee_simd_i _ee_packs_epi16(ee_simd_i a, ee_simd_i b)
 
     for (int i = 0; i < 4; ++i)
     {
-        s16 ai = (a >> (i * 16)) & 0xFFFF;
+        i16 ai = (a >> (i * 16)) & 0xFFFF;
 
         if (ai > 127) 
             ai = 127;
@@ -426,7 +461,7 @@ EE_INLINE ee_simd_i _ee_packs_epi16(ee_simd_i a, ee_simd_i b)
 
         out |= ((ee_simd_i)(ai & 0xFF)) << (i * 8);
 
-        s16 bi = (b >> (i * 16)) & 0xFFFF;
+        i16 bi = (b >> (i * 16)) & 0xFFFF;
 
         if (bi > 127) 
             bi = 127;
@@ -469,6 +504,34 @@ EE_INLINE ee_simd_i _ee_and_si(ee_simd_i a, ee_simd_i b)
     return a & b;
 }
 
+EE_INLINE ee_simd_i _ee_min_epi32(ee_simd_i a, ee_simd_i b)
+{
+    ee_simd_i out = 0;
+    u32* out_u32 = (u32*)&out;
+
+    const u32* a_u32 = (u32*)&a;
+    const u32* b_u32 = (u32*)&b;
+
+    out_u32[0] = a_u32[0] < b_u32[0] ? a_u32[0] : b_u32[0];
+    out_u32[1] = a_u32[1] < b_u32[1] ? a_u32[1] : b_u32[1];
+
+    return out;
+}
+
+EE_INLINE ee_simd_i _ee_max_epi32(ee_simd_i a, ee_simd_i b)
+{
+    ee_simd_i out = 0;
+    u32* out_u32 = (u32*)&out;
+
+    const u32* a_u32 = (u32*)&a;
+    const u32* b_u32 = (u32*)&b;
+
+    out_u32[0] = a_u32[0] > b_u32[0] ? a_u32[0] : b_u32[0];
+    out_u32[1] = a_u32[1] > b_u32[1] ? a_u32[1] : b_u32[1];
+
+    return out;
+}
+
 #define ee_loadu_si           _ee_load_si
 #define ee_load_si            _ee_load_si
 
@@ -494,6 +557,8 @@ EE_INLINE ee_simd_i _ee_and_si(ee_simd_i a, ee_simd_i b)
 #define ee_and_si             _ee_and_si
 #define ee_srl_epi16          _ee_srl_epi16
 #define ee_prefetch           _ee_prefetch
+#define ee_min_epi32          _ee_min_epi32
+#define ee_max_epi32          _ee_max_epi32
 
 #else
 #error Invalid EE_SIMD_EFFECTIVE_MAX_LEVEL value
@@ -580,9 +645,9 @@ EE_INLINE eed_simd_i _eed_cmpeq_epi8(eed_simd_i a, eed_simd_i b)
     return out;
 }
 
-EE_INLINE s32 _eed_movemask_epi8(eed_simd_i a)
+EE_INLINE i32 _eed_movemask_epi8(eed_simd_i a)
 {
-    s32 m = 0;
+    i32 m = 0;
     const u8* a_u8 = (const u8*)&a;
 
     for (size_t i = 0; i < EED_SIMD_BYTES; ++i)
@@ -598,7 +663,7 @@ EE_INLINE eed_simd_i _eed_or_si(eed_simd_i a, eed_simd_i b)
     return a | b;
 }
 
-EE_INLINE void _eed_prefetch(const void* p, s32 sel)
+EE_INLINE void _eed_prefetch(const void* p, i32 sel)
 {
     (void)p;
     (void)sel;
@@ -693,7 +758,7 @@ typedef int (*BinCmp)(const void* a, const void* b);
 // Functions
 //
 
-EE_INLINE s32 ee_first_bit_u32(u32 x)
+EE_INLINE i32 ee_first_bit_u32(u32 x)
 {
 #if defined(__BMI__)
     return _tzcnt_u32(x);
@@ -704,14 +769,14 @@ EE_INLINE s32 ee_first_bit_u32(u32 x)
 
     if (_BitScanForward(&i, x))
     {
-        return (s32)i;
+        return (i32)i;
     }
     else
     {
         return EE_FIND_FIRST_BIT_INVALID;
     }
 #else
-    for (s32 i = 0; i < 32; ++i)
+    for (i32 i = 0; i < 32; ++i)
     {
         if (x & (1u << i))
         {
@@ -723,7 +788,7 @@ EE_INLINE s32 ee_first_bit_u32(u32 x)
 #endif
 }
 
-EE_INLINE s32 ee_first_zero_u32(u32 x)
+EE_INLINE i32 ee_first_zero_u32(u32 x)
 {
     return ee_first_bit_u32(~x);
 }
@@ -749,14 +814,14 @@ EE_INLINE u64 ee_next_pow_2(u64 x)
     return x;
 }
 
-EE_INLINE s32 ee_popcnt_u32(u32 x)
+EE_INLINE i32 ee_popcnt_u32(u32 x)
 {
 #if defined(__GNUC__) || defined(__clang__)
     return __builtin_popcount(x);
 #elif defined(_MSC_VER)
     return __popcnt(x);
 #else
-    s32 count = 0;
+    i32 count = 0;
 
     while (x)
     {

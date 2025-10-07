@@ -18,17 +18,17 @@ static const u8 EE_BLACK = 0xFF;
 
 typedef struct Node
 {
-	s64 left;
-	s64 right;
-	s64 prev;
+	i64 left;
+	i64 right;
+	i64 prev;
 	u8 data[EE_NODE_PL_SIZE];
 } Node;
 
 typedef struct Set
 {
-	s64 root;
-	s64 min;
-	s64 max;
+	i64 root;
+	i64 min;
+	i64 max;
 
 	BinCmp cmp;
 
@@ -39,7 +39,7 @@ typedef struct Set
 
 EE_EXTERN_C_START
 
-EE_INLINE Node ee_node_new(s64 prev, u8 data[EE_NODE_PL_SIZE])
+EE_INLINE Node ee_node_new(i64 prev, u8 data[EE_NODE_PL_SIZE])
 {
 	Node out = { 0 };
 
@@ -68,7 +68,7 @@ EE_INLINE Set ee_set_new(size_t size, BinCmp cmp)
 	out.cmp    = cmp;
 
 	out.nodes  = ee_array_new(size, sizeof(Node), NULL);
-	out.free   = ee_array_new(size, sizeof(s64), NULL);
+	out.free   = ee_array_new(size, sizeof(i64), NULL);
 	out.colors = ee_array_new(size, sizeof(u8), NULL);
 
 	ee_array_fill(&out.colors, EE_RECAST_U8(EE_RED), 0, size);

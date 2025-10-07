@@ -230,7 +230,7 @@ EE_INLINE void ee_dict_free(Dict* dict)
 	memset(dict, 0, sizeof(Dict));
 }
 
-EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
+EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
 	EE_ASSERT(key != NULL, "Trying to dereference NULL key");
@@ -260,11 +260,11 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 
-		s32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
+		i32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
 		
 		while (match_mask)
 		{
-			s32 first = ee_first_bit_u32(match_mask);
+			i32 first = ee_first_bit_u32(match_mask);
 		
 			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
@@ -276,14 +276,14 @@ EE_INLINE s32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 			match_mask &= match_mask - 1;
 		}
 
-		s32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, deleted128));
+		i32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, deleted128));
 		
 		if (deleted_mask && first_deleted == (size_t)-1)
 		{
 			first_deleted = group_index + (size_t)ee_first_bit_u32(deleted_mask);
 		}
 
-		s32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
+		i32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
 		
 		if (empty_mask)
 		{
@@ -362,9 +362,9 @@ EE_INLINE void ee_dict_rehash(Dict* dict)
 	*dict = out;
 }
 
-EE_INLINE s32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
+EE_INLINE i32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 {
-	s32 result = ee_dict_insert(dict, key, val);
+	i32 result = ee_dict_insert(dict, key, val);
 
 	if (!result)
 	{
@@ -382,7 +382,7 @@ EE_INLINE s32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 	return result;
 }
 
-EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
+EE_INLINE i32 ee_dict_remove(Dict* dict, const u8* key)
 {
 	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
 	EE_ASSERT(key != NULL, "Trying to dereference NULL key");
@@ -410,11 +410,11 @@ EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
-		s32 match_mask = eed_movemask_epi8(match);
+		i32 match_mask = eed_movemask_epi8(match);
 
 		while (match_mask)
 		{
-			s32 first = ee_first_bit_u32(match_mask);
+			i32 first = ee_first_bit_u32(match_mask);
 
 			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
@@ -438,7 +438,7 @@ EE_INLINE s32 ee_dict_remove(Dict* dict, const u8* key)
 
 		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
 
-		s32 empty_mask = eed_movemask_epi8(empty);
+		i32 empty_mask = eed_movemask_epi8(empty);
 
 		if (empty_mask)
 		{
@@ -480,11 +480,11 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrls[group_index]);
 		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
 
-		s32 match_mask = eed_movemask_epi8(match);
+		i32 match_mask = eed_movemask_epi8(match);
 		
 		while (match_mask)
 		{
-			s32 first = ee_first_bit_u32(match_mask);
+			i32 first = ee_first_bit_u32(match_mask);
 
 			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
@@ -496,7 +496,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 
 		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
 
-		s32 empty_mask = eed_movemask_epi8(empty);
+		i32 empty_mask = eed_movemask_epi8(empty);
 
 		if (empty_mask)
 		{
@@ -539,7 +539,7 @@ EE_INLINE void ee_dict_iter_reset(DictIter* iter)
 	iter->it = 0;
 }
 
-EE_INLINE s32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
+EE_INLINE i32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
 {
 	EE_ASSERT(iter != NULL, "Trying to dereference NULL DictIter");
 	EE_ASSERT(key_out != NULL, "Trying to dereference NULL key");
@@ -575,11 +575,11 @@ EE_INLINE s32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
 		eed_simd_i group = eed_load_si(&ctrls[i]);
 		eed_simd_i match = eed_or_si(eed_cmpeq_epi8(group, p_empty), eed_cmpeq_epi8(group, p_deleted));
 		
-		s32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);
+		i32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);
 
 		if (mask)
 		{
-			s32 first = ee_first_bit_u32(mask);
+			i32 first = ee_first_bit_u32(mask);
 			size_t pos = (size_t)first + i;
 
 			memcpy(key_out, ee_dict_key_at(iter->dict, pos), iter->dict->key_len);

@@ -13,12 +13,12 @@ typedef struct Rng
 {
 	u64 state[EE_RNG_STATE_LEN];
 	f64 spare;
-	s32 have_spare;
+	i32 have_spare;
 } Rng;
 
 EE_EXTERN_C_START
 
-EE_INLINE u64 ee_rotl_u64(u64 x, s32 k)
+EE_INLINE u64 ee_rotl_u64(u64 x, i32 k)
 {
 	return (x << k) | (x >> (64 - k));
 }
@@ -93,7 +93,7 @@ EE_INLINE u64 ee_rand_u64_b(Rng* rng, u64 bound)
 		return ee_rand_u64(rng) & (bound - 1ull);
 	}
 	
-	u64 threshold = (u64)(-(s64)bound) % bound;
+	u64 threshold = (u64)(-(i64)bound) % bound;
 	
 	while (EE_TRUE)
 	{
@@ -120,7 +120,7 @@ EE_INLINE u32 ee_rand_u32_b(Rng* rng, u32 bound)
 		return ee_rand_u32(rng) & (bound - 1ull);
 	}
 
-	u32 threshold = (u32)(-(s32)bound) % bound;
+	u32 threshold = (u32)(-(i32)bound) % bound;
 	
 	while (EE_TRUE)
 	{

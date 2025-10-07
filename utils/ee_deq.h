@@ -66,11 +66,19 @@ EE_INLINE size_t ee_deq_size(const Deq* deq)
 	return (deq->head - deq->tail) & deq->mask;
 }
 
-EE_INLINE s32 ee_deq_full(const Deq* deq)
+EE_INLINE size_t ee_deq_len(const Deq* deq)
 {
-	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
-	
+	return ee_deq_size(deq) / deq->elem_size;
+}
+
+EE_INLINE i32 ee_deq_full(const Deq* deq)
+{
 	return ee_deq_size(deq) >= (deq->cap - deq->elem_size);
+}
+
+EE_INLINE i32 ee_deq_empty(const Deq* deq)
+{
+	return deq->tail == deq->head;
 }
 
 EE_INLINE void ee_deq_grow(Deq* deq)
@@ -82,12 +90,11 @@ EE_INLINE void ee_deq_grow(Deq* deq)
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Array.buffer", new_cap);
 
+	size_t size = ee_deq_size(deq);
+
 	if (deq->head > deq->tail)
 	{
-		memcpy(new_buffer, &deq->buffer[deq->tail], deq->head - deq->tail);
-
-		deq->head -= deq->tail;
-		deq->tail = 0;
+		memcpy(new_buffer, &deq->buffer[deq->tail], size);
 	}
 	else
 	{
@@ -95,10 +102,10 @@ EE_INLINE void ee_deq_grow(Deq* deq)
 
 		memcpy(new_buffer, &deq->buffer[deq->tail], tail_chunk);
 		memcpy(&new_buffer[tail_chunk], deq->buffer, deq->head);
-
-		deq->head = tail_chunk + deq->head;
-		deq->tail = 0;
 	}
+
+	deq->tail = 0;
+	deq->head = size;
 
 	deq->cap = new_cap;
 	deq->mask = deq->cap - 1;
@@ -124,7 +131,7 @@ EE_INLINE void ee_deq_pop_head(Deq* deq, u8* out_val)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 	EE_ASSERT(out_val != NULL, "Trying to dereference NULL output value");
-	EE_ASSERT(deq->head > deq->tail, "Trying to pop empty deq");
+	EE_ASSERT(ee_deq_size(deq) > 0, "Trying to pop empty deq");
 
 	deq->head = (deq->head - deq->elem_size) & deq->mask;
 
@@ -165,16 +172,26 @@ EE_INLINE void ee_deq_pop_tail(Deq* deq, u8* out_val)
 	deq->tail = (deq->tail + deq->elem_size) & deq->mask;
 }
 
-EE_INLINE u8* ee_deq_at_head(Deq* deq)
+EE_INLINE u8* ee_deq_at_head(const Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
-	return &deq->buffer[deq->head];
+	if (ee_deq_empty(deq))
+	{
+		return NULL;
+	}
+
+	return &deq->buffer[deq->head - deq->elem_size];
 }
 
 EE_INLINE u8* ee_deq_at_tail(Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+
+	if (ee_deq_empty(deq))
+	{
+		return NULL;
+	}
 
 	return &deq->buffer[deq->tail];
 }

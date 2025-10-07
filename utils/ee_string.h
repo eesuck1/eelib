@@ -199,14 +199,14 @@ EE_INLINE void ee_str_grow(Str* str)
 	str->buffer = new_buffer;
 }
 
-EE_INLINE s32 ee_str_full(const Str* str)
+EE_INLINE i32 ee_str_full(const Str* str)
 {
 	EE_ASSERT(str != NULL, "Trying to check NULL string");
 
 	return str->top >= str->cap;
 }
 
-EE_INLINE s32 ee_str_empty(const Str* str)
+EE_INLINE i32 ee_str_empty(const Str* str)
 {
 	EE_ASSERT(str != NULL, "Trying to check NULL string");
 
@@ -238,7 +238,7 @@ EE_INLINE void ee_str_pop(Str* str, u8* out_val)
 	}
 }
 
-EE_INLINE s32 ee_str_cmp(const Str* a, const Str* b)
+EE_INLINE i32 ee_str_cmp(const Str* a, const Str* b)
 {
 	if (a->top < b->top)
 	{
@@ -280,11 +280,11 @@ EE_INLINE size_t ee_str_find_b(const Str* str, const Str* target, size_t low, si
 	{
 		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
-		s32 match_mask = ee_movemask_epi8(match);
+		i32 match_mask = ee_movemask_epi8(match);
 
 		while (match_mask)
 		{
-			s32 first = ee_first_bit_u32(match_mask);
+			i32 first = ee_first_bit_u32(match_mask);
 
 			if ((i + first + target_len <= high) &&
 				memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
@@ -343,18 +343,18 @@ EE_INLINE size_t ee_str_count_b(const Str* str, const Str* target, size_t low, s
 		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str->buffer[i]);
 		ee_simd_i match = ee_cmpeq_epi8(group, mask);
 		
-		s32 match_mask = ee_movemask_epi8(match);
+		i32 match_mask = ee_movemask_epi8(match);
 
 		while (match_mask)
 		{
-			s32 first = ee_first_bit_u32(match_mask);
+			i32 first = ee_first_bit_u32(match_mask);
 
 			if ((i + first + target_len <= high) && memcmp(&str->buffer[i + first], target->buffer, target_len) == 0)
 			{
 				out++;
 
 				u64 remove = (1ull << (first + target_len)) - 1ull;
-				match_mask &= ~(s32)remove;
+				match_mask &= ~(i32)remove;
 			}
 			else
 			{
@@ -386,12 +386,12 @@ EE_INLINE size_t ee_str_replace_b(Str* str, const Str* old_str, const Str* new_s
 	EE_ASSERT(old_str != NULL, "Trying to replace NULL old substring");
 	EE_ASSERT(new_str != NULL, "Trying to replace with NULL new substring");
 
-	s64 old_len = old_str->top;
-	s64 new_len = new_str->top;
-	s64 str_len = str->top;
+	i64 old_len = old_str->top;
+	i64 new_len = new_str->top;
+	i64 str_len = str->top;
 
-	s64 replace_count = ee_str_count_b(str, old_str, low, high);
-	s64 new_str_len = str_len + replace_count * (new_len - old_len);
+	i64 replace_count = ee_str_count_b(str, old_str, low, high);
+	i64 new_str_len = str_len + replace_count * (new_len - old_len);
 
 	EE_ASSERT(new_str_len > 0, "Invalid resulting length of the buffer");
 
@@ -441,7 +441,7 @@ EE_INLINE size_t ee_str_len(const Str* str)
 	return str->top;
 }
 
-EE_INLINE s32 ee_str_lev_m64(const Str* a, const Str* b)
+EE_INLINE i32 ee_str_lev_m64(const Str* a, const Str* b)
 {
 	EE_ASSERT(a != NULL, "Trying to compute distance from NULL 'a' string");
 	EE_ASSERT(b != NULL, "Trying to compute distance from NULL 'b' string");
@@ -450,10 +450,10 @@ EE_INLINE s32 ee_str_lev_m64(const Str* a, const Str* b)
 	EE_ASSERT(a->top >= b->top, "'a' string should be longer that 'b'");
 
 	if (a->top == 0)
-		return (s32)b->top;
+		return (i32)b->top;
 
 	if (b->top == 0)
-		return (s32)a->top;
+		return (i32)a->top;
 
 	u64 char_equal[EE_STR_CHARS_MASK_LEN] = { 0 };
 
@@ -468,7 +468,7 @@ EE_INLINE s32 ee_str_lev_m64(const Str* a, const Str* b)
 	u64 neg_vec = 0;
 	u64 last = 1ull << (a->top - 1);
 
-	s32 score = (s32)a->top;
+	i32 score = (i32)a->top;
 
 	for (size_t j = 0; j < b->top; ++j)
 	{
@@ -494,7 +494,7 @@ EE_INLINE s32 ee_str_lev_m64(const Str* a, const Str* b)
 	return score;
 }
 
-EE_INLINE s32 ee_str_lev_mx(const Str* a, const Str* b) 
+EE_INLINE i32 ee_str_lev_mx(const Str* a, const Str* b) 
 {
 	EE_ASSERT(a != NULL, "Trying to compute distance from NULL 'a' string");
 	EE_ASSERT(b != NULL, "Trying to compute distance from NULL 'b' string");
@@ -502,10 +502,10 @@ EE_INLINE s32 ee_str_lev_mx(const Str* a, const Str* b)
 
 
 	if (a->top == 0)
-		return (s32)b->top;
+		return (i32)b->top;
 
 	if (b->top == 0)
-		return (s32)a->top;
+		return (i32)a->top;
 
 	size_t n = a->top;
 	size_t m = b->top;
@@ -527,7 +527,7 @@ EE_INLINE s32 ee_str_lev_mx(const Str* a, const Str* b)
 	}
 
 	u64 char_equal[EE_STR_CHARS_MASK_LEN] = { 0 };
-	s32 score = (s32)m;
+	i32 score = (i32)m;
 
 	size_t block_index = 0;
 
@@ -633,7 +633,7 @@ EE_INLINE s32 ee_str_lev_mx(const Str* a, const Str* b)
 	return score;
 }
 
-EE_INLINE s32 ee_str_lev(const Str* a, const Str* b)
+EE_INLINE i32 ee_str_lev(const Str* a, const Str* b)
 {
 	const Str* shorter = a;
 	const Str* longer = b;

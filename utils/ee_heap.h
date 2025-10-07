@@ -38,11 +38,11 @@ EE_INLINE void ee_heap_free(Heap* heap)
 	memset(heap, 0, sizeof(Heap));
 }
 
-EE_INLINE void ee_heap_up(Heap* heap, s64 i)
+EE_INLINE void ee_heap_up(Heap* heap, i64 i)
 {
 	while (i > 0)
 	{
-		s64 parent = EE_HEAP_PARENT(i);
+		i64 parent = EE_HEAP_PARENT(i);
 
 		if (heap->cmp(ee_array_at(&heap->items, i), ee_array_at(&heap->items, parent)) < 0)
 		{
@@ -57,10 +57,10 @@ EE_INLINE void ee_heap_up(Heap* heap, s64 i)
 	}
 }
 
-EE_INLINE void ee_heap_down(Heap* heap, s64 i)
+EE_INLINE void ee_heap_down(Heap* heap, i64 i)
 {
-	s64 len = (s64)ee_array_len(&heap->items);
-	s64 left = 0, right = 0, smallest = 0;
+	i64 len = (i64)ee_array_len(&heap->items);
+	i64 left = 0, right = 0, smallest = 0;
 
 	while (left < len)
 	{

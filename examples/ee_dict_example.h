@@ -1,6 +1,9 @@
 #ifndef EE_DICT_EXAMPLE_H
 #define EE_DICT_EXAMPLE_H
 
+// Warning that 'fprintf' is not inlined (we do not care)
+#pragma warning(disable : 4710)
+
 #include "ee_dict.h"
 
 // 16-byte key structure

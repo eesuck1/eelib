@@ -583,7 +583,7 @@ EE_INLINE i32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
 
 	for (; i < iter->dict->cap; i += EED_SIMD_BYTES)
 	{
-		eed_simd_i group = eed_load_si(&ctrls[i]);
+		eed_simd_i group = eed_load_si((const eed_simd_i*)&ctrls[i]);
 		eed_simd_i match = eed_or_si(eed_cmpeq_epi8(group, p_empty), eed_cmpeq_epi8(group, p_deleted));
 		
 		i32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);
@@ -638,7 +638,7 @@ EE_INLINE i32 ee_dict_iter_next_ptr(DictIter* iter, u8** key_out, u8** val_out)
 
 	for (; i < iter->dict->cap; i += EED_SIMD_BYTES)
 	{
-		eed_simd_i group = eed_load_si(&ctrls[i]);
+		eed_simd_i group = eed_load_si((const eed_simd_i*)&ctrls[i]);
 		eed_simd_i match = eed_or_si(eed_cmpeq_epi8(group, p_empty), eed_cmpeq_epi8(group, p_deleted));
 		
 		i32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);

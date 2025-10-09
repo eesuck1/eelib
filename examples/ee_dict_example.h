@@ -137,7 +137,9 @@ void run_dict_iter_example(void)
 	f32* val_ptr = NULL;
 
 	// Iterating again
-	while (ee_dict_iter_next_ptr(&iter, EE_RECAST_U8(key_ptr), EE_RECAST_U8(val_ptr)))
+	// Here the address of u32* is casted to u8* and resulting type is u8**
+	// so there is implicit convertion from u8* to u32*/f32*
+	while (ee_dict_iter_next_ptr(&iter, EE_RECAST_U8_PTR(key_ptr), EE_RECAST_U8_PTR(val_ptr)))
 	{
 		EE_ASSERT(key_ptr != NULL && val_ptr != NULL, "Invalid iterator result");
 		EE_PRINTLN("(%u, %.1f) obtained via pointer iterator", *key_ptr, *val_ptr);

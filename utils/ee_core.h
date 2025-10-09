@@ -69,7 +69,11 @@
 #endif // EE_MEM_SIZES
 
 #ifndef EE_RECAST_U8
-#define EE_RECAST_U8(x)    ((u8*)(&(x)))
+#define EE_RECAST_U8(x)        ((u8*)(&(x)))
+#endif
+
+#ifndef EE_RECAST_U8_PTR
+#define EE_RECAST_U8_PTR(x)    ((u8**)(&(x)))
 #endif
 
 #ifndef EE_MAX_ALIGN

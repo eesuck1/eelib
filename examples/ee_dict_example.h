@@ -196,7 +196,7 @@ void* custom_alloc_fn(Allocator* self, size_t size)
 
 void run_dict_custom_fn_example(void)
 {
-	// Creating a hash-table with starting size of 128 values, 4-byte key and 4-byte value
+	// Creating a hash-table with starting size of 128 values, 16-byte key and 4-byte value
 	// Custom heap Allocator with very important work, custom mixer hash function and custom key comparison function
 
 	Allocator allocator = { 0 };

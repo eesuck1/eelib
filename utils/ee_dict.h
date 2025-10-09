@@ -30,8 +30,10 @@ static const f64 EE_ONE_F64  = 1.0;
 
 // #define EE_DICT_TOMBS_REHASH
 typedef u64 (*DictHash)(const u8* key, size_t len);
+typedef i32 (*DictEq)(const u8* a, const u8* b, size_t len);
 
-#define ee_dict_new_m(size, key_type, val_type, allocator, hash_fn)    ee_dict_new(size, sizeof(key_type), sizeof(val_type), EE_ALIGNOF(key_type), EE_ALIGNOF(val_type), allocator, hash_fn)
+#define ee_dict_new_m(size, key_type, val_type, allocator, hash_fn, eq_fn)    ee_dict_new(size, sizeof(key_type), sizeof(val_type), EE_ALIGNOF(key_type), EE_ALIGNOF(val_type), allocator, hash_fn, eq_fn)
+#define ee_dict_def_m(size, key_type, val_type)                               ee_dict_new(size, sizeof(key_type), sizeof(val_type), EE_ALIGNOF(key_type), EE_ALIGNOF(val_type), NULL, NULL, NULL)
 
 typedef struct Dict
 {
@@ -58,6 +60,7 @@ typedef struct Dict
 
 	Allocator allocator;
 	DictHash  hash_fn;
+	DictEq    eq_fn;
 } Dict;
 
 typedef struct DictIter
@@ -154,7 +157,7 @@ EE_INLINE u8* ee_dict_val_at(const Dict* dict, size_t i)
 	return &dict->slots[i * dict->slot_len + dict->key_len_al];
 }
 
-EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, size_t key_align, size_t val_align, const Allocator* allocator, DictHash hash_fn)
+EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, size_t key_align, size_t val_align, const Allocator* allocator, DictHash hash_fn, DictEq eq_fn)
 {
 	EE_ASSERT(key_len > 0, "Invalid key_len (%zu)", key_len);
 	EE_ASSERT(val_len > 0, "Invalid val_len (%zu)", val_len);
@@ -207,6 +210,7 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, size_t k
 	out.th = ee_dict_th(out.cap);
 	
 	out.hash_fn = hash_fn == NULL ? ee_hash : hash_fn;
+	out.eq_fn = eq_fn == NULL ? ee_bin_u8_eq : eq_fn;
 
 #ifdef EE_DICT_TOMBS_REHASH
 	out.tombs = 0;
@@ -266,7 +270,7 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 		{
 			i32 first = ee_first_bit_u32(match_mask);
 		
-			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (dict->eq_fn(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				memcpy(ee_dict_val_at(dict, group_index + first), val, dict->val_len);
 			
@@ -326,7 +330,7 @@ EE_INLINE void ee_dict_grow(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn);
+	Dict out = ee_dict_new(dict->cap * 2, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn, dict->eq_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -346,7 +350,7 @@ EE_INLINE void ee_dict_rehash(Dict* dict)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
-	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn);
+	Dict out = ee_dict_new(dict->cap, dict->key_len, dict->val_len, dict->slot_align, dict->slot_align, &dict->allocator, dict->hash_fn, dict->eq_fn);
 
 	for (size_t i = 0; i < dict->cap; ++i)
 	{
@@ -416,7 +420,7 @@ EE_INLINE i32 ee_dict_remove(Dict* dict, const u8* key)
 		{
 			i32 first = ee_first_bit_u32(match_mask);
 
-			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (dict->eq_fn(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				dict->ctrls[group_index + first] = EE_SLOT_DELETED;
 				dict->count--;
@@ -486,7 +490,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		{
 			i32 first = ee_first_bit_u32(match_mask);
 
-			if (ee_bin_u8_eq(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
+			if (dict->eq_fn(ee_dict_key_at(dict, group_index + first), key, dict->key_len))
 			{
 				return ee_dict_val_at(dict, group_index + first);
 			}
@@ -518,6 +522,13 @@ EE_INLINE int ee_dict_contains(const Dict* dict, const u8* key)
 	u8* val = ee_dict_at(dict, key);
 
 	return val != NULL;
+}
+
+EE_INLINE size_t ee_dict_count(const Dict* dict)
+{
+	EE_ASSERT(dict != NULL, "Trying to dereference NULL Dict");
+
+	return dict->count;
 }
 
 EE_INLINE DictIter ee_dict_iter_new(const Dict* dict)
@@ -584,6 +595,61 @@ EE_INLINE i32 ee_dict_iter_next(DictIter* iter, u8* key_out, u8* val_out)
 
 			memcpy(key_out, ee_dict_key_at(iter->dict, pos), iter->dict->key_len);
 			memcpy(val_out, ee_dict_val_at(iter->dict, pos), iter->dict->val_len);
+
+			iter->it = pos + 1;
+
+			return EE_TRUE;
+		}
+	}
+
+	return EE_FALSE;
+}
+
+EE_INLINE i32 ee_dict_iter_next_ptr(DictIter* iter, u8** key_out, u8** val_out)
+{
+	EE_ASSERT(iter != NULL, "Trying to dereference NULL DictIter");
+	EE_ASSERT(key_out != NULL, "Trying to dereference NULL key");
+	EE_ASSERT(val_out != NULL, "Trying to dereference NULL value");
+
+	if (iter->it >= iter->dict->cap)
+	{
+		return EE_FALSE;
+	}
+
+	const u8* ctrls = (const u8*)iter->dict->ctrls;
+	size_t i = iter->it;
+	size_t high = ee_round_up_pow2(iter->it, EED_SIMD_BYTES);
+
+	for (; i < high; ++i)
+	{
+		if (ctrls[i] != EE_SLOT_EMPTY && ctrls[i] != EE_SLOT_DELETED)
+		{
+			*key_out = ee_dict_key_at(iter->dict, i);
+			*val_out = ee_dict_val_at(iter->dict, i);
+
+			iter->it = i + 1;
+
+			return EE_TRUE;
+		}
+	}
+
+	eed_simd_i p_empty = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i p_deleted = eed_set1_epi8(EE_SLOT_DELETED);
+
+	for (; i < iter->dict->cap; i += EED_SIMD_BYTES)
+	{
+		eed_simd_i group = eed_load_si(&ctrls[i]);
+		eed_simd_i match = eed_or_si(eed_cmpeq_epi8(group, p_empty), eed_cmpeq_epi8(group, p_deleted));
+		
+		i32 mask = (~eed_movemask_epi8(match)) & ((1u << EED_SIMD_BYTES) - 1);
+
+		if (mask)
+		{
+			i32 first = ee_first_bit_u32(mask);
+			size_t pos = (size_t)first + i;
+
+			*key_out = ee_dict_key_at(iter->dict, pos);
+			*val_out = ee_dict_val_at(iter->dict, pos);
 
 			iter->it = pos + 1;
 

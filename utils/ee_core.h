@@ -115,6 +115,27 @@
 #endif
 #endif
 
+#define EE_DECL_EQ_FN_CPY(type)                                         \
+    i32 ee_eq_cpy_##type(const u8* a_ptr, const u8* b_ptr, size_t len)  \
+    {                                                                   \
+        EE_UNUSED_1(len);                                               \
+                                                                        \
+        type a, b;                                                      \
+                                                                        \
+        memcpy(&a, a_ptr, sizeof(type));                                \
+        memcpy(&b, b_ptr, sizeof(type));                                \
+                                                                        \
+        return a == b;                                                  \
+    }                                                               
+                                                                    
+#define EE_DECL_EQ_FN(type)                                             \
+    i32 ee_eq_##type(const u8* a_ptr, const u8* b_ptr, size_t len)      \
+    {                                                                   \
+        EE_UNUSED_1(len);                                               \
+                                                                        \
+        return (*(const type*)a_ptr) == (*(const type*)b_ptr);          \
+    }
+
 //
 // Extern C
 //
@@ -942,6 +963,34 @@ EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
     }
     }
 }
+
+EE_DECL_EQ_FN(u8);
+EE_DECL_EQ_FN(u16);
+EE_DECL_EQ_FN(u32);
+EE_DECL_EQ_FN(u64);
+
+EE_DECL_EQ_FN(i8);
+EE_DECL_EQ_FN(i16);
+EE_DECL_EQ_FN(i32);
+EE_DECL_EQ_FN(i64);
+
+EE_DECL_EQ_FN(f32);
+EE_DECL_EQ_FN(f64);
+EE_DECL_EQ_FN(f80);
+
+EE_DECL_EQ_FN_CPY(u8);
+EE_DECL_EQ_FN_CPY(u16);
+EE_DECL_EQ_FN_CPY(u32);
+EE_DECL_EQ_FN_CPY(u64);
+
+EE_DECL_EQ_FN_CPY(i8);
+EE_DECL_EQ_FN_CPY(i16);
+EE_DECL_EQ_FN_CPY(i32);
+EE_DECL_EQ_FN_CPY(i64);
+
+EE_DECL_EQ_FN_CPY(f32);
+EE_DECL_EQ_FN_CPY(f64);
+EE_DECL_EQ_FN_CPY(f80);
 
 EE_EXTERN_C_END
 

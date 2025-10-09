@@ -63,7 +63,7 @@ EE_INLINE size_t ee_deq_size(const Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
-	return (deq->head - deq->tail) & deq->mask;
+	return deq->head - deq->tail;
 }
 
 EE_INLINE size_t ee_deq_len(const Deq* deq)
@@ -73,43 +73,27 @@ EE_INLINE size_t ee_deq_len(const Deq* deq)
 
 EE_INLINE i32 ee_deq_full(const Deq* deq)
 {
-	return ee_deq_size(deq) >= (deq->cap - deq->elem_size);
+	return ee_deq_size(deq) == deq->cap;
 }
 
 EE_INLINE i32 ee_deq_empty(const Deq* deq)
 {
-	return deq->tail == deq->head;
+	return ee_deq_size(deq) == 0;
 }
 
 EE_INLINE void ee_deq_grow(Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
+	size_t old_cap = deq->cap;
 	size_t new_cap = deq->cap << 1;
-	u8* new_buffer = (u8*)deq->allocator.alloc_fn(&deq->allocator, new_cap);
+
+	u8* new_buffer = (u8*)deq->allocator.realloc_fn(&deq->allocator, deq->buffer, old_cap, new_cap);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Array.buffer", new_cap);
 
-	size_t size = ee_deq_size(deq);
-
-	if (deq->head > deq->tail)
-	{
-		memcpy(new_buffer, &deq->buffer[deq->tail], size);
-	}
-	else
-	{
-		size_t tail_chunk = deq->cap - deq->tail;
-
-		memcpy(new_buffer, &deq->buffer[deq->tail], tail_chunk);
-		memcpy(&new_buffer[tail_chunk], deq->buffer, deq->head);
-	}
-
-	deq->tail = 0;
-	deq->head = size;
-
 	deq->cap = new_cap;
 	deq->mask = deq->cap - 1;
-	deq->allocator.free_fn(&deq->allocator, deq->buffer);
 	deq->buffer = new_buffer;
 }
 
@@ -122,9 +106,11 @@ EE_INLINE void ee_deq_push_head(Deq* deq, const u8* val)
 	{
 		ee_deq_grow(deq);
 	}
+
+	size_t index = deq->head & deq->mask;
 	
-	memcpy(&deq->buffer[deq->head], val, deq->elem_size);
-	deq->head = (deq->head + deq->elem_size) & deq->mask;
+	memcpy(&deq->buffer[index], val, deq->elem_size);
+	deq->head += deq->elem_size;
 }
 
 EE_INLINE void ee_deq_pop_head(Deq* deq, u8* out_val)
@@ -133,7 +119,7 @@ EE_INLINE void ee_deq_pop_head(Deq* deq, u8* out_val)
 	EE_ASSERT(out_val != NULL, "Trying to dereference NULL output value");
 	EE_ASSERT(ee_deq_size(deq) > 0, "Trying to pop empty deq");
 
-	deq->head = (deq->head - deq->elem_size) & deq->mask;
+	deq->head = deq->head - deq->elem_size;
 
 	if (out_val != NULL)
 	{
@@ -150,60 +136,41 @@ EE_INLINE void ee_deq_push_tail(Deq* deq, const u8* val)
 	{
 		ee_deq_grow(deq);
 	}
-	
-	deq->tail = (deq->tail + deq->cap - deq->elem_size) & deq->mask;
-	memcpy(&deq->buffer[deq->tail], val, deq->elem_size);
+
+	deq->tail = deq->tail - deq->elem_size;
+	size_t index = deq->tail & deq->mask;
+
+	memcpy(&deq->buffer[index], val, deq->elem_size);
 }
 
 EE_INLINE void ee_deq_pop_tail(Deq* deq, u8* out_val)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 	EE_ASSERT(out_val != NULL, "Trying to dereference NULL output value");
+	EE_ASSERT(ee_deq_size(deq) > 0, "Trying to pop empty deq");
 
-	size_t size = ee_deq_size(deq);
-	
-	EE_ASSERT(size > 0, "Trying to pop empty deq");
+	size_t index = deq->tail & deq->mask;
 
 	if (out_val != NULL)
 	{
-		memcpy(out_val, &deq->buffer[deq->tail], deq->elem_size);
+		memcpy(out_val, &deq->buffer[index], deq->elem_size);
 	}
 
-	deq->tail = (deq->tail + deq->elem_size) & deq->mask;
+	deq->tail = deq->tail + deq->elem_size;
 }
 
 EE_INLINE u8* ee_deq_at_head(const Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
-	if (ee_deq_empty(deq))
-	{
-		return NULL;
-	}
-
-	return &deq->buffer[deq->head - deq->elem_size];
+	return &deq->buffer[(deq->head - deq->elem_size) & deq->mask];
 }
 
 EE_INLINE u8* ee_deq_at_tail(Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
-	if (ee_deq_empty(deq))
-	{
-		return NULL;
-	}
-
 	return &deq->buffer[deq->tail];
-}
-
-EE_INLINE u8* ee_deq_at(Deq* deq, size_t i)
-{
-	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
-	
-	size_t i_b = i * deq->elem_size;
-	EE_ASSERT(((deq->head - deq->tail) & deq->mask) > i_b, "Invalid index (%zu) for deq with size (%zu)", i, ((deq->head - deq->tail) & deq->mask) / deq->elem_size);
-
-	return &deq->buffer[(deq->tail + i_b) & deq->mask];
 }
 
 #endif // EE_DEQ_H

@@ -10,16 +10,19 @@ typedef struct
 	u64 high;
 } Key;
 
+// Basic example, shows how to create a table, insert and remove a value and check if the key is present
 void run_dict_example_hello_world(void)
 {
 	// Creating a hash-table with starting size of 128 values, 16-byte key and 4-byte value
-	// Default heap Allocator and default ee_hash function
-	// using 'ee_dict_new_m' macro
+	// Default heap Allocator, default ee_hash function and default key comparison function
+	// In order to specify those arguments use either 'ee_dict_new' function directly 
+	// or 'ee_dict_new_m' macro with extra parameters
+	// using 'ee_dict_def_m' macro
 
-	Dict dict = ee_dict_new_m(128, Key, f32, NULL, NULL);
+	Dict dict = ee_dict_def_m(128, Key, f32);
 
 	// Same as:
-	// Dict dict = ee_dict_new(128, sizeof(Key), sizeof(f32), alignof(Key), alignof(f32), NULL, NULL);
+	// Dict dict = ee_dict_new(128, sizeof(Key), sizeof(f32), alignof(Key), alignof(f32), NULL, NULL, NULL);
 	
 	Key key = { 1, 2 };
 	Key key_missing = { 3, 4 };
@@ -74,16 +77,19 @@ void run_dict_example_hello_world(void)
 	ee_dict_free(&dict);
 }
 
+// Iterator example, shows how to create an iterator over the table, and access it's keys and values
 void run_dict_iter_example(void)
 {
 	// Creating a hash-table with starting size of 128 values, 4-byte key and 4-byte value
-	// Default heap Allocator and default ee_hash function
-	// using 'ee_dict_new_m' macro
+	// Default heap Allocator, default ee_hash function and default key comparison function
+	// In order to specify those arguments use either 'ee_dict_new' function directly 
+	// or 'ee_dict_new_m' macro with extra parameters
+	// using 'ee_dict_def_m' macro
 
-	Dict dict = ee_dict_new_m(128, u32, f32, NULL, NULL);
+	Dict dict = ee_dict_def_m(128, u32, f32);
 
 	// Same as:
-	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), NULL, NULL);
+	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), NULL, NULL, NULL);
 
 	// Inserting 'pairs_count' random values wuth random keys
 	i32 pairs_count = 8;
@@ -127,19 +133,118 @@ void run_dict_iter_example(void)
 	// Reset the iterator to repeat
 	ee_dict_iter_reset(&iter);
 
+	u32* key_ptr = NULL;
+	f32* val_ptr = NULL;
+
 	// Iterating again
-	while (ee_dict_iter_next(&iter, EE_RECAST_U8(current_key), EE_RECAST_U8(current_val)))
+	while (ee_dict_iter_next_ptr(&iter, EE_RECAST_U8(key_ptr), EE_RECAST_U8(val_ptr)))
 	{
-		EE_PRINTLN("(%u, %.1f) obtained via iterator again", current_key, current_val);
+		EE_ASSERT(key_ptr != NULL && val_ptr != NULL, "Invalid iterator result");
+		EE_PRINTLN("(%u, %.1f) obtained via pointer iterator", *key_ptr, *val_ptr);
 		count++;
 
-		// Do something with key and value
+		// Do something with key and value pointers
 	}
 
 	EE_ASSERT(count == 2 * pairs_count, "Invalid iteration result");
 	EE_PRINTLN("\nSecond loop over dict completed successfully");
 
 	// Clear the table
+	ee_dict_free(&dict);
+}
+
+//
+// Custom functions example, shows how to implement and specify custom functions for key comparison, hashing and custom memory Allocator
+//
+
+i32 key_eq_fn(const u8* a_ptr, const u8* b_ptr, size_t len)
+{
+	// In this example length of the keys are known
+	EE_UNUSED(len);
+
+	Key* a = (Key*)a_ptr;
+	Key* b = (Key*)b_ptr;
+
+	// Comparison function only needs to known wheter the values are equal on not
+	// unlike 'memcmp' which retuns -1, 1 and 0
+	return (a->high == b->high) && (a->low == b->low);
+}
+
+u64 key_hash_fn(const u8* key_ptr, size_t len)
+{
+	// In this example length of the key are known
+	EE_UNUSED(len);
+
+	Key* key = (Key*)key_ptr;
+
+	// Output hash
+	u64 hash = key->low;
+
+	// Basic mixer
+	hash ^= key->high + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
+
+	return hash;
+}
+
+void* custom_alloc_fn(Allocator* self, size_t size)
+{
+	// Performing some important work
+	EE_PRINTLN("Basic custom alloc function called, allocated size (%zu) bytes", size);
+
+	return ee_default_alloc(self, size);
+}
+
+void run_dict_custom_fn_example(void)
+{
+	// Creating a hash-table with starting size of 128 values, 4-byte key and 4-byte value
+	// Custom heap Allocator with very important work, custom mixer hash function and custom key comparison function
+
+	Allocator allocator = { 0 };
+
+	// You should specify how to allocate, reallocate and free your memory
+	// If you want left some behaviour as default use ee_default_* functions
+	// Also you can pass user context
+
+	allocator.alloc_fn = custom_alloc_fn;
+	allocator.realloc_fn = ee_default_realloc;
+	allocator.free_fn = ee_default_free;
+	allocator.context = NULL;
+
+	Dict dict = ee_dict_new_m(128, Key, f32, &allocator, key_hash_fn, key_eq_fn);
+
+	// Same as:
+	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), &allocator, key_hash_fn, key_eq_fn);
+
+	// Inserting 1048576 values, MB is the constant (1 << 20) for bytes 
+	// but i also like to use it such cases
+	u32 pairs_count = EE_MB;
+
+	for (u32 i = 0; i < pairs_count; ++i)
+	{
+		Key key = { 0 };
+		f32 val = (f32)i;
+
+		// Generating very simple key
+		// 'ee_random' have convinient 'ee_rand_u64' function for such cases
+		key.high = (u64)i;
+		key.low  = (u64)i;
+
+		// Insert random key and value
+		i32 set_res = ee_dict_set(&dict, EE_RECAST_U8(key), EE_RECAST_U8(val));
+
+		// Practically it will fail only if Dict ran out of memory (either entire RAM or some pull if custom Allocator is used)
+		EE_ASSERT(set_res == EE_TRUE, "Failed to insert (%f) into hash table", val);
+
+		// Get same value that just was inserted
+		u8* val_ptr = ee_dict_at(&dict, EE_RECAST_U8(key));
+
+		// Never fails
+		EE_ASSERT(val_ptr != NULL && val == *(f32*)val_ptr, "Invalid insertion");
+	}
+
+	EE_ASSERT(ee_dict_count(&dict) == pairs_count, "Invalid insertation");
+	EE_PRINTLN("\nTotal inserted: (%zu)", ee_dict_count(&dict));
+
 	ee_dict_free(&dict);
 }
 

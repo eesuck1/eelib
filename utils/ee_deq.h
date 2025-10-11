@@ -116,7 +116,6 @@ EE_INLINE void ee_deq_push_head(Deq* deq, const u8* val)
 EE_INLINE void ee_deq_pop_head(Deq* deq, u8* out_val)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
-	EE_ASSERT(out_val != NULL, "Trying to dereference NULL output value");
 	EE_ASSERT(ee_deq_size(deq) > 0, "Trying to pop empty deq");
 
 	deq->head = deq->head - deq->elem_size;
@@ -146,7 +145,6 @@ EE_INLINE void ee_deq_push_tail(Deq* deq, const u8* val)
 EE_INLINE void ee_deq_pop_tail(Deq* deq, u8* out_val)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
-	EE_ASSERT(out_val != NULL, "Trying to dereference NULL output value");
 	EE_ASSERT(ee_deq_size(deq) > 0, "Trying to pop empty deq");
 
 	size_t index = deq->tail & deq->mask;
@@ -170,7 +168,44 @@ EE_INLINE u8* ee_deq_at_tail(Deq* deq)
 {
 	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
 
-	return &deq->buffer[deq->tail];
+	return &deq->buffer[deq->tail & deq->mask];
+}
+
+EE_INLINE u8* ee_deq_emplace_tail(Deq* deq)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+
+	if (ee_deq_full(deq))
+	{
+		ee_deq_grow(deq);
+	}
+
+	deq->tail = deq->tail - deq->elem_size;
+	size_t index = deq->tail & deq->mask;
+
+	return &deq->buffer[index];
+}
+
+EE_INLINE u8* ee_deq_emplace_head(Deq* deq)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+
+	if (ee_deq_full(deq))
+	{
+		ee_deq_grow(deq);
+	}
+
+	size_t index = deq->head & deq->mask;
+	deq->head += deq->elem_size;
+
+	return &deq->buffer[index];
+}
+
+EE_INLINE void ee_deq_clear(Deq* deq, u8 val)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+
+	memset(deq->buffer, val, deq->cap);
 }
 
 #endif // EE_DEQ_H

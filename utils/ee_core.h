@@ -27,14 +27,19 @@
 	}                                                                     \
 } while (0)
 
-#define EE_PRINT(fmt, ...)    fprintf(stdout, fmt, ##__VA_ARGS__)
-#define EE_PRINTLN(fmt, ...)    fprintf(stdout, fmt "\n", ##__VA_ARGS__)
-
 #endif
 #else
 
 #define EE_ASSERT(cond, fmt, ...)    ((void)0)
 
+#endif
+
+#ifndef EE_PRINT
+#define EE_PRINT(fmt, ...)    fprintf(stdout, fmt, ##__VA_ARGS__)
+#endif
+
+#ifndef EE_PRINTLN
+#define EE_PRINTLN(fmt, ...)    fprintf(stdout, fmt "\n", ##__VA_ARGS__)
 #endif
 
 #ifndef EE_INLINE
@@ -119,7 +124,7 @@
 #endif
 #endif
 
-#define EE_DECL_EQ_FN_CPY(type)                                         \
+#define EE_DEFINE_EQ_FN_CPY(type)                                         \
     i32 ee_eq_cpy_##type(const u8* a_ptr, const u8* b_ptr, size_t len)  \
     {                                                                   \
         EE_UNUSED_1(len);                                               \
@@ -132,12 +137,20 @@
         return a == b;                                                  \
     }                                                               
                                                                     
-#define EE_DECL_EQ_FN(type)                                             \
+#define EE_DEFINE_EQ_FN(type)                                             \
     i32 ee_eq_##type(const u8* a_ptr, const u8* b_ptr, size_t len)      \
     {                                                                   \
         EE_UNUSED_1(len);                                               \
                                                                         \
-        return (*(const type*)a_ptr) == (*(const type*)b_ptr);          \
+        return *(const type*)a_ptr == *(const type*)b_ptr;              \
+    }
+
+#define EE_DEFINE_CPY_FN(type)                                            \
+    void ee_cpy_##type(u8* a_ptr, const u8* b_ptr, size_t len)          \
+    {                                                                   \
+        EE_UNUSED_1(len);                                               \
+                                                                        \
+        *(type*)a_ptr = *(const type*)b_ptr;                            \
     }
 
 //
@@ -968,33 +981,47 @@ EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
     }
 }
 
-EE_DECL_EQ_FN(u8);
-EE_DECL_EQ_FN(u16);
-EE_DECL_EQ_FN(u32);
-EE_DECL_EQ_FN(u64);
+EE_DEFINE_EQ_FN(u8);
+EE_DEFINE_EQ_FN(u16);
+EE_DEFINE_EQ_FN(u32);
+EE_DEFINE_EQ_FN(u64);
 
-EE_DECL_EQ_FN(i8);
-EE_DECL_EQ_FN(i16);
-EE_DECL_EQ_FN(i32);
-EE_DECL_EQ_FN(i64);
+EE_DEFINE_EQ_FN(i8);
+EE_DEFINE_EQ_FN(i16);
+EE_DEFINE_EQ_FN(i32);
+EE_DEFINE_EQ_FN(i64);
 
-EE_DECL_EQ_FN(f32);
-EE_DECL_EQ_FN(f64);
-EE_DECL_EQ_FN(f80);
+EE_DEFINE_EQ_FN(f32);
+EE_DEFINE_EQ_FN(f64);
+EE_DEFINE_EQ_FN(f80);
 
-EE_DECL_EQ_FN_CPY(u8);
-EE_DECL_EQ_FN_CPY(u16);
-EE_DECL_EQ_FN_CPY(u32);
-EE_DECL_EQ_FN_CPY(u64);
+EE_DEFINE_EQ_FN_CPY(u8);
+EE_DEFINE_EQ_FN_CPY(u16);
+EE_DEFINE_EQ_FN_CPY(u32);
+EE_DEFINE_EQ_FN_CPY(u64);
 
-EE_DECL_EQ_FN_CPY(i8);
-EE_DECL_EQ_FN_CPY(i16);
-EE_DECL_EQ_FN_CPY(i32);
-EE_DECL_EQ_FN_CPY(i64);
+EE_DEFINE_EQ_FN_CPY(i8);
+EE_DEFINE_EQ_FN_CPY(i16);
+EE_DEFINE_EQ_FN_CPY(i32);
+EE_DEFINE_EQ_FN_CPY(i64);
 
-EE_DECL_EQ_FN_CPY(f32);
-EE_DECL_EQ_FN_CPY(f64);
-EE_DECL_EQ_FN_CPY(f80);
+EE_DEFINE_EQ_FN_CPY(f32);
+EE_DEFINE_EQ_FN_CPY(f64);
+EE_DEFINE_EQ_FN_CPY(f80);
+
+EE_DEFINE_CPY_FN(u8);
+EE_DEFINE_CPY_FN(u16);
+EE_DEFINE_CPY_FN(u32);
+EE_DEFINE_CPY_FN(u64);
+
+EE_DEFINE_CPY_FN(i8);
+EE_DEFINE_CPY_FN(i16);
+EE_DEFINE_CPY_FN(i32);
+EE_DEFINE_CPY_FN(i64);
+
+EE_DEFINE_CPY_FN(f32);
+EE_DEFINE_CPY_FN(f64);
+EE_DEFINE_CPY_FN(f80);
 
 EE_EXTERN_C_END
 

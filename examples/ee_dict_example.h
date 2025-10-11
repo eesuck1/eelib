@@ -4,6 +4,9 @@
 // Warning that 'fprintf' is not inlined (we do not care)
 #pragma warning(disable : 4710)
 
+// #define EE_NO_ASSERT when you have debugged your application
+// it will increase the performance
+
 #include "ee_dict.h"
 
 // 16-byte key structure
@@ -17,16 +20,12 @@ typedef struct
 void run_dict_example_hello_world(void)
 {
 	// Creating a hash-table with starting size of 128 values, 16-byte key and 4-byte value
-	// Default heap Allocator, default ee_hash function and default key comparison function
+	// Default heap Allocator, default ee_hash function and default key comparison function using 'ee_dict_def_m' macro
 	// In order to specify those arguments use either 'ee_dict_new' function directly 
-	// or 'ee_dict_new_m' macro with extra parameters
-	// using 'ee_dict_def_m' macro
+	// or 'ee_dict_new_m'/'ee_dict_new_conf_m' macro with extra parameters
 
 	Dict dict = ee_dict_def_m(128, Key, f32);
 
-	// Same as:
-	// Dict dict = ee_dict_new(128, sizeof(Key), sizeof(f32), alignof(Key), alignof(f32), NULL, NULL, NULL);
-	
 	Key key = { 1, 2 };
 	Key key_missing = { 3, 4 };
 	f32 val = 3.0f;
@@ -84,15 +83,11 @@ void run_dict_example_hello_world(void)
 void run_dict_iter_example(void)
 {
 	// Creating a hash-table with starting size of 128 values, 4-byte key and 4-byte value
-	// Default heap Allocator, default ee_hash function and default key comparison function
+	// Default heap Allocator, default ee_hash function and default key comparison function using 'ee_dict_def_m' macro
 	// In order to specify those arguments use either 'ee_dict_new' function directly 
-	// or 'ee_dict_new_m' macro with extra parameters
-	// using 'ee_dict_def_m' macro
+	// or 'ee_dict_new_m'/'ee_dict_new_conf_m' macro with extra parameters
 
 	Dict dict = ee_dict_def_m(128, u32, f32);
-
-	// Same as:
-	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), NULL, NULL, NULL);
 
 	// Inserting 'pairs_count' random values wuth random keys
 	i32 pairs_count = 8;
@@ -175,6 +170,20 @@ i32 key_eq_fn(const u8* a_ptr, const u8* b_ptr, size_t len)
 	return (a->high == b->high) && (a->low == b->low);
 }
 
+void key_cpy_fn(u8* a_ptr, const u8* b_ptr, size_t len)
+{
+	// In this example length of the keys are known
+	EE_UNUSED(len);
+
+	Key* a = (Key*)a_ptr;
+	const Key* b = (const Key*)b_ptr;
+
+	a->high = b->high;
+	a->low  = b->low;
+}
+
+// 'f32' is the primitive type so there is already 'ee_cpy_f32' function defined
+
 u64 key_hash_fn(const u8* key_ptr, size_t len)
 {
 	// In this example length of the key are known
@@ -215,10 +224,11 @@ void run_dict_custom_fn_example(void)
 	allocator.free_fn = ee_default_free;
 	allocator.context = NULL;
 
-	Dict dict = ee_dict_new_m(128, Key, f32, &allocator, key_hash_fn, key_eq_fn);
+	// Container for all extra parameters, if some of the config values are NULL the default callbacks will be used
+	// Default config can be obtained vit 'ee_dict_config_def' or simply using 'DictConfig config = { 0 };'
+	DictConfig config = ee_dict_config_new(&allocator, key_hash_fn, key_eq_fn, key_cpy_fn, ee_cpy_f32);
 
-	// Same as:
-	// Dict dict = ee_dict_new(128, sizeof(u32), sizeof(f32), alignof(u32), alignof(f32), &allocator, key_hash_fn, key_eq_fn);
+	Dict dict = ee_dict_new_conf_m(128, Key, f32, config);
 
 	// Inserting 1048576 values, MB is the constant (1 << 20) for bytes 
 	// but i also like to use it such cases
@@ -230,7 +240,6 @@ void run_dict_custom_fn_example(void)
 		f32 val = (f32)i;
 
 		// Generating very simple key
-		// 'ee_random' have convinient 'ee_rand_u64' function for such cases
 		key.high = (u64)i;
 		key.low  = (u64)i;
 

@@ -643,10 +643,70 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	{
 		out.hash_fn = config.hash_fn;
 	}
-	
-	out.eq_fn      = config.eq_fn   == NULL ? ee_bin_u8_eq : config.eq_fn;
-	out.key_cpy_fn = config.key_cpy_fn == NULL ? ee_cpy_def : config.key_cpy_fn;
-	out.val_cpy_fn = config.val_cpy_fn == NULL ? ee_cpy_def : config.val_cpy_fn;
+
+	// TODO(eesuck): safe\fast same as hash
+
+	if (config.eq_fn == NULL)
+	{
+		if (out.key_len == 1)
+			out.eq_fn = ee_eq_cpy_u8;
+		else if (out.key_len == 2)
+			out.eq_fn = ee_eq_cpy_u16;
+		else if (out.key_len == 4)
+			out.eq_fn = ee_eq_cpy_u32;
+		else if (out.key_len == 8)
+			out.eq_fn = ee_eq_cpy_u64;
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_SSE
+		else if (out.key_len == 16)
+			out.eq_fn = ee_eq_cpy_u128;
+#endif
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_AVX
+		else if (out.key_len == 32)
+			out.eq_fn = ee_eq_cpy_u256;
+#endif
+		else
+			out.eq_fn = ee_eq_def;
+	}
+	else
+	{
+		out.eq_fn = config.eq_fn;
+	}
+
+	if (config.key_cpy_fn == NULL)
+	{
+		if (out.key_len == 1)
+			out.key_cpy_fn = ee_cpy_u8;
+		else if (out.key_len == 2)
+			out.key_cpy_fn = ee_cpy_u16;
+		else if (out.key_len == 4)
+			out.key_cpy_fn = ee_cpy_u32;
+		else if (out.key_len == 8)
+			out.key_cpy_fn = ee_cpy_u64;
+		else
+			out.key_cpy_fn = ee_cpy_def;
+	}
+	else
+	{
+		out.key_cpy_fn = config.key_cpy_fn;
+	}
+
+	if (config.val_cpy_fn == NULL)
+	{
+		if (out.val_len == 1)
+			out.val_cpy_fn = ee_cpy_u8;
+		else if (out.val_len == 2)
+			out.val_cpy_fn = ee_cpy_u16;
+		else if (out.val_len == 4)
+			out.val_cpy_fn = ee_cpy_u32;
+		else if (out.val_len == 8)
+			out.val_cpy_fn = ee_cpy_u64;
+		else
+			out.val_cpy_fn = ee_cpy_def;
+	}
+	else
+	{
+		out.val_cpy_fn = config.val_cpy_fn;
+	}
 
 #ifdef EE_DICT_TOMBS_REHASH
 	out.tombs = 0;

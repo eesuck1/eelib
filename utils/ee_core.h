@@ -927,72 +927,63 @@ EE_INLINE size_t ee_round_down_pow2(size_t x, size_t r)
     return x & (~(r - 1));
 }
 
-EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
+EE_INLINE i32 ee_eq_def(const u8* a_ptr, const u8* b_ptr, size_t len)
 {
-    switch (len)
-    {
-    case 1:
-    {
-        return first[0] == second[0];
-    }
-    case 2:
-    {
-        u16 a, b;
-
-        memcpy(&a, first, sizeof(a));
-        memcpy(&b, second, sizeof(b));
-
-        return a == b;
-    }
-    case 4:
-    {
-        u32 a, b;
-
-        memcpy(&a, first, sizeof(a));
-        memcpy(&b, second, sizeof(b));
-
-        return a == b;
-    }
-    case 8:
-    {
-        u64 a, b;
-
-        memcpy(&a, first, sizeof(a));
-        memcpy(&b, second, sizeof(b));
-
-        return a == b;
-    }
-#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_SSE
-    case 16:
-    {
-        __m128i a = _mm_loadu_si128((const __m128i*)first);
-        __m128i b = _mm_loadu_si128((const __m128i*)second);
-        __m128i cmp = _mm_cmpeq_epi8(a, b);
-
-        return _mm_movemask_epi8(cmp) == 0xFFFF;
-    }
-#endif
-#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_AVX
-    case 32:
-    {
-        __m256i a = _mm256_loadu_si256((const __m256i*)first);
-        __m256i b = _mm256_loadu_si256((const __m256i*)second);
-        __m256i cmp = _mm256_cmpeq_epi8(a, b);
-
-        return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
-    }
-#endif
-    default:
-    {
-        return memcmp(first, second, len) == 0;
-    }
-    }
+    return memcmp(a_ptr, b_ptr, len) == 0;
 }
 
 EE_INLINE void ee_cpy_def(u8* a_ptr, const u8* b_ptr, size_t len)
 {
     memcpy(a_ptr, b_ptr, len);
 }
+
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_SSE
+EE_INLINE i32 ee_eq_cpy_u128(const u8* a_ptr, const u8* b_ptr, size_t len)
+{
+    EE_UNUSED(len);
+
+    __m128i a = _mm_loadu_si128((const __m128i*)a_ptr);
+    __m128i b = _mm_loadu_si128((const __m128i*)b_ptr);
+    __m128i cmp = _mm_cmpeq_epi8(a, b);
+
+    return _mm_movemask_epi8(cmp) == 0xFFFF;
+}
+
+EE_INLINE i32 ee_eq_u128(const u8* a_ptr, const u8* b_ptr, size_t len)
+{
+    EE_UNUSED(len);
+
+    __m128i a = _mm_loadu_si128((const __m128i*)a_ptr);
+    __m128i b = _mm_loadu_si128((const __m128i*)b_ptr);
+    __m128i cmp = _mm_cmpeq_epi8(a, b);
+
+    return _mm_movemask_epi8(cmp) == 0xFFFF;
+}
+#endif
+
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_AVX
+EE_INLINE i32 ee_eq_cpy_u256(const u8* a_ptr, const u8* b_ptr, size_t len)
+{
+    EE_UNUSED(len);
+    
+    __m256i a = _mm256_loadu_si256((const __m256i*)a_ptr);
+    __m256i b = _mm256_loadu_si256((const __m256i*)b_ptr);
+    __m256i cmp = _mm256_cmpeq_epi8(a, b);
+
+    return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
+}
+
+EE_INLINE i32 ee_eq_u256(const u8* a_ptr, const u8* b_ptr, size_t len)
+{
+    EE_UNUSED(len);
+    
+    __m256i a = _mm256_loadu_si256((const __m256i*)a_ptr);
+    __m256i b = _mm256_loadu_si256((const __m256i*)b_ptr);
+    __m256i cmp = _mm256_cmpeq_epi8(a, b);
+
+    return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
+}
+#endif
 
 EE_DEFINE_EQ_FN(u8);
 EE_DEFINE_EQ_FN(u16);

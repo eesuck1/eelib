@@ -56,7 +56,7 @@ EE_INLINE AlignedBuffer ee_aligned_alloc(size_t size, size_t align, Allocator* a
 	if (allocator == NULL)
 		out.base = malloc(out.size + align - 1);
 	else
-		out.base = allocator->alloc_fn(allocator, size);
+		out.base = allocator->alloc_fn(allocator, out.size + align - 1);
 
 	EE_ASSERT(out.base != NULL, "Unable to allocate (%zu) bytes for aligned alloc", out.size + align - 1);
 
@@ -221,8 +221,6 @@ EE_INLINE u8* ee_dict_val_at(const Dict* dict, size_t i)
 
 	return &dict->vals.buffer[i * dict->val_len];
 }
-
-
 
 EE_INLINE DictIter ee_dict_iter_new(const Dict* dict)
 {
@@ -457,9 +455,9 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	out.key_len = key_len;
 	out.val_len = val_len;
 
-	out.keys = ee_aligned_alloc(size * out.key_len, EE_MAX_ALIGN, &out.allocator);
-	out.vals = ee_aligned_alloc(size * out.val_len, EE_MAX_ALIGN, &out.allocator);
-	out.ctrl = ee_aligned_alloc(size, EE_MAX_ALIGN, &out.allocator);
+	out.keys = ee_aligned_alloc(cap * out.key_len, EE_MAX_ALIGN, &out.allocator);
+	out.vals = ee_aligned_alloc(cap * out.val_len, EE_MAX_ALIGN, &out.allocator);
+	out.ctrl = ee_aligned_alloc(cap, EE_MAX_ALIGN, &out.allocator);
 
 	out.count = 0;
 	out.cap = cap;

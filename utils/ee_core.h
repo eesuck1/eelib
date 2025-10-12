@@ -124,7 +124,7 @@
 #endif
 #endif
 
-#define EE_DEFINE_EQ_FN_CPY(type)                                         \
+#define EE_DEFINE_EQ_FN_CPY(type)                                       \
     i32 ee_eq_cpy_##type(const u8* a_ptr, const u8* b_ptr, size_t len)  \
     {                                                                   \
         EE_UNUSED_1(len);                                               \
@@ -137,7 +137,7 @@
         return a == b;                                                  \
     }                                                               
                                                                     
-#define EE_DEFINE_EQ_FN(type)                                             \
+#define EE_DEFINE_EQ_FN(type)                                           \
     i32 ee_eq_##type(const u8* a_ptr, const u8* b_ptr, size_t len)      \
     {                                                                   \
         EE_UNUSED_1(len);                                               \
@@ -145,7 +145,7 @@
         return *(const type*)a_ptr == *(const type*)b_ptr;              \
     }
 
-#define EE_DEFINE_CPY_FN(type)                                            \
+#define EE_DEFINE_CPY_FN(type)                                          \
     void ee_cpy_##type(u8* a_ptr, const u8* b_ptr, size_t len)          \
     {                                                                   \
         EE_UNUSED_1(len);                                               \

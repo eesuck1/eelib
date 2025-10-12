@@ -620,6 +620,7 @@ typedef __m256i eed_simd_i;
 #define eed_loadu_si           _mm256_loadu_si256
 #define eed_load_si            _mm256_load_si256
 #define eed_set1_epi8          _mm256_set1_epi8
+#define eed_set1_epi64         _mm256_set1_epi64x
 #define eed_cmpeq_epi8         _mm256_cmpeq_epi8
 #define eed_movemask_epi8      _mm256_movemask_epi8
 #define eed_or_si              _mm256_or_si256
@@ -637,6 +638,7 @@ typedef __m128i eed_simd_i;
 #define eed_loadu_si           _mm_loadu_si128
 #define eed_load_si            _mm_load_si128
 #define eed_set1_epi8          _mm_set1_epi8
+#define eed_set1_epi64         _mm_set1_epi64x
 #define eed_cmpeq_epi8         _mm_cmpeq_epi8
 #define eed_movemask_epi8      _mm_movemask_epi8
 #define eed_or_si              _mm_or_si128
@@ -707,9 +709,15 @@ EE_INLINE void _eed_prefetch(const void* p, i32 sel)
     (void)sel;
 }
 
-#define eed_load_si           _eed_load_si
+EE_INLINE eed_simd_i _eed_set1_epi64(u64 val)
+{
+    return val;
+}
+
+#define eed_loadu_si           _eed_load_si
 #define eed_load_si            _eed_load_si
 #define eed_set1_epi8          _eed_set1_epi8
+#define eed_set64_epi8         _eed_set1_epi64
 #define eed_cmpeq_epi8         _eed_cmpeq_epi8
 #define eed_movemask_epi8      _eed_movemask_epi8
 #define eed_or_si              _eed_or_si
@@ -979,6 +987,11 @@ EE_INLINE int ee_bin_u8_eq(const u8* first, const u8* second, size_t len)
         return memcmp(first, second, len) == 0;
     }
     }
+}
+
+EE_INLINE void ee_cpy_def(u8* a_ptr, const u8* b_ptr, size_t len)
+{
+    memcpy(a_ptr, b_ptr, len);
 }
 
 EE_DEFINE_EQ_FN(u8);

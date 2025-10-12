@@ -28,6 +28,217 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_CONST_ZERO_F64            (EE_RECAST_U8(EE_ZERO_F64))
 #define EE_CONST_ONE_F64             (EE_RECAST_U8(EE_ONE_F64))
 
+#ifndef EE_HASH_SAFE
+#define EE_HASH_SAFE      (0)
+#endif
+
+#ifndef EE_HASH_FAST
+#define EE_HASH_FAST      (1)
+#endif
+
+#ifndef EE_HASH_ROBUST
+#define EE_HASH_ROBUST    (2)
+#endif
+
+#ifndef EE_HASH_SIMPLE
+#define EE_HASH_SIMPLE    (3)
+#endif
+
+#ifndef EE_HASH_SAFETY_TYPE
+#define EE_HASH_SAFETY_TYPE EE_HASH_SAFE
+#endif
+
+#ifndef EE_HASH_COMP_TYPE
+#define EE_HASH_COMP_TYPE EE_HASH_SIMPLE
+#endif
+
+
+EE_INLINE u64 ee_hash_u64_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 hash = *(u64*)key_ptr;
+
+	hash *= 0x9E3779B185EBCA87ULL;
+	hash ^= hash >> 33;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u64_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 hash;
+
+	memcpy(&hash, key_ptr, sizeof(hash));
+
+	hash *= 0x9E3779B185EBCA87ULL;
+	hash ^= hash >> 33;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u32_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u32 key = *(u32*)key_ptr;
+	u64 hash = key;
+
+	hash *= 0x9E3779B185EBCA87ULL;
+	hash ^= hash >> 33;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u32_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u32 key;
+	memcpy(&key, key_ptr, sizeof(key));
+	u64 hash = key;
+
+	hash *= 0x9E3779B185EBCA87ULL;
+	hash ^= hash >> 33;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_mm_u32_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u32 key = *(const u32*)key_ptr;
+	u64 hash = key;
+
+	hash ^= hash >> 30;
+	hash *= 0xbf58476d1ce4e5b9ULL;
+	hash ^= hash >> 27;
+	hash *= 0x94d049bb133111ebULL;
+	hash ^= hash >> 31;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_mm_u32_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u32 key;
+	memcpy(&key, key_ptr, sizeof(u32));
+	u64 hash = key;
+
+	hash ^= hash >> 30;
+	hash *= 0xbf58476d1ce4e5b9ULL;
+	hash ^= hash >> 27;
+	hash *= 0x94d049bb133111ebULL;
+	hash ^= hash >> 31;
+
+	return hash;
+}
+
+
+EE_INLINE u64 ee_hash_mm_u64_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 hash = *(u64*)key_ptr;
+
+	hash ^= hash >> 30;
+	hash *= 0xbf58476d1ce4e5b9ULL;
+	hash ^= hash >> 27;
+	hash *= 0x94d049bb133111ebULL;
+	hash ^= hash >> 31;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_mm_u64_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 hash;
+
+	memcpy(&hash, key_ptr, sizeof(u64));
+
+	hash ^= hash >> 30;
+	hash *= 0xbf58476d1ce4e5b9ULL;
+	hash ^= hash >> 27;
+	hash *= 0x94d049bb133111ebULL;
+	hash ^= hash >> 31;
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u128_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	eed_simd_i h_const = eed_set1_epi64(0x9E3779B185EBCA87ULL);
+	eed_simd_i key_128 = eed_load_si((const eed_simd_i*)key_ptr);
+
+	EE_ASSERT(0, "TODO");
+}
+
+
+EE_INLINE u64 ee_hash_mm(const u8* key, size_t len)
+{
+	// TODO(eesuck): SIMD accelerate
+
+	u64 hash = 0x9e3779b97f4a7c15ull;
+	size_t i = 0;
+
+	for (; i + sizeof(u64) <= len; i += sizeof(u64))
+	{
+		u64 key_u64 = 0;
+		memcpy(&key_u64, &key[i], sizeof(u64));
+
+		hash ^= key_u64 + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
+		hash ^= hash >> 30;
+		hash *= 0xbf58476d1ce4e5b9ULL;
+		hash ^= hash >> 27;
+	}
+
+	if (len > i)
+	{
+		u64 key_rem = 0;
+		memcpy(&key_rem, &key[i], len - i);
+
+		hash ^= key_rem + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
+		hash ^= hash >> 30;
+		hash *= 0xbf58476d1ce4e5b9ULL;
+		hash ^= hash >> 27;
+	}
+
+	return hash;
+}
+
+#if (EE_HASH_SAFETY_TYPE == EE_HASH_SAFE) && (EE_HASH_COMP_TYPE == EE_HASH_ROBUST)
+
+#define eed_hash_u32    ee_hash_mm_u32_safe
+#define eed_hash_u64    ee_hash_mm_u64_safe
+
+#elif (EE_HASH_SAFETY_TYPE == EE_HASH_SAFE) && (EE_HASH_COMP_TYPE == EE_HASH_SIMPLE)
+
+#define eed_hash_u32    ee_hash_u32_safe
+#define eed_hash_u64    ee_hash_u64_safe
+
+#elif (EE_HASH_SAFETY_TYPE == EE_HASH_FAST) && (EE_HASH_COMP_TYPE == EE_HASH_ROBUST)
+
+#define eed_hash_u32    ee_hash_mm_u32_fast
+#define eed_hash_u64    ee_hash_mm_u64_fast
+
+#elif (EE_HASH_SAFETY_TYPE == EE_HASH_FAST) && (EE_HASH_COMP_TYPE == EE_HASH_SIMPLE)
+
+#define eed_hash_u32    ee_hash_u32_fast
+#define eed_hash_u64    ee_hash_u64_fast
+
+#else
+#error Invalid hash function macro setting
+#endif // EE_HASH_TYPE
+
 // #define EE_DICT_TOMBS_REHASH
 typedef u64  (*DictHash)(const u8* key, size_t len);
 typedef i32  (*DictEq)(const u8* a, const u8* b, size_t len);
@@ -41,6 +252,7 @@ typedef void (*DictCpy)(u8* dest, const u8* src, size_t len);
 typedef struct AlignedBuffer
 {
 	size_t size;
+	size_t align;
 	u8*    buffer;
 	void*  base;
 } AlignedBuffer;
@@ -50,15 +262,17 @@ EE_INLINE AlignedBuffer ee_aligned_alloc(size_t size, size_t align, Allocator* a
 	EE_ASSERT(ee_is_pow2(align), "Alignment should be power of two");
 
 	AlignedBuffer out = { 0 };
+	size_t total_size = size + align - 1;
 
-	out.size = size;
+	out.size  = size;
+	out.align = align;
 	
 	if (allocator == NULL)
-		out.base = malloc(out.size + align - 1);
+		out.base = malloc(total_size);
 	else
-		out.base = allocator->alloc_fn(allocator, out.size + align - 1);
+		out.base = allocator->alloc_fn(allocator, total_size);
 
-	EE_ASSERT(out.base != NULL, "Unable to allocate (%zu) bytes for aligned alloc", out.size + align - 1);
+	EE_ASSERT(out.base != NULL, "Unable to allocate (%zu) bytes for aligned alloc", total_size);
 
 	uintptr_t base    = (uintptr_t)out.base;
 	uintptr_t aligned = (base + (align - 1)) & ~(uintptr_t)(align - 1);
@@ -136,56 +350,6 @@ EE_INLINE u64 ee_tombs_th(u64 cap)
 }
 #endif
 
-EE_INLINE u64 ee_hash64(const u8* key) 
-{
-	u64 hash;
-
-	memcpy(&hash, key, sizeof(u64));
-
-	hash ^= hash >> 30;
-	hash *= 0xbf58476d1ce4e5b9ULL;
-	hash ^= hash >> 27;
-	hash *= 0x94d049bb133111ebULL;
-	hash ^= hash >> 31;
-
-	return hash;
-}
-
-EE_INLINE u64 ee_hash(const u8* key, size_t len) 
-{
-	if (len == sizeof(u64))
-	{
-		return ee_hash64(key);
-	}
-
-	u64 hash = 0x9e3779b97f4a7c15ull;
-	size_t i = 0;
-	
-	for (; i + sizeof(u64) <= len; i += sizeof(u64))
-	{
-		u64 key_u64 = 0;
-		memcpy(&key_u64, &key[i], sizeof(u64));
-
-		hash ^= key_u64 + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
-		hash ^= hash >> 30;
-		hash *= 0xbf58476d1ce4e5b9ULL;
-		hash ^= hash >> 27;
-	}
-
-	if (len > i)
-	{
-		u64 key_rem = 0;
-		memcpy(&key_rem, &key[i], len - i);
-
-		hash ^= key_rem + 0x9e3779b97f4a7c15ull + (hash << 6) + (hash >> 2);
-		hash ^= hash >> 30;
-		hash *= 0xbf58476d1ce4e5b9ULL;
-		hash ^= hash >> 27;
-	}
-
-	return hash;
-}
-
 EE_INLINE DictConfig ee_dict_config_new(Allocator* allocator, DictHash hash_fn, DictEq eq_fn, DictCpy key_cpy_fn, DictCpy val_cpy_fn)
 {
 	DictConfig out = { 0 };
@@ -199,7 +363,7 @@ EE_INLINE DictConfig ee_dict_config_new(Allocator* allocator, DictHash hash_fn, 
 	return out;
 }
 
-EE_INLINE DictConfig ee_dict_config_def()
+EE_INLINE DictConfig ee_dict_config_def(void)
 {
 	DictConfig out = { 0 };
 
@@ -241,7 +405,7 @@ EE_INLINE void ee_dict_iter_reset(DictIter* iter)
 	iter->it = 0;
 }
 
-EE_INLINE DictConfig ee_dict_get_config(const Dict* dict)
+EE_INLINE DictConfig ee_dict_get_config(Dict* dict)
 {
 	DictConfig out = { 0 };
 
@@ -464,10 +628,25 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	out.mask = out.cap - 1;
 	out.th = ee_dict_th(out.cap);
 	
-	out.hash_fn    = config.hash_fn == NULL ? ee_hash : config.hash_fn;
+	if (config.hash_fn == NULL)
+	{
+		if (out.key_len == 4)
+			out.hash_fn = eed_hash_u32;
+		else if (out.key_len == 8)
+			out.hash_fn = eed_hash_u64;
+		//else if (out.key_len == 16)
+		//	out.hash_fn = eed_hash_u128;
+		else
+			out.hash_fn = ee_hash_mm;
+	}
+	else
+	{
+		out.hash_fn = config.hash_fn;
+	}
+	
 	out.eq_fn      = config.eq_fn   == NULL ? ee_bin_u8_eq : config.eq_fn;
-	out.key_cpy_fn = config.key_cpy_fn == NULL ? memcpy : config.key_cpy_fn;
-	out.val_cpy_fn = config.val_cpy_fn == NULL ? memcpy : config.val_cpy_fn;
+	out.key_cpy_fn = config.key_cpy_fn == NULL ? ee_cpy_def : config.key_cpy_fn;
+	out.val_cpy_fn = config.val_cpy_fn == NULL ? ee_cpy_def : config.val_cpy_fn;
 
 #ifdef EE_DICT_TOMBS_REHASH
 	out.tombs = 0;
@@ -538,26 +717,26 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 			match_mask &= match_mask - 1;
 		}
 
+		i32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
+
+		if (empty_mask)
+		{
+			size_t place = (first_deleted != (size_t)-1) ? first_deleted : (group_index + (size_t)ee_first_bit_u32(empty_mask));
+
+			dict->key_cpy_fn(ee_dict_key_at(dict, place), key, dict->key_len);
+			dict->val_cpy_fn(ee_dict_val_at(dict, place), val, dict->val_len);
+
+			dict->ctrl.buffer[place] = hash_sign;
+			dict->count++;
+
+			return EE_TRUE;
+		}
+
 		i32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, deleted128));
 		
 		if (deleted_mask && first_deleted == (size_t)-1)
 		{
 			first_deleted = group_index + (size_t)ee_first_bit_u32(deleted_mask);
-		}
-
-		i32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
-		
-		if (empty_mask)
-		{
-			size_t place = (first_deleted != (size_t)-1) ? first_deleted : (group_index + (size_t)ee_first_bit_u32(empty_mask));
-			
-			dict->key_cpy_fn(ee_dict_key_at(dict, place), key, dict->key_len);
-			dict->val_cpy_fn(ee_dict_val_at(dict, place), val, dict->val_len);
-			
-			dict->ctrl.buffer[place] = hash_sign;
-			dict->count++;
-			
-			return EE_TRUE;
 		}
 
 		probe_step = next_probe_step;

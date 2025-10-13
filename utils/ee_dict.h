@@ -194,11 +194,62 @@ EE_INLINE u64 ee_hash_u128_fast(const u8* key_ptr, size_t len)
 {
 	EE_UNUSED(len);
 
-	eed_simd_i h_const = eed_set1_epi64(0x9E3779B185EBCA87ULL);
-	eed_simd_i key_128 = eed_load_si((const eed_simd_i*)key_ptr);
+	u64* key = (u64*)key_ptr;
+	u64 hash = key[0] * 0x9E3779B185EBCA87ULL;
 
-	EE_ASSERT(0, "TODO");
+	hash ^= key[1] + 0xC6BC279692B5C323ULL + (hash << 17);
+
+	return hash;
 }
+
+EE_INLINE u64 ee_hash_u128_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 low, high, hash;
+
+	memcpy(&low, key_ptr, sizeof(u64));
+	memcpy(&high, &key_ptr[sizeof(u64)], sizeof(u64));
+
+	hash = low * 0x9E3779B185EBCA87ULL;
+	hash ^= high + 0xC6BC279692B5C323ULL + (hash << 17);
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u256_fast(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64* key = (u64*)key_ptr;
+
+	u64 hash = key[0] * 0x9E3779B185EBCA87ULL;
+	hash ^= key[1] + 0x9e3779b97f4a7c15ull + (hash << 17);
+	hash ^= key[2] + 0xC6BC279692B5C323ULL + (hash << 13);
+	hash ^= key[3] + 0x165667B19E3779F9ULL + (hash << 11);
+
+	return hash;
+}
+
+EE_INLINE u64 ee_hash_u256_safe(const u8* key_ptr, size_t len)
+{
+	EE_UNUSED(len);
+
+	u64 k0, k1, k2, k3, hash;
+
+	memcpy(&k0, &key_ptr[0], sizeof(u64));
+	memcpy(&k1, &key_ptr[8], sizeof(u64));
+	memcpy(&k2, &key_ptr[16], sizeof(u64));
+	memcpy(&k3, &key_ptr[24], sizeof(u64));
+
+	hash = k0 * 0x9E3779B185EBCA87ULL;
+	hash ^= k1 + 0x9e3779b97f4a7c15ull + (hash << 17);
+	hash ^= k2 + 0xC6BC279692B5C323ULL + (hash << 13);
+	hash ^= k3 + 0x165667B19E3779F9ULL + (hash << 11);
+
+	return hash;
+}
+
 
 EE_INLINE u64 ee_hash_mm(const u8* key, size_t len)
 {
@@ -739,8 +790,10 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 			out.hash_fn = eed_hash_u32;
 		else if (out.key_len == 8)
 			out.hash_fn = eed_hash_u64;
-		//else if (out.key_len == 16)
-		//	out.hash_fn = eed_hash_u128;
+		else if (out.key_len == 16)
+			out.hash_fn = ee_hash_u128_safe;
+		else if (out.key_len == 32)
+			out.hash_fn = ee_hash_u256_safe;
 		else
 			out.hash_fn = ee_hash_safe;
 	}

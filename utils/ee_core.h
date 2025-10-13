@@ -251,7 +251,7 @@ typedef __m256i  ee_simd_i; // integer
 typedef __m256   ee_simd_f; // float
 typedef __m256d  ee_simd_d; // double
 
-#define EE_SIMD_BYTES         (32)
+#define EE_SIMD_BYTES         32
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm256_loadu_si256
@@ -299,7 +299,7 @@ typedef __m128i  ee_simd_i; // integer
 typedef __m128   ee_simd_f; // float
 typedef __m128d  ee_simd_d; // double
 
-#define EE_SIMD_BYTES         (16)
+#define EE_SIMD_BYTES         16
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm_loadu_si128
@@ -345,7 +345,7 @@ typedef u64 ee_simd_i; // integer
 typedef f64 ee_simd_f; // float
 typedef f64 ee_simd_d; // double
 
-#define EE_SIMD_BYTES         (8)
+#define EE_SIMD_BYTES         8
 #define EE_SIMD_PREFETCH_T0   (0)
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)

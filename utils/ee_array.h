@@ -235,7 +235,7 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 
 	for (; i < low_tail; i += array->elem_size)
 	{
-		if (ee_bin_u8_eq(target, &array->buffer[i], array->elem_size))
+		if (ee_eq_def(target, &array->buffer[i], array->elem_size))
 		{
 			return i / array->elem_size;
 		}
@@ -342,7 +342,7 @@ EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t lo
 
 	for (; i < array->top; i += array->elem_size)
 	{
-		if (ee_bin_u8_eq(target, &array->buffer[i], array->elem_size))
+		if (ee_eq_def(target, &array->buffer[i], array->elem_size))
 		{
 			return i / array->elem_size;
 		}

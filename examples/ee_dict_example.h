@@ -182,7 +182,7 @@ void key_cpy_fn(u8* a_ptr, const u8* b_ptr, size_t len)
 	a->low  = b->low;
 }
 
-// 'f32' is the primitive type so there is already 'ee_cpy_f32' function defined
+// 'f32' is the primitive type so there is already 'ee_cpy_32' function defined
 
 u64 key_hash_fn(const u8* key_ptr, size_t len)
 {
@@ -226,7 +226,7 @@ void run_dict_custom_fn_example(void)
 
 	// Container for all extra parameters, if some of the config values are NULL the default callbacks will be used
 	// Default config can be obtained vit 'ee_dict_config_def' or simply using 'DictConfig config = { 0 };'
-	DictConfig config = ee_dict_config_new(&allocator, key_hash_fn, key_eq_fn, key_cpy_fn, ee_cpy_f32);
+	DictConfig config = ee_dict_config_new(&allocator, key_hash_fn, key_eq_fn, key_cpy_fn, ee_cpy_32);
 
 	Dict dict = ee_dict_new_conf_m(128, Key, f32, config);
 

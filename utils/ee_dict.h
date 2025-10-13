@@ -1,5 +1,14 @@
 #pragma once
 
+/*
+
+TODO:
+
+1. Safe/Fast versions of copy and comparison functions
+2. Bulk table operations
+
+*/
+
 #ifndef EE_DICT_H
 #define EE_DICT_H
 
@@ -52,6 +61,15 @@ static const f64 EE_ONE_F64  = 1.0;
 #define EE_HASH_COMP_TYPE EE_HASH_SIMPLE
 #endif
 
+// #define EE_DICT_TOMBS_REHASH
+typedef u64  (*DictHash)(const u8* key, size_t len);
+typedef i32  (*DictEq)(const u8* a, const u8* b, size_t len);
+typedef void (*DictCpy)(u8* dest, const u8* src, size_t len);
+
+#define ee_dict_new_conf_m(size, key_type, val_type, config)     ee_dict_new(size, sizeof(key_type), sizeof(val_type), config)
+#define ee_dict_new_m(size, key_type, val_type, \
+	allocator, hash_fn, eq_fn, key_cpy_fn, val_cpy_fn)           ee_dict_new(size, sizeof(key_type), sizeof(val_type), (DictConfig) { allocator, hash_fn, eq_fn, key_cpy_fn, val_cpy_fn })
+#define ee_dict_def_m(size, key_type, val_type)                  ee_dict_new(size, sizeof(key_type), sizeof(val_type), (DictConfig){ 0 })
 
 EE_INLINE u64 ee_hash_u64_fast(const u8* key_ptr, size_t len)
 {
@@ -182,11 +200,8 @@ EE_INLINE u64 ee_hash_u128_fast(const u8* key_ptr, size_t len)
 	EE_ASSERT(0, "TODO");
 }
 
-
 EE_INLINE u64 ee_hash_mm(const u8* key, size_t len)
 {
-	// TODO(eesuck): SIMD accelerate
-
 	u64 hash = 0x9e3779b97f4a7c15ull;
 	size_t i = 0;
 
@@ -215,6 +230,106 @@ EE_INLINE u64 ee_hash_mm(const u8* key, size_t len)
 	return hash;
 }
 
+EE_INLINE u64 ee_hash_fast(const u8* key, size_t len)
+{
+	EE_ALIGNAS(EE_SIMD_BYTES) u64 hash_u64[EE_SIMD_BYTES / 8] = { 0 };
+
+	ee_simd_i hash = ee_set1_epi32(0x6d0f494f);
+	u64 hash_out = 0;
+
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL > EE_SIMD_LEVEL_NONE
+	__m128i count = _mm_set1_epi32(17);
+#else
+	i32 count = 17;
+#endif
+
+	size_t i = 0;
+	size_t upper = ee_round_down_pow2(len, EE_SIMD_BYTES);
+
+	for (; i < upper; i += EE_SIMD_BYTES)
+	{
+		ee_simd_i group = ee_load_si((const ee_simd_i*)&key[i]);
+
+		hash = ee_mullo_epi32(hash, group);
+		hash = ee_xor_si(hash, ee_srl_epi32(hash, count));
+	}
+
+	ee_store_si((ee_simd_i*)hash_u64, hash);
+
+	hash_out ^= hash_u64[0] + 0x9e3779b97f4a7c15ull + (hash_u64[1] << 11);
+#if EE_SIMD_BYTES > 16
+	hash_out ^= hash_u64[2] + 0xbf58476d1ce4e5b9ull + (hash_u64[3] << 17);
+#endif
+
+	for (; i + sizeof(u64) <= len; i += sizeof(u64))
+	{
+		u64 key_u64 = 0;
+		memcpy(&key_u64, &key[i], sizeof(u64));
+
+		hash_out ^= key_u64 + 0x9e3779b97f4a7c15ull + (hash_out << 6);
+	}
+
+	if (len > i)
+	{
+		u64 key_rem = 0;
+		memcpy(&key_rem, &key[i], len - i);
+
+		hash_out ^= key_rem + 0x9e3779b97f4a7c15ull + (hash_out >> 2);
+	}
+
+	return hash_out;
+}
+
+EE_INLINE u64 ee_hash_safe(const u8* key, size_t len)
+{
+	EE_ALIGNAS(EE_SIMD_BYTES) u64 hash_u64[EE_SIMD_BYTES / 8] = { 0 };
+
+	ee_simd_i hash = ee_set1_epi32(0x6d0f494f);
+	u64 hash_out = 0;
+
+#if EE_SIMD_EFFECTIVE_MAX_LEVEL > EE_SIMD_LEVEL_NONE
+	__m128i count = _mm_set1_epi32(17);
+#else
+	i32 count = 17;
+#endif
+
+	size_t i = 0;
+	size_t upper = ee_round_down_pow2(len, EE_SIMD_BYTES);
+
+	for (; i < upper; i += EE_SIMD_BYTES)
+	{
+		ee_simd_i group = ee_loadu_si((const ee_simd_i*)&key[i]);
+
+		hash = ee_mullo_epi32(hash, group);
+		hash = ee_xor_si(hash, ee_srl_epi32(hash, count));
+	}
+
+	ee_store_si((ee_simd_i*)hash_u64, hash);
+
+	hash_out ^= hash_u64[0] + 0x9e3779b97f4a7c15ull + (hash_u64[1] << 11);
+#if EE_SIMD_BYTES > 16
+	hash_out ^= hash_u64[2] + 0xbf58476d1ce4e5b9ull + (hash_u64[3] << 17);
+#endif
+
+	for (; i + sizeof(u64) <= len; i += sizeof(u64))
+	{
+		u64 key_u64 = 0;
+		memcpy(&key_u64, &key[i], sizeof(u64));
+
+		hash_out ^= key_u64 + 0x9e3779b97f4a7c15ull + (hash_out << 6);
+	}
+
+	if (len > i)
+	{
+		u64 key_rem = 0;
+		memcpy(&key_rem, &key[i], len - i);
+
+		hash_out ^= key_rem + 0x9e3779b97f4a7c15ull + (hash_out >> 2);
+	}
+
+	return hash_out;
+}
+
 #if (EE_HASH_SAFETY_TYPE == EE_HASH_SAFE) && (EE_HASH_COMP_TYPE == EE_HASH_ROBUST)
 
 #define eed_hash_u32    ee_hash_mm_u32_safe
@@ -238,16 +353,6 @@ EE_INLINE u64 ee_hash_mm(const u8* key, size_t len)
 #else
 #error Invalid hash function macro setting
 #endif // EE_HASH_TYPE
-
-// #define EE_DICT_TOMBS_REHASH
-typedef u64  (*DictHash)(const u8* key, size_t len);
-typedef i32  (*DictEq)(const u8* a, const u8* b, size_t len);
-typedef void (*DictCpy)(u8* dest, const u8* src, size_t len);
-
-#define ee_dict_new_conf_m(size, key_type, val_type, config)     ee_dict_new(size, sizeof(key_type), sizeof(val_type), config)
-#define ee_dict_new_m(size, key_type, val_type, \
-	allocator, hash_fn, eq_fn, key_cpy_fn, val_cpy_fn)           ee_dict_new(size, sizeof(key_type), sizeof(val_type), (DictConfig) { allocator, hash_fn, eq_fn, key_cpy_fn, val_cpy_fn })
-#define ee_dict_def_m(size, key_type, val_type)                  ee_dict_new(size, sizeof(key_type), sizeof(val_type), (DictConfig){ 0 })
 
 typedef struct AlignedBuffer
 {
@@ -637,32 +742,30 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 		//else if (out.key_len == 16)
 		//	out.hash_fn = eed_hash_u128;
 		else
-			out.hash_fn = ee_hash_mm;
+			out.hash_fn = ee_hash_safe;
 	}
 	else
 	{
 		out.hash_fn = config.hash_fn;
 	}
 
-	// TODO(eesuck): safe\fast same as hash
-
 	if (config.eq_fn == NULL)
 	{
 		if (out.key_len == 1)
-			out.eq_fn = ee_eq_cpy_u8;
+			out.eq_fn = ee_eq_safe_8;
 		else if (out.key_len == 2)
-			out.eq_fn = ee_eq_cpy_u16;
+			out.eq_fn = ee_eq_safe_16;
 		else if (out.key_len == 4)
-			out.eq_fn = ee_eq_cpy_u32;
+			out.eq_fn = ee_eq_safe_32;
 		else if (out.key_len == 8)
-			out.eq_fn = ee_eq_cpy_u64;
+			out.eq_fn = ee_eq_safe_64;
 #if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_SSE
 		else if (out.key_len == 16)
-			out.eq_fn = ee_eq_cpy_u128;
+			out.eq_fn = ee_eq_safe_128;
 #endif
 #if EE_SIMD_EFFECTIVE_MAX_LEVEL >= EE_SIMD_LEVEL_AVX
 		else if (out.key_len == 32)
-			out.eq_fn = ee_eq_cpy_u256;
+			out.eq_fn = ee_eq_safe_256;
 #endif
 		else
 			out.eq_fn = ee_eq_def;
@@ -675,13 +778,13 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	if (config.key_cpy_fn == NULL)
 	{
 		if (out.key_len == 1)
-			out.key_cpy_fn = ee_cpy_u8;
+			out.key_cpy_fn = ee_cpy_8;
 		else if (out.key_len == 2)
-			out.key_cpy_fn = ee_cpy_u16;
+			out.key_cpy_fn = ee_cpy_16;
 		else if (out.key_len == 4)
-			out.key_cpy_fn = ee_cpy_u32;
+			out.key_cpy_fn = ee_cpy_32;
 		else if (out.key_len == 8)
-			out.key_cpy_fn = ee_cpy_u64;
+			out.key_cpy_fn = ee_cpy_64;
 		else
 			out.key_cpy_fn = ee_cpy_def;
 	}
@@ -693,13 +796,13 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	if (config.val_cpy_fn == NULL)
 	{
 		if (out.val_len == 1)
-			out.val_cpy_fn = ee_cpy_u8;
+			out.val_cpy_fn = ee_cpy_8;
 		else if (out.val_len == 2)
-			out.val_cpy_fn = ee_cpy_u16;
+			out.val_cpy_fn = ee_cpy_16;
 		else if (out.val_len == 4)
-			out.val_cpy_fn = ee_cpy_u32;
+			out.val_cpy_fn = ee_cpy_32;
 		else if (out.val_len == 8)
-			out.val_cpy_fn = ee_cpy_u64;
+			out.val_cpy_fn = ee_cpy_64;
 		else
 			out.val_cpy_fn = ee_cpy_def;
 	}
@@ -715,7 +818,8 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 
 	EE_ASSERT(out.ctrl.buffer != NULL, "NULL control buffer");
 
-	memset(out.ctrl.buffer, EE_SLOT_EMPTY, cap);
+	if (out.ctrl.buffer != NULL)
+		memset(out.ctrl.buffer, EE_SLOT_EMPTY, cap);
 
 	return out;
 }

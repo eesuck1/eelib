@@ -1,6 +1,8 @@
 #ifndef EE_STRING_H
 #define EE_STRING_H
 
+#pragma warning(disable : 4996)
+
 #include "stdio.h"
 #include "ee_core.h"
 
@@ -50,7 +52,7 @@ EE_INLINE Str ee_str_new(size_t size, const Allocator* allocator)
 
 	out.cap = size;
 	out.top = 0;
-	out.buffer = out.allocator.alloc_fn(&out.allocator, size);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, size);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", size);
 
@@ -77,7 +79,7 @@ EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
 
 	out.cap = size;
 	out.top = size;
-	out.buffer = out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
 
@@ -124,7 +126,7 @@ EE_INLINE Str ee_str_from_file(const char* file_path, const char* mode, const Al
 
 	out.cap = file_size;
 	out.top = file_size;
-	out.buffer = out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
 
@@ -191,7 +193,7 @@ EE_INLINE void ee_str_grow(Str* str)
 	EE_ASSERT(str->buffer != NULL, "Trying to grow NULL string buffer");
 
 	size_t new_cap = str->cap + (str->cap >> 1);
-	u8* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+	u8* new_buffer = (u8*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
 
@@ -395,7 +397,7 @@ EE_INLINE size_t ee_str_replace_b(Str* str, const Str* old_str, const Str* new_s
 
 	EE_ASSERT(new_str_len > 0, "Invalid resulting length of the buffer");
 
-	u8* new_buffer = str->allocator.alloc_fn(&str->allocator, new_str_len);
+	u8* new_buffer = (u8*)str->allocator.alloc_fn(&str->allocator, new_str_len);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to allocate (%zd) bytes for temporary buffer", new_str_len);
 
@@ -701,7 +703,7 @@ EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
 	}
 
 	size_t new_cap = new_size;
-	u8* new_buffer = str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+	u8* new_buffer = (u8*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
 

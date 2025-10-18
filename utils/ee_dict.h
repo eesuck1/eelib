@@ -381,25 +381,40 @@ EE_INLINE u64 ee_hash_safe(const u8* key, size_t len)
 	return hash_out;
 }
 
+//#define EE_HASH_SAFETY_TYPE EE_HASH_FAST
+//#define EE_HASH_COMP_TYPE EE_HASH_SIMPLE
+
 #if (EE_HASH_SAFETY_TYPE == EE_HASH_SAFE) && (EE_HASH_COMP_TYPE == EE_HASH_ROBUST)
 
-#define eed_hash_u32    ee_hash_mm_u32_safe
-#define eed_hash_u64    ee_hash_mm_u64_safe
+#define eed_hash_32     ee_hash_mm_u32_safe
+#define eed_hash_64     ee_hash_mm_u64_safe
+#define eed_hash_128    ee_hash_u128_safe
+#define eed_hash_256    ee_hash_u256_safe
+#define eed_hash        ee_hash_safe
 
 #elif (EE_HASH_SAFETY_TYPE == EE_HASH_SAFE) && (EE_HASH_COMP_TYPE == EE_HASH_SIMPLE)
 
-#define eed_hash_u32    ee_hash_u32_safe
-#define eed_hash_u64    ee_hash_u64_safe
+#define eed_hash_32     ee_hash_u32_safe
+#define eed_hash_64     ee_hash_u64_safe
+#define eed_hash_128    ee_hash_u128_safe
+#define eed_hash_256    ee_hash_u256_safe
+#define eed_hash        ee_hash_safe
 
 #elif (EE_HASH_SAFETY_TYPE == EE_HASH_FAST) && (EE_HASH_COMP_TYPE == EE_HASH_ROBUST)
 
-#define eed_hash_u32    ee_hash_mm_u32_fast
-#define eed_hash_u64    ee_hash_mm_u64_fast
+#define eed_hash_32     ee_hash_mm_u32_fast
+#define eed_hash_64     ee_hash_mm_u64_fast
+#define eed_hash_128    ee_hash_u128_fast
+#define eed_hash_256    ee_hash_u256_fast
+#define eed_hash        ee_hash_fast
 
 #elif (EE_HASH_SAFETY_TYPE == EE_HASH_FAST) && (EE_HASH_COMP_TYPE == EE_HASH_SIMPLE)
 
-#define eed_hash_u32    ee_hash_u32_fast
-#define eed_hash_u64    ee_hash_u64_fast
+#define eed_hash_32     ee_hash_u32_fast
+#define eed_hash_64     ee_hash_u64_fast
+#define eed_hash_128    ee_hash_u128_fast
+#define eed_hash_256    ee_hash_u256_fast
+#define eed_hash        ee_hash_fast
 
 #else
 #error Invalid hash function macro setting
@@ -787,15 +802,15 @@ EE_INLINE Dict ee_dict_new(size_t size, size_t key_len, size_t val_len, DictConf
 	if (config.hash_fn == NULL)
 	{
 		if (out.key_len == 4)
-			out.hash_fn = eed_hash_u32;
+			out.hash_fn = eed_hash_32;
 		else if (out.key_len == 8)
-			out.hash_fn = eed_hash_u64;
+			out.hash_fn = eed_hash_64;
 		else if (out.key_len == 16)
-			out.hash_fn = ee_hash_u128_safe;
+			out.hash_fn = eed_hash_128;
 		else if (out.key_len == 32)
-			out.hash_fn = ee_hash_u256_safe;
+			out.hash_fn = eed_hash_256;
 		else
-			out.hash_fn = ee_hash_safe;
+			out.hash_fn = eed_hash;
 	}
 	else
 	{
@@ -898,9 +913,9 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
-	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
-	eed_simd_i deleted128 = eed_set1_epi8(EE_SLOT_DELETED);
+	eed_simd_i hash_sign_wide = eed_set1_epi8(hash_sign);
+	eed_simd_i empty_wide = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i del_wide = eed_set1_epi8(EE_SLOT_DELETED);
 
 	size_t probe_step = 0;
 	size_t first_deleted = (size_t)-1;
@@ -918,7 +933,7 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrl.buffer[group_index]);
 
-		i32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign128));
+		i32 match_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, hash_sign_wide));
 		
 		while (match_mask)
 		{
@@ -934,7 +949,7 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 			match_mask &= match_mask - 1;
 		}
 
-		i32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty128));
+		i32 empty_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, empty_wide));
 
 		if (empty_mask)
 		{
@@ -949,7 +964,7 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 			return EE_TRUE;
 		}
 
-		i32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, deleted128));
+		i32 deleted_mask = eed_movemask_epi8(eed_cmpeq_epi8(group, del_wide));
 		
 		if (deleted_mask && first_deleted == (size_t)-1)
 		{
@@ -969,14 +984,14 @@ EE_INLINE i32 ee_dict_insert(Dict* dict, const u8* key, const u8* val)
 
 		dict->ctrl.buffer[place] = hash_sign;
 		dict->count++;
-		
+
 		return EE_TRUE;
 	}
 
 	return EE_FALSE;
 }
 
-EE_INLINE void ee_dict_grow(Dict* dict)
+EE_INLINE void ee_dict_grow(Dict* dict, size_t new_cap)
 {
 	EE_ASSERT(dict != NULL, "Trying to insert to NULL Dict");
 
@@ -1022,20 +1037,12 @@ EE_INLINE void ee_dict_rehash(Dict* dict)
 
 EE_INLINE i32 ee_dict_set(Dict* dict, const u8* key, const u8* val)
 {
+	if (dict->count + 1 > dict->th)
+	{
+		ee_dict_grow(dict, 2 * dict->cap);
+	}
+
 	i32 result = ee_dict_insert(dict, key, val);
-
-	if (!result)
-	{
-		ee_dict_grow(dict);
-		result = ee_dict_insert(dict, key, val);
-
-		EE_ASSERT(result == EE_TRUE, "Unable to insert after grow");
-	}
-
-	if (dict->count > dict->th)
-	{
-		ee_dict_grow(dict);
-	}
 
 	return result;
 }
@@ -1049,8 +1056,8 @@ EE_INLINE i32 ee_dict_remove(Dict* dict, const u8* key)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
-	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i hash_sign_wide = eed_set1_epi8(hash_sign);
+	eed_simd_i empty_wide = eed_set1_epi8(EE_SLOT_EMPTY);
 
 	size_t probe_step = 0;
 
@@ -1066,7 +1073,7 @@ EE_INLINE i32 ee_dict_remove(Dict* dict, const u8* key)
 		eed_prefetch((const char*)ee_dict_key_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrl.buffer[group_index]);
-		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
+		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign_wide);
 
 		i32 match_mask = eed_movemask_epi8(match);
 
@@ -1094,7 +1101,7 @@ EE_INLINE i32 ee_dict_remove(Dict* dict, const u8* key)
 			match_mask &= match_mask - 1;
 		}
 
-		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
+		eed_simd_i empty = eed_cmpeq_epi8(group, empty_wide);
 
 		i32 empty_mask = eed_movemask_epi8(empty);
 
@@ -1119,8 +1126,8 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 	u64 base_index = (hash >> 7) & dict->mask;
 	u8  hash_sign = hash & 0x7F;
 
-	eed_simd_i hash_sign128 = eed_set1_epi8(hash_sign);
-	eed_simd_i empty128 = eed_set1_epi8(EE_SLOT_EMPTY);
+	eed_simd_i hash_sign_wide = eed_set1_epi8(hash_sign);
+	eed_simd_i empty_wide = eed_set1_epi8(EE_SLOT_EMPTY);
 
 	size_t probe_step = 0;
 
@@ -1136,7 +1143,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 		eed_prefetch((const char*)ee_dict_key_at(dict, next_group_index), EED_SIMD_PREFETCH_T0);
 
 		eed_simd_i group = eed_load_si((eed_simd_i*)&dict->ctrl.buffer[group_index]);
-		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign128);
+		eed_simd_i match = eed_cmpeq_epi8(group, hash_sign_wide);
 
 		i32 match_mask = eed_movemask_epi8(match);
 		
@@ -1152,7 +1159,7 @@ EE_INLINE u8* ee_dict_at(const Dict* dict, const u8* key)
 			match_mask &= match_mask - 1;
 		}
 
-		eed_simd_i empty = eed_cmpeq_epi8(group, empty128);
+		eed_simd_i empty = eed_cmpeq_epi8(group, empty_wide);
 
 		i32 empty_mask = eed_movemask_epi8(empty);
 

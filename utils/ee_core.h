@@ -124,33 +124,33 @@
 #endif
 #endif
 
-#define EE_DEFINE_EQ_FN_SAFE(size)                                      \
-    i32 ee_eq_safe_##size(const u8* a_ptr, const u8* b_ptr, size_t len) \
-    {                                                                   \
-        EE_UNUSED_1(len);                                               \
-                                                                        \
-        u##size a, b;                                                   \
-                                                                        \
-        memcpy(&a, a_ptr, sizeof(a));                                   \
-        memcpy(&b, b_ptr, sizeof(b));                                   \
-                                                                        \
-        return a == b;                                                  \
+#define EE_DEFINE_EQ_FN_SAFE(size)                                                \
+    EE_INLINE i32 ee_eq_safe_##size(const u8* a_ptr, const u8* b_ptr, size_t len) \
+    {                                                                             \
+        EE_UNUSED_1(len);                                                         \
+                                                                                  \
+        u##size a, b;                                                             \
+                                                                                  \
+        memcpy(&a, a_ptr, sizeof(a));                                             \
+        memcpy(&b, b_ptr, sizeof(b));                                             \
+                                                                                  \
+        return a == b;                                                            \
     }                                                               
                                                                     
-#define EE_DEFINE_EQ_FN(size)                                           \
-    i32 ee_eq_##size(const u8* a_ptr, const u8* b_ptr, size_t len)      \
-    {                                                                   \
-        EE_UNUSED_1(len);                                               \
-                                                                        \
-        return *(const u##size*)a_ptr == *(const u##size*)b_ptr;        \
+#define EE_DEFINE_EQ_FN(size)                                                     \
+    EE_INLINE i32 ee_eq_##size(const u8* a_ptr, const u8* b_ptr, size_t len)      \
+    {                                                                             \
+        EE_UNUSED_1(len);                                                         \
+                                                                                  \
+        return *(const u##size*)a_ptr == *(const u##size*)b_ptr;                  \
     }
 
-#define EE_DEFINE_CPY_FN(size)                                          \
-    void ee_cpy_##size(u8* a_ptr, const u8* b_ptr, size_t len)          \
-    {                                                                   \
-        EE_UNUSED_1(len);                                               \
-                                                                        \
-        *(u##size*)a_ptr = *(const u##size*)b_ptr;                      \
+#define EE_DEFINE_CPY_FN(size)                                                    \
+    EE_INLINE void ee_cpy_##size(u8* a_ptr, const u8* b_ptr, size_t len)          \
+    {                                                                             \
+        EE_UNUSED_1(len);                                                         \
+                                                                                  \
+        *(u##size*)a_ptr = *(const u##size*)b_ptr;                                \
     }
 
 //
@@ -252,6 +252,7 @@ typedef __m256   ee_simd_f; // float
 typedef __m256d  ee_simd_d; // double
 
 #define EE_SIMD_BYTES         32
+#define EE_SIMD_DWORDS        (EE_SIMD_BYTES / 4)
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm256_loadu_si256
@@ -281,15 +282,30 @@ typedef __m256d  ee_simd_d; // double
 #define ee_and_si             _mm256_and_si256
 #define ee_srl_epi16          _mm256_srl_epi16
 #define ee_srl_epi32          _mm256_srl_epi32
+#define ee_srl_epi64          _mm256_srl_epi64
 #define ee_sll_epi16          _mm256_sll_epi16
 #define ee_sll_epi32          _mm256_sll_epi32
+#define ee_sll_epi64          _mm256_sll_epi64
+#define ee_srli_epi16         _mm256_srli_epi16
+#define ee_srli_epi32         _mm256_srli_epi32
+#define ee_srli_epi64         _mm256_srli_epi64
+#define ee_slli_epi16         _mm256_slli_epi16
+#define ee_slli_epi32         _mm256_slli_epi32
+#define ee_slli_epi64         _mm256_slli_epi64
 #define ee_prefetch           _mm_prefetch
 
 #define ee_min_epi32          _mm256_min_epi32
 #define ee_max_epi32          _mm256_max_epi32
 
 #define ee_mul_epi32          _mm256_mul_epi32
+#define ee_mul_epu32          _mm256_mul_epu32
+#define ee_add_epi64          _mm256_add_epi64
 #define ee_mullo_epi32        _mm256_mullo_epi32
+
+#define ee_unpackhi_epi32     _mm256_unpackhi_epi32
+#define ee_unpacklo_epi32     _mm256_unpacklo_epi32
+
+#define ee_mullo_epi64        _ee_mullo_epi64
 
 #elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_SSE
 
@@ -300,6 +316,7 @@ typedef __m128   ee_simd_f; // float
 typedef __m128d  ee_simd_d; // double
 
 #define EE_SIMD_BYTES         16
+#define EE_SIMD_DWORDS        (EE_SIMD_BYTES / 4)
 #define EE_SIMD_PREFETCH_T0   (_MM_HINT_T0)
 
 #define ee_loadu_si           _mm_loadu_si128
@@ -329,15 +346,30 @@ typedef __m128d  ee_simd_d; // double
 #define ee_and_si             _mm_and_si128
 #define ee_srl_epi16          _mm_srl_epi16
 #define ee_srl_epi32          _mm_srl_epi32
+#define ee_srl_epi64          _mm_srl_epi64
 #define ee_sll_epi16          _mm_sll_epi16
 #define ee_sll_epi32          _mm_sll_epi32
+#define ee_sll_epi64          _mm_sll_epi64
+#define ee_srli_epi16         _mm_srli_epi16
+#define ee_srli_epi32         _mm_srli_epi32
+#define ee_srli_epi64         _mm_srli_epi64
+#define ee_slli_epi16         _mm_slli_epi16
+#define ee_slli_epi32         _mm_slli_epi32
+#define ee_slli_epi64         _mm_slli_epi64
 #define ee_prefetch           _mm_prefetch
 
 #define ee_min_epi32          _mm_min_epi32
 #define ee_max_epi32          _mm_max_epi32
 
 #define ee_mul_epi32          _mm_mul_epi32
+#define ee_mul_epu32          _mm_mul_epu32
+#define ee_add_epi64          _mm_add_epi64
 #define ee_mullo_epi32        _mm_mullo_epi32
+
+#define ee_unpackhi_epi32     _mm_unpackhi_epi32
+#define ee_unpacklo_epi32     _mm_unpacklo_epi32
+
+#define ee_mullo_epi64        _ee_mullo_epi64
 
 #elif EE_SIMD_EFFECTIVE_MAX_LEVEL == EE_SIMD_LEVEL_NONE
 
@@ -1081,6 +1113,20 @@ EE_INLINE i32 ee_eq_safe_256(const u8* a_ptr, const u8* b_ptr, size_t len)
     return _mm256_movemask_epi8(cmp) == 0xFFFFFFFF;
 }
 #endif
+
+ee_simd_i _ee_mullo_epi64(ee_simd_i ab, ee_simd_i cd)
+{
+    ee_simd_i ac = ee_mul_epu32(ab, cd);
+    ee_simd_i b = ee_srli_epi64(ab, 32);
+    ee_simd_i bc = ee_mul_epu32(b, cd);
+    ee_simd_i d = ee_srli_epi64(cd, 32);
+    ee_simd_i ad = ee_mul_epu32(ab, d);
+    ee_simd_i high = ee_add_epi64(bc, ad);
+
+    high = ee_slli_epi64(high, 32);
+
+    return ee_add_epi64(high, ac);
+}
 
 EE_DEFINE_EQ_FN(8);
 EE_DEFINE_EQ_FN(16);

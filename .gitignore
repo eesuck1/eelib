@@ -1047,3 +1047,5 @@ dkms.conf
 main.c
 main_utils.c
 test_dir/
+
+third_party_test/

@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/;$(SolutionDir)third_party_test/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils/;$(SolutionDir)eevolve/;$(SolutionDir)eevolve_examples/;$(SolutionDir)third_party_test/</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>

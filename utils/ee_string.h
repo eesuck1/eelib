@@ -28,9 +28,15 @@ typedef struct Str
 {
 	size_t top;
 	size_t cap;
-	u8* buffer;
+	char* buffer;
 	Allocator allocator;
 } Str;
+
+typedef struct Str_View
+{
+	size_t len;
+	const char* buffer;
+} Str_View;
 
 EE_EXTERN_C_START
 
@@ -52,7 +58,7 @@ EE_INLINE Str ee_str_new(size_t size, const Allocator* allocator)
 
 	out.cap = size;
 	out.top = 0;
-	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, size);
+	out.buffer = (char*)out.allocator.alloc_fn(&out.allocator, size);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", size);
 
@@ -79,7 +85,7 @@ EE_INLINE Str ee_str_from_cstr(const char* c_str, const Allocator* allocator)
 
 	out.cap = size;
 	out.top = size;
-	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (char*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
 
@@ -126,7 +132,7 @@ EE_INLINE Str ee_str_from_file(const char* file_path, const char* mode, const Al
 
 	out.cap = file_size;
 	out.top = file_size;
-	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (char*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer", out.cap);
 
@@ -193,7 +199,7 @@ EE_INLINE void ee_str_grow(Str* str)
 	EE_ASSERT(str->buffer != NULL, "Trying to grow NULL string buffer");
 
 	size_t new_cap = str->cap + (str->cap >> 1);
-	u8* new_buffer = (u8*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+	char* new_buffer = (char*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
 
@@ -215,7 +221,7 @@ EE_INLINE i32 ee_str_empty(const Str* str)
 	return str->top == 0;
 }
 
-EE_INLINE void ee_str_push(Str* str, u8 symbol)
+EE_INLINE void ee_str_push(Str* str, char symbol)
 {
 	EE_ASSERT(str != NULL, "Trying to push into NULL string");
 
@@ -227,7 +233,7 @@ EE_INLINE void ee_str_push(Str* str, u8 symbol)
 	str->buffer[str->top++] = symbol;
 }
 
-EE_INLINE void ee_str_pop(Str* str, u8* out_val)
+EE_INLINE void ee_str_pop(Str* str, char* out_val)
 {
 	EE_ASSERT(str != NULL, "Trying to pop from NULL string");
 	EE_ASSERT(!ee_str_empty(str), "Trying to pop from empty string");
@@ -397,7 +403,7 @@ EE_INLINE size_t ee_str_replace_b(Str* str, const Str* old_str, const Str* new_s
 
 	EE_ASSERT(new_str_len > 0, "Invalid resulting length of the buffer");
 
-	u8* new_buffer = (u8*)str->allocator.alloc_fn(&str->allocator, new_str_len);
+	char* new_buffer = (char*)str->allocator.alloc_fn(&str->allocator, new_str_len);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to allocate (%zd) bytes for temporary buffer", new_str_len);
 
@@ -412,7 +418,7 @@ EE_INLINE size_t ee_str_replace_b(Str* str, const Str* old_str, const Str* new_s
 	return count;
 }
 
-EE_INLINE void ee_str_set(Str* str, size_t i, u8 symbol)
+EE_INLINE void ee_str_set(Str* str, size_t i, char symbol)
 {
 	EE_ASSERT(str != NULL, "Trying to set into NULL string");
 	EE_ASSERT(i < str->top, "Invalid set index (%zu) for string with length (%zu)", i, str->top);
@@ -420,7 +426,7 @@ EE_INLINE void ee_str_set(Str* str, size_t i, u8 symbol)
 	str->buffer[i] = symbol;
 }
 
-EE_INLINE u8 ee_str_get(const Str* str, size_t i)
+EE_INLINE char ee_str_get(const Str* str, size_t i)
 {
 	EE_ASSERT(str != NULL, "Trying to get from NULL string");
 	EE_ASSERT(i < str->top, "Invalid get index (%zu) for string with length (%zu)", i, str->top);
@@ -428,7 +434,7 @@ EE_INLINE u8 ee_str_get(const Str* str, size_t i)
 	return str->buffer[i];
 }
 
-EE_INLINE u8* ee_str_at(const Str* str, size_t i)
+EE_INLINE char* ee_str_at(const Str* str, size_t i)
 {
 	EE_ASSERT(str != NULL, "Trying to get from NULL string");
 	EE_ASSERT(i < str->top, "Invalid get index (%zu) for string with length (%zu)", i, str->top);
@@ -461,7 +467,7 @@ EE_INLINE i32 ee_str_lev_m64(const Str* a, const Str* b)
 
 	for (size_t i = 0; i < a->top; ++i)
 	{
-		u8 symbol = a->buffer[i];
+		char symbol = a->buffer[i];
 
 		char_equal[symbol] |= 1ull << i;
 	}
@@ -474,7 +480,7 @@ EE_INLINE i32 ee_str_lev_m64(const Str* a, const Str* b)
 
 	for (size_t j = 0; j < b->top; ++j)
 	{
-		u8 symbol = b->buffer[j];
+		char symbol = b->buffer[j];
 		u64 equal = char_equal[symbol];
 		u64 xv = equal | neg_vec;
 
@@ -543,13 +549,13 @@ EE_INLINE i32 ee_str_lev_mx(const Str* a, const Str* b)
 
 		for (size_t k = row_start; k < row_end; ++k) 
 		{
-			u8 symbol = b->buffer[k];
+			char symbol = b->buffer[k];
 			char_equal[symbol] |= 1ull << (k & EE_UINT64_MASK);
 		}
 
 		for (size_t i = 0; i < n; ++i) 
 		{
-			u8 symbol = a->buffer[i];
+			char symbol = a->buffer[i];
 			u64 equal = char_equal[symbol];
 
 			u64 pv_bit = (phc[i >> EE_UINT64_SHIFT] >> (i & EE_UINT64_MASK)) & 1ull;
@@ -592,13 +598,13 @@ EE_INLINE i32 ee_str_lev_mx(const Str* a, const Str* b)
 
 	for (size_t k = row_start; k < row_end; ++k) 
 	{
-		u8 symbol = b->buffer[k];
+		char symbol = b->buffer[k];
 		char_equal[symbol] |= 1ull << (k & EE_UINT64_MASK);
 	}
 
 	for (size_t i = 0; i < n; ++i) 
 	{
-		u8 symbol = a->buffer[i];
+		char symbol = a->buffer[i];
 		u64 equal = char_equal[symbol];
 
 		u64 pv_bit = (phc[i >> EE_UINT64_SHIFT] >> (i & EE_UINT64_MASK)) & 1ull;
@@ -682,7 +688,7 @@ EE_INLINE Str ee_str_copy(const Str* str, Allocator* allocator)
 	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
 	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
 
-	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	out.buffer = (char*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer copy", out.cap);
 
@@ -703,7 +709,7 @@ EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
 	}
 
 	size_t new_cap = new_size;
-	u8* new_buffer = (u8*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
+	char* new_buffer = (char*)str->allocator.realloc_fn(&str->allocator, str->buffer, str->cap, new_cap);
 
 	EE_ASSERT(new_buffer != NULL, "Unable to reallocate (%zu) bytes for Str.buffer", new_cap);
 
@@ -711,7 +717,7 @@ EE_INLINE void ee_str_grow_to(Str* str, size_t new_size)
 	str->buffer = new_buffer;
 }
 
-EE_INLINE void ee_str_push_bytes(Str* str, const u8* bytes, size_t len)
+EE_INLINE void ee_str_push_bytes(Str* str, const char* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to push into NULL string");
 	EE_ASSERT(bytes != NULL, "Trying to push NULL bytes");
@@ -734,7 +740,7 @@ EE_INLINE void ee_str_push_bytes(Str* str, const u8* bytes, size_t len)
 	str->top += len;
 }
 
-EE_INLINE void ee_str_fill_free(Str* str, u8 val)
+EE_INLINE void ee_str_fill_free(Str* str, char val)
 {
 	EE_ASSERT(str != NULL, "Trying to fill NULL string");
 
@@ -747,7 +753,7 @@ EE_INLINE void ee_str_fill_free(Str* str, u8 val)
 	str->top = str->cap;
 }
 
-EE_INLINE void ee_str_clear_free(Str* str, u8 val)
+EE_INLINE void ee_str_clear_free(Str* str, char val)
 {
 	EE_ASSERT(str != NULL, "Trying to clear NULL string");
 
@@ -759,7 +765,7 @@ EE_INLINE void ee_str_clear_free(Str* str, u8 val)
 	memset(&str->buffer[str->top], val, str->cap - str->top);
 }
 
-EE_INLINE void ee_str_clear(Str* str, u8 val)
+EE_INLINE void ee_str_clear(Str* str, char val)
 {
 	EE_ASSERT(str != NULL, "Trying to clear NULL string");
 
@@ -772,7 +778,7 @@ EE_INLINE void ee_str_clear_zero(Str* str)
 
 	memset(str->buffer, 0, str->cap);
 }
-EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const u8* bytes, size_t len)
+EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const char* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
 	EE_ASSERT(bytes != NULL, "Trying to insert NULL bytes");
@@ -804,7 +810,7 @@ EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const u8* bytes, size_t l
 	str->top += len;
 }
 
-EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const u8* bytes, size_t len)
+EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const char* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
 	EE_ASSERT(bytes != NULL, "Trying to insert NULL bytes");
@@ -832,6 +838,32 @@ EE_INLINE void ee_str_reset(Str* str)
 	EE_ASSERT(str != NULL, "Trying to reset NULL string");
 
 	str->top = 0;
+}
+
+
+EE_INLINE Str_View ee_str_view_new(const char* buffer, size_t len)
+{
+	EE_ASSERT(buffer != NULL, "Trying to create string view from NULL buffer");
+
+	Str_View out = { 0 };
+
+	out.buffer = buffer;
+	out.len = len;
+
+	return out;
+}
+
+EE_INLINE Str_View ee_str_view_from_str(const Str* str, size_t pos, size_t len)
+{
+	EE_ASSERT(str != NULL, "Trying to get view from NULL string");
+	EE_ASSERT(pos + len <= ee_str_len(str), "Invalid position or length (%zu, %zu) from string view for stirng with len (%zu)", pos, len, ee_str_len(str));
+
+	Str_View out = { 0 };
+
+	out.buffer = (const char*)ee_str_at(str, pos);
+	out.len = len;
+
+	return out;
 }
 
 EE_EXTERN_C_END

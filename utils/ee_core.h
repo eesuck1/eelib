@@ -1114,7 +1114,7 @@ EE_INLINE i32 ee_eq_safe_256(const u8* a_ptr, const u8* b_ptr, size_t len)
 }
 #endif
 
-ee_simd_i _ee_mullo_epi64(ee_simd_i ab, ee_simd_i cd)
+EE_INLINE ee_simd_i _ee_mullo_epi64(ee_simd_i ab, ee_simd_i cd)
 {
     ee_simd_i ac = ee_mul_epu32(ab, cd);
     ee_simd_i b = ee_srli_epi64(ab, 32);

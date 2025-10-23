@@ -31,7 +31,7 @@ typedef enum ArraySortType
 
 EE_EXTERN_C_START
 
-EE_INLINE Array ee_array_new(size_t size, size_t elem_size, Allocator* allocator)
+EE_INLINE Array ee_array_new(size_t size, size_t elem_size, const Allocator* allocator)
 {
 	EE_ASSERT(size > 0, "Invalid arraytor size (%zu)", size);
 	EE_ASSERT(elem_size > 0, "Invalid arraytor elem_size (%zu)", elem_size);
@@ -816,6 +816,21 @@ EE_INLINE void ee_array_reset(Array* array)
 	EE_ASSERT(array != NULL, "Trying to reset NULL array");
 
 	array->top = 0;
+}
+
+EE_INLINE u8* ee_array_emplace(Array* array)
+{
+	EE_ASSERT(array != NULL, "Trying to push into NULL Array");
+
+	if (ee_array_full(array))
+	{
+		ee_array_grow(array);
+	}
+
+	u8* out = &array->buffer[array->top];
+	array->top += array->elem_size;
+
+	return out;
 }
 
 EE_EXTERN_C_END

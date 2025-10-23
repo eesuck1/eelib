@@ -101,6 +101,28 @@ EE_INLINE void* ee_arena_alloc(Arena* arena, size_t size)
     return out;
 }
 
+EE_INLINE void* ee_arena_alloc_al(Arena* arena, size_t size, size_t align)
+{
+    EE_ASSERT(arena != NULL, "Trying to alloc from NULL arena");
+
+    size_t offset_aligned;
+
+    if (align > 1)
+        offset_aligned = ee_round_up_pow2(arena->offset, align);
+    else
+        offset_aligned = arena->offset;
+
+    if (offset_aligned + size > arena->size)
+    {
+        return NULL;
+    }
+
+    void* out = (void*)(arena->buffer + offset_aligned);
+    arena->offset = offset_aligned + size;
+
+    return out;
+}
+
 EE_INLINE void ee_arena_mark(Arena* arena)
 {
     EE_ASSERT(arena != NULL, "Trying to mark NULL arena");

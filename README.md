@@ -82,11 +82,34 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 
 ### **`EE_NO_ASSERT`** usage
 
-Defining `EE_NO_ASSERT` before including `ee_core.h` disables all `EE_ASSERT()` checks at compile time.
+Defining `EE_NO_ASSERT` before including header disables all `EE_ASSERT()` checks at compile time.
 
-| Mode                | Description                                                 |
-|:--------------------|:------------------------------------------------------------|
-| Default             | `EE_ASSERT` validates conditions and terminates on failure. |
-| With `EE_NO_ASSERT` | Assertions are removed — no checks or runtime overhead.     |
+| Mode                             | Description                                                 |
+|:---------------------------------|:------------------------------------------------------------|
+| With `EE_ASSERT` <br/> (default) | `EE_ASSERT` validates conditions and terminates on failure. |
+| With `EE_NO_ASSERT`              | Assertions are removed — no checks or runtime overhead.     |
+
+**Usage example**:
+
+```c
+#ifndef EE_DICT_EXAMPLE_H
+#define EE_DICT_EXAMPLE_H
+
+#define EE_NO_ASSERT
+
+#include "ee_dict.h"
+```
 
 Use this to exclude safety checks in release builds for better performance.
+
+### **SIMD Levels**
+
+SIMD levels define the width and type of vector instructions supported by the processor. 
+
+The library supports multiple SIMD optimization levels:
+
+| Macro                             | Value | Description                                                  |
+|:----------------------------------|:------|:-------------------------------------------------------------|
+| `EE_SIMD_LEVEL_NONE`              | 0     | No SIMD instructions; operations are scalar.                 |
+| `EE_SIMD_LEVEL_SSE`               | 1     | Supports 128-bit vector instructions for ints and floats.    |
+| `EE_SIMD_LEVEL_AVX`<br/>(default) | 2     | Supports 256-bit vector instructions for higher parallelism. |

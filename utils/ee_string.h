@@ -866,6 +866,14 @@ EE_INLINE Str_View ee_str_view_from_str(const Str* str, size_t pos, size_t len)
 	return out;
 }
 
+EE_INLINE void ee_str_view_print(Str_View str_view)
+{
+	EE_ASSERT(str_view.buffer != NULL, "Trying to dereference NULL buffer");
+	EE_ASSERT(str_view.len != 0, "Trying to print invalid string view, length (%zu)", str_view.len);
+
+	fwrite(str_view.buffer, 1, str_view.len, stdout);
+}
+
 EE_EXTERN_C_END
 
 #endif // EE_STRING_H

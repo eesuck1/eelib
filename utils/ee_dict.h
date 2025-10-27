@@ -288,12 +288,6 @@ EE_INLINE u64 ee_hash_fast(const u8* key, size_t len)
 	ee_simd_i hash = ee_set1_epi32(0x6d0f494f);
 	u64 hash_out = 0;
 
-#if EE_SIMD_EFFECTIVE_MAX_LEVEL > EE_SIMD_LEVEL_NONE
-	__m128i count = _mm_set1_epi32(17);
-#else
-	i32 count = 17;
-#endif
-
 	size_t i = 0;
 	size_t upper = ee_round_down_pow2(len, EE_SIMD_BYTES);
 
@@ -302,7 +296,7 @@ EE_INLINE u64 ee_hash_fast(const u8* key, size_t len)
 		ee_simd_i group = ee_load_si((const ee_simd_i*)&key[i]);
 
 		hash = ee_mullo_epi32(hash, group);
-		hash = ee_xor_si(hash, ee_srl_epi32(hash, count));
+		hash = ee_xor_si(hash, ee_srli_epi32(hash, 17));
 	}
 
 	ee_store_si((ee_simd_i*)hash_u64, hash);

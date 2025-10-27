@@ -92,12 +92,9 @@ Defining `EE_NO_ASSERT` before including header disables all `EE_ASSERT()` check
 **Usage example**:
 
 ```c
-#ifndef EE_DICT_EXAMPLE_H
-#define EE_DICT_EXAMPLE_H
-
 #define EE_NO_ASSERT
 
-#include "ee_dict.h"
+#include "ee_core.h"
 ```
 
 Use this to exclude safety checks in release builds for better performance.

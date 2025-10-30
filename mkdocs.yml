@@ -1,0 +1,59 @@
+site_name: " "
+repo_url: https://github.com/eesuck1/eelib
+nav:
+  - Home: index.md
+  - Headers:
+#      - headers/headers.md
+      - Arena:
+          - headers/Arena/arena.md
+      - Array:
+          - headers/Array/array.md
+      - Core:
+          - headers/Core/core.md
+      - Deq (Double-ended queue):
+          - headers/Deq (Double-ended queue)/deq.md
+      - Dictionary:
+          - headers/Dictionary/dict.md
+      - FS (File System):
+          - headers/FS (File System)/fs.md
+      - Grid:
+          - headers/Grid/grid.md
+      - Heap:
+          - headers/Heap/heap.md
+      - Random:
+          - headers/Random/random.md
+      - Set:
+          - headers/Set/set.md
+      - String:
+          - headers/String/string.md
+      - Thread:
+          - headers/Thread/thread.md
+theme:
+  name: material
+  logo: logo1.svg
+  favicon: ee.svg
+  hide:
+    - toc
+  features:
+    # - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.annotate
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+      primary: custom
+      accent: custom
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+      primary: custom
+      accent: custom
+
+extra_css:
+  - style.css

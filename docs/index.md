@@ -3,7 +3,7 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-264653)
 ![C Standard](https://img.shields.io/badge/C-C99-F4A261)
 
-**eelib** is a header-only C library providing common data structures and utilities. 
+**eelib** is a header-only C library providing common data structures and utilities.
 
 It includes implementations for arrays, dictionaries, strings, memory management, and other structures. The library is designed to be used directly in C projects without external dependencies.
 
@@ -22,15 +22,15 @@ The library provides a set of building blocks:
     - Binary heaps (```ee_heap.h```) for priority scheduling.
     - Sets (```ee_set.h```) with efficient lookup.
     - 2D grids (```ee_grid.h```) for spatial or game-related logic.
-      
+
 - **String utilities**
 
     - ```ee_string.h``` builds on vectors to support dynamic strings, fixed-length buffers, and lightweight string views.
-      
+
 - **System utilities**
 
     - ```ee_fs.h``` for filesystem traversal and file utilities (Windows support).
-    - ```ee_random.h``` for uniform and normal random distributions.  
+    - ```ee_random.h``` for uniform and normal random distributions.
 
 ### **Supported platforms/compilers**
 
@@ -63,7 +63,7 @@ Then in your code:
 
 Since **ee** is header-only, you can also copy a single header (or a subset) into your project.
 
-> [!IMPORTANT]  
+> **Note**  
 > Some headers depend on others. Make sure you copy all required files.
 
 | Header                                                                          | Description                                                                                                                                                                                 | Dependencies                                                                                                                                                                                                                                        |
@@ -101,7 +101,7 @@ Use this to exclude safety checks in release builds for better performance.
 
 ### **SIMD Levels**
 
-SIMD levels define the width and type of vector instructions supported by the processor. 
+SIMD levels define the width and type of vector instructions supported by the processor.
 
 The library supports multiple SIMD optimization levels:
 
@@ -110,3 +110,4 @@ The library supports multiple SIMD optimization levels:
 | `EE_SIMD_LEVEL_NONE`              | 0     | No SIMD instructions; operations are scalar.                 |
 | `EE_SIMD_LEVEL_SSE`               | 1     | Supports 128-bit vector instructions for ints and floats.    |
 | `EE_SIMD_LEVEL_AVX`<br/>(default) | 2     | Supports 256-bit vector instructions for higher parallelism. |
+

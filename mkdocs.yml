@@ -30,7 +30,7 @@ nav:
           - headers/Thread/thread.md
 theme:
   name: material
-  logo: logo1.svg
+  logo: ee.svg
   favicon: ee.svg
   features:
     # - navigation.expand

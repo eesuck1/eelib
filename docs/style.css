@@ -1,3 +1,29 @@
 .md-sidebar--secondary {
     display: none !important;
 }
+
+.md-header {
+    background-color: #272a35 !important;
+}
+
+.md-header nav.md-header-nav a {
+    color: #fff !important;
+}
+
+/* Стиль для всіх блоків note у вигляді blockquote */
+.md-typeset blockquote {
+    border: 1px solid #5c5c5c;        /* базова сіра рамка навколо всього */
+    border-left: 6px solid #5c5c5c !important;   /* ліва рамка стандартна, тонка */
+    color: var(--md-default-fg);   /* текст міняється з темою */
+    background-color: rgba(245, 245, 245, 0);     /* світло-сірий фон */
+    padding: 5px;
+    margin: 1em 0;
+    border-radius: 15px;
+}
+
+/* Текст “Note” жирний, щоб виділявся */
+.md-typeset blockquote strong:first-child {
+    font-weight: bold;
+    color: var(--md-default-fg);   /* текст міняється з темою */
+}
+

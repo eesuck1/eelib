@@ -32,10 +32,9 @@ theme:
   name: material
   logo: logo1.svg
   favicon: ee.svg
-  hide:
-    - toc
   features:
     # - navigation.expand
+    - navigation.path
     - navigation.top
     - search.suggest
     - search.highlight

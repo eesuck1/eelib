@@ -10,20 +10,108 @@
     color: #fff !important;
 }
 
-/* Стиль для всіх блоків note у вигляді blockquote */
+/*!* Кольори підсвічування для Pygments *!
+code, pre code {
+    font-family: "Fira Code", Consolas, monospace;
+}
+
+code .k, pre code .k { color: #007acc; }      !* Ключові слова (if, return...) *!
+code .n, pre code .n { color: #333333; }      !* Імена змінних *!
+code .s, pre code .s { color: #a31515; }      !* Рядки *!
+code .c, pre code .c { color: #6a9955; }      !* Коментарі *!
+code .m, pre code .m { color: #098658; }      !* Числа *!
+code .o, pre code .o { color: #d19a66; }      !* Оператори (+, -, =) *!
+
+!* Темна тема *!
+[data-md-color-scheme="slate"] {
+    --md-code-bg-color: #1e1e1e;
+    --md-code-fg-color: #d4d4d4;
+}
+
+[data-md-color-scheme="slate"] code .k,
+[data-md-color-scheme="slate"] pre code .k { color: #569cd6; }
+
+[data-md-color-scheme="slate"] code .n,
+[data-md-color-scheme="slate"] pre code .n { color: #d4d4d4; }
+
+[data-md-color-scheme="slate"] code .s,
+[data-md-color-scheme="slate"] pre code .s { color: #ce9178; }
+
+[data-md-color-scheme="slate"] code .c,
+[data-md-color-scheme="slate"] pre code .c { color: #6a9955; }
+
+[data-md-color-scheme="slate"] code .m,
+[data-md-color-scheme="slate"] pre code .m { color: #b5cea8; }
+
+[data-md-color-scheme="slate"] code .o,
+[data-md-color-scheme="slate"] pre code .o { color: #d19a66; }*/
+
 .md-typeset blockquote {
-    border: 1px solid #5c5c5c;        /* базова сіра рамка навколо всього */
-    border-left: 6px solid #5c5c5c !important;   /* ліва рамка стандартна, тонка */
-    color: var(--md-default-fg);   /* текст міняється з темою */
-    background-color: rgba(245, 245, 245, 0);     /* світло-сірий фон */
+    border: 1px solid #5c5c5c;
+    border-left: 6px solid #5c5c5c !important;
+    color: var(--md-default-fg);
+    background-color: rgba(245, 245, 245, 0);
     padding: 5px;
     margin: 1em 0;
     border-radius: 15px;
 }
 
-/* Текст “Note” жирний, щоб виділявся */
 .md-typeset blockquote strong:first-child {
     font-weight: bold;
-    color: var(--md-default-fg);   /* текст міняється з темою */
+    color: var(--md-default-fg);
 }
 
+details {
+    border: 1px solid #9F9F9FFF !important;
+    background: var(--md-default-bg-color) !important;
+    border-left: 4px solid rgb(159, 159, 159) !important;
+    border-right: 0px solid rgba(204, 204, 204, 0) !important;
+    margin: 1em 0;
+    padding: 0;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.md-typeset .admonition > .admonition-title::before,
+.md-typeset details > summary::before {
+    content: none !important;
+    background: var(--md-default-bg-color) !important;
+}
+
+details > summary {
+    font-family: "Fira Code", "JetBrains Mono", monospace !important;
+    font-size: 0.58rem;
+    padding: 0.75em 1em;
+    cursor: pointer;
+    font-weight: 500;
+    background: var(--md-default-bg-color) !important;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-left: 0.9em !important;
+}
+
+[data-md-color-scheme="default"] details > summary {
+    color: #4c4c4c !important;
+}
+
+[data-md-color-scheme="slate"] details > summary {
+    color: #adb0b6 !important;
+}
+
+details > summary::after {
+    content: "›";
+    font-size: 1.2em;
+    transition: transform 0.2s ease;
+    color: #c3c3c3 !important;
+}
+
+details[open] > summary::after {
+    transform: rotate(90deg);
+}
+
+details > *:not(summary) {
+    padding-left: 0em !important;
+}

@@ -47,12 +47,28 @@ theme:
         name: Switch to dark mode
       primary: custom
       accent: custom
+      code: github-light
     - scheme: slate
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
       primary: custom
       accent: custom
+      code: dracula
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - codehilite:
+      guess_lang: false
+      linenums: false
+  - pymdownx.highlight:
+      anchor_linenums: false
+      linenums: false
+      use_pygments: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
 
 extra_css:
   - style.css

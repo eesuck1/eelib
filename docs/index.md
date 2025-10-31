@@ -1,4 +1,4 @@
-# ee — Lightweight C Utility Library
+# **ee — Lightweight C Utility Library**
 ![Version](https://img.shields.io/badge/Version-0.0.1-3DA9FC)
 ![License: MIT](https://img.shields.io/badge/License-MIT-264653)
 ![C Standard](https://img.shields.io/badge/C-C99-F4A261)

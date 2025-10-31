@@ -115,3 +115,14 @@ details[open] > summary::after {
 details > *:not(summary) {
     padding-left: 0em !important;
 }
+
+/* Зміна розміру тексту та відступів між абзацами */
+body, .md-typeset {
+    font-size: 15px; /* базовий розмір тексту на сторінці */
+    line-height: 1.5; /* міжрядковий інтервал */
+}
+
+.md-typeset p {
+    margin-top: 0.3em;  /* відступ зверху для абзацу */
+    margin-bottom: 0.3em; /* відступ знизу для абзацу */
+}

@@ -10,42 +10,6 @@
     color: #fff !important;
 }
 
-/*!* Кольори підсвічування для Pygments *!
-code, pre code {
-    font-family: "Fira Code", Consolas, monospace;
-}
-
-code .k, pre code .k { color: #007acc; }      !* Ключові слова (if, return...) *!
-code .n, pre code .n { color: #333333; }      !* Імена змінних *!
-code .s, pre code .s { color: #a31515; }      !* Рядки *!
-code .c, pre code .c { color: #6a9955; }      !* Коментарі *!
-code .m, pre code .m { color: #098658; }      !* Числа *!
-code .o, pre code .o { color: #d19a66; }      !* Оператори (+, -, =) *!
-
-!* Темна тема *!
-[data-md-color-scheme="slate"] {
-    --md-code-bg-color: #1e1e1e;
-    --md-code-fg-color: #d4d4d4;
-}
-
-[data-md-color-scheme="slate"] code .k,
-[data-md-color-scheme="slate"] pre code .k { color: #569cd6; }
-
-[data-md-color-scheme="slate"] code .n,
-[data-md-color-scheme="slate"] pre code .n { color: #d4d4d4; }
-
-[data-md-color-scheme="slate"] code .s,
-[data-md-color-scheme="slate"] pre code .s { color: #ce9178; }
-
-[data-md-color-scheme="slate"] code .c,
-[data-md-color-scheme="slate"] pre code .c { color: #6a9955; }
-
-[data-md-color-scheme="slate"] code .m,
-[data-md-color-scheme="slate"] pre code .m { color: #b5cea8; }
-
-[data-md-color-scheme="slate"] code .o,
-[data-md-color-scheme="slate"] pre code .o { color: #d19a66; }*/
-
 .md-typeset blockquote {
     border: 1px solid #5c5c5c;
     border-left: 6px solid #5c5c5c !important;

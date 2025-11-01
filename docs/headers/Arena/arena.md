@@ -7,6 +7,27 @@ Memory is allocated from a contiguous buffer with alignment handling; marks allo
 
 The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
+### **Structures**:
+
+```c
+typedef struct Arena
+{
+    size_t* marks;       // Stack of stored memory offsets for rewind points
+    u8* buffer;          // Pointer to the main aligned memory buffer
+    u8* base;            // Pointer to the raw allocated memory block
+
+    size_t  size;        // Total available arena size in bytes
+    size_t  offset;      // Current allocation offset (used size)
+    size_t  mark;        // Current depth of the mark stack
+    size_t  marks_depth; // Maximum number of mark entries available
+
+    Allocator allocator; // Custom or default allocator used for base memory
+} Arena;
+
+```
+
+### **Functions**:
+
 ??? "EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* allocator)"
 
     **Decription**
@@ -15,7 +36,7 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
     
     If `allocator` is `NULL`, the default allocator is used. Returns an `Arena` structure ready for allocations.
 
-    **Parameters**
+    **Parameters:**
     
     | Name         | Type       | Description                                                                      |
     |--------------|------------|----------------------------------------------------------------------------------|
@@ -23,7 +44,7 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
     | rewind_depth | size_t     | Number of marks that can be stored for rewinding. Use `EE_NO_REWIND` to disable. |
     | allocator    | Allocator* | 	Optional custom allocator. If `NULL`, defaults are used.                          |
 
-    **Example**
+    **Example:**
     
     ```c
     Arena arena = ee_arena_new(1024, 4, NULL);
@@ -32,17 +53,17 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void ee_arena_clear(Arena* arena)"
     
-    **Description**
+    **Description:**
     
     Clears the arena buffer by setting all bytes to zero without freeing memory.
 
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
 
-    **Example**
+    **Example:**
     
     ```c
     ee_arena_clear(&arena);
@@ -50,20 +71,20 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void\* ee_arena_alloc(Arena* arena, size_t size)"
 
-    **Description**
+    **Description:**
     
     Allocates a memory block of size bytes from the arena.
     
     Returns `NULL` if there isn’t enough space is available.
     
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
     | size  | size_t | Number of bytes to allocate. |
     
-    **Example**
+    **Example:**
     
     ```c
     void* data = ee_arena_alloc(&arena, 256);
@@ -71,13 +92,13 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void\* ee_arena_alloc_al(Arena* arena, size_t size, size_t align)"
 
-    **Description**
+    **Description:**
     
     Allocates a memory block of `size` bytes from the arena with a specified alignment.
     
     Returns `NULL` if not enough aligned space is available.
     
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                                |
     |-------|--------|--------------------------------------------|
@@ -85,7 +106,7 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
     | size  | size_t | Number of bytes to allocate.               |
     | align | size_t | Alignment in bytes (must be power of two). |
     
-    **Example**
+    **Example:**
     
     ```c
     void* aligned_data = ee_arena_alloc_al(&arena, 128, 16);
@@ -93,18 +114,18 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void ee_arena_mark(Arena* arena)"
 
-    **Description**
+    **Description:**
     
     Marks the current allocation position in the arena so it can be rewound later.
     Useful for temporary allocations.
     
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
     
-    **Example**
+    **Example:**
     
     ```c
     ee_arena_mark(&arena);
@@ -113,17 +134,17 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void ee_arena_rewind(Arena* arena)"
 
-    **Description**
+    **Description:**
     
     Restores the arena’s allocation state to the last saved mark, effectively freeing allocations made after that mark.
 
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
 
-    **Example**
+    **Example:**
     
     ```c
     ee_arena_rewind(&arena);
@@ -131,18 +152,18 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void ee_arena_reset(Arena* arena)"
 
-    **Description**
+    **Description:**
     
     Resets the arena to its initial state, clearing all marks and allocations.  
     Does not free memory — only resets internal offsets.
 
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
 
-    **Example**
+    **Example:**
     
     ```c
     ee_arena_reset(&arena);
@@ -150,17 +171,17 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void ee_arena_free(Arena* arena)"
 
-    **Description**
+    **Description:**
     
     Frees all arena memory and resets its internal state to zero.
 
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
 
-    **Example**
+    **Example:**
     
     ```c
     ee_arena_free(&arena);
@@ -168,19 +189,19 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void\* eev_arena_alloc_fn(Allocator\* allocator, size_t size)"
 
-    **Description**
+    **Description:**
     
     Allocator callback for arena-based allocation.  
     This function integrates the arena with generic allocator interfaces.
 
-    **Parameters**
+    **Parameters:**
     
     | Name      | Type        | Description                      |
     |------------|-------------|----------------------------------|
     | allocator  | Allocator*  | Pointer to the allocator object. |
     | size       | size_t      | Number of bytes to allocate.     |
 
-    **Example**
+    **Example:**
     
     ```c
     Allocator a = ee_arena_allocator(&arena);
@@ -189,12 +210,12 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void\* eev_arena_realloc_fn(Allocator\* allocator, void* buffer, size_t old_size, size_t new_size)"
 
-    **Description**
+    **Description:**
     
     Stub implementation of realloc for arena allocator (always returns `NULL`).  
     Arena memory is not resizable.
 
-    **Parameters**
+    **Parameters:**
     
     | Name      | Type        | Description                         |
     |------------|-------------|-------------------------------------|
@@ -203,7 +224,7 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
     | old_size   | size_t      | Original buffer size (unused).      |
     | new_size   | size_t      | Requested size (unused).            |
 
-    **Example**
+    **Example:**
     
     ```c
     void* p = eev_arena_realloc_fn(&allocator, ptr, 64, 128); // always returns NULL
@@ -211,19 +232,19 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE void eev_arena_free_fn(Allocator\* allocator, void\* buffer)"
 
-    **Description**
+    **Description:**
     
     Stub implementation of free for arena allocator (does nothing).  
     Arena allocations are released only via `ee_arena_reset` or `ee_arena_free`.
 
-    **Parameters**
+    **Parameters:**
     
     | Name      | Type        | Description                      |
     |------------|-------------|----------------------------------|
     | allocator  | Allocator*  | Pointer to allocator.            |
     | buffer     | void*       | Pointer to buffer (unused).      |
 
-    **Example**
+    **Example:**
     
     ```c
     eev_arena_free_fn(&allocator, ptr); // no effect
@@ -231,17 +252,17 @@ The arena can be wrapped as a standard `Allocator` using `ee_arena_allocator()`.
 
 ??? "EE_INLINE Allocator ee_arena_allocator(Arena* arena)"
 
-    **Description**
+    **Description:**
     
     Creates an `Allocator` object that uses the specified `Arena` for its memory operations.
 
-    **Parameters**
+    **Parameters:**
     
     | Name  | Type   | Description                  |
     |-------|--------|------------------------------|
     | arena | Arena* | Pointer to the arena object. |
 
-    **Example**
+    **Example:**
     
     ```c
     Allocator a = ee_arena_allocator(&arena);

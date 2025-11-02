@@ -126,9 +126,11 @@ typedef struct Arena
     **Example**
     
     ```c
-    MyStruct* s = (MyStruct*)ee_arena_alloc(&arena, sizeof(MyStruct));
-    if (s != NULL) {
-        // ... initialize and use s ...
+    MyStruct* s = ee_arena_alloc(&arena, sizeof(*s));
+    
+    if (s != NULL)
+    {
+    // ... initialize and use s ...
     }
     ```
     
@@ -226,8 +228,8 @@ typedef struct Arena
     ee_arena_mark(&arena);
     
     // Perform temporary allocations
-    void* temp_obj1 = ee_arena_alloc(&arena, 32);
-    void* temp_obj2 = ee_arena_alloc(&arena, 64);
+    void* temp_obj_1 = ee_arena_alloc(&arena, 32);
+    void* temp_obj_2 = ee_arena_alloc(&arena, 64);
     
     // ... use temp objects ...
     
@@ -321,25 +323,38 @@ typedef struct Arena
     
     An `Allocator` struct configured to use the provided `arena` for allocations.
     
-    **Example**
-    
-    ```c
-    // Create a 4K scratch arena for temporary objects
-    Arena scratch_arena = ee_arena_new(4096, EE_NO_REWIND, NULL);
-    
-    // Get the generic allocator interface for it
-    Allocator arena_iface = ee_arena_allocator(&scratch_arena);
-    
-    // Pass the interface to another system (e.g., a list constructor)
-    MyList* list = my_list_create(&arena_iface);
-    my_list_push(list, "hello"); // This allocation uses the arena
-    
-    // ... use the list for a short time ...
-    
-    // When done, free the *entire* arena at once
-    ee_arena_free(&scratch_arena);
-    // The 'list' and its data are now invalid
-    ```
+[//]: # (    **Example**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    // Create a 4K scratch arena for temporary objects)
+
+[//]: # (    Arena scratch_arena = ee_arena_new&#40;4096, EE_NO_REWIND, NULL&#41;;)
+
+[//]: # (    )
+[//]: # (    // Get the generic allocator interface for it)
+
+[//]: # (    Allocator arena_iface = ee_arena_allocator&#40;&scratch_arena&#41;;)
+
+[//]: # (    )
+[//]: # (    // Pass the interface to another system &#40;e.g., a list constructor&#41;)
+
+[//]: # (    MyList* list = my_list_create&#40;&arena_iface&#41;;)
+
+[//]: # (    my_list_push&#40;list, "hello"&#41;; // This allocation uses the arena)
+
+[//]: # (    )
+[//]: # (    // ... use the list for a short time ...)
+
+[//]: # (    )
+[//]: # (    // When done, free the *entire* arena at once)
+
+[//]: # (    ee_arena_free&#40;&scratch_arena&#41;;)
+
+[//]: # (    // The 'list' and its data are now invalid)
+
+[//]: # (    ```)
     
     **See Also**
     

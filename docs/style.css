@@ -10,6 +10,7 @@
     color: #fff !important;
 }
 
+/*
 .md-typeset blockquote {
     border: 1px solid #5c5c5c;
     border-left: 6px solid #5c5c5c !important;
@@ -24,6 +25,52 @@
     font-weight: bold;
     color: var(--md-default-fg);
 }
+*/
+
+.md-typeset .admonition {
+    border: 1px solid;
+    border-left-width: 6px !important;
+    color: var(--md-default-fg);
+    background-color: rgba(245, 245, 245, 0);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+.md-typeset .admonition-title {
+    background-color: transparent !important;
+    border-bottom: none;
+
+    font-weight: bold;
+    color: var(--md-default-fg);
+    margin: 0 0 0.6em -43px; /* Верх: 0, Право: 0, Низ: 0.6em, Ліво: 0 */
+    padding: 0;
+}
+
+.md-typeset .admonition.note {
+    border-color: #5c5c5c;
+}
+
+.md-typeset .admonition.warning {
+    border-color: #FFC107;
+    background-color: rgba(255, 193, 7, 0.05);
+    padding: 15px !important;
+}
+
+.md-typeset .admonition.warning .admonition-title {
+    color: #E6A700;
+}
+
+.md-typeset .admonition.info {
+    border-color: #3c8c30;
+    background-color: rgba(48, 255, 7, 0.05);
+    padding: 15px !important;
+}
+
+.md-typeset .admonition.info .admonition-title {
+    color: #3c8c30;
+}
+
 
 details {
     border: 1px solid #9F9F9FFF !important;
@@ -88,5 +135,5 @@ body, .md-typeset {
 
 .md-typeset p {
     margin-top: 0.3em;  /* відступ зверху для абзацу */
-    margin-bottom: 0.3em; /* відступ знизу для абзацу */
+    margin-bottom: 0.5em; /* відступ знизу для абзацу */
 }

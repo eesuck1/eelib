@@ -1,368 +1,480 @@
-# **ee_array**
+[//]: # (# **ee_array**)
 
-The `ee_array.h` defines a generic, dynamically resizable array implementation with customizable memory management.  
-It provides low-level operations for allocation, resizing, element access, and sorting, built around an explicit memory model using a user-defined or default `Allocator`.
+[//]: # ()
+[//]: # (The `ee_array.h` defines a generic, dynamically resizable array implementation with customizable memory management.  )
 
-### **Structures**:
+[//]: # (It provides low-level operations for allocation, resizing, element access, and sorting, built around an explicit memory model using a user-defined or default `Allocator`.)
 
-Structure `struct Array` defines the core container for a resizable, contiguous array.
-All array operations depend on these fields to manage allocation and indexing.
+[//]: # ()
+[//]: # (### **Structures**:)
 
-```c
-typedef struct Array 
-{
-    size_t top;          // Current used memory offset
-    size_t cap;          // Total allocated capacity in bytes
-    size_t elem_size;    // Size of each element
-    u8* buffer;          // Pointer to data buffer
-    Allocator allocator; // Memory allocator for dynamic operations
-} Array;
-```
+[//]: # ()
+[//]: # (Structure `struct Array` defines the core container for a resizable, contiguous array.)
 
-Structure `enum ArraySortType` enumerates available sorting algorithms for internal operations.
+[//]: # (All array operations depend on these fields to manage allocation and indexing.)
 
-```c
-typedef enum ArraySortType 
-{
-	EE_SORT_DEFAULT = 0,
-	EE_SORT_INSERT  = 1,
-	EE_SORT_QUICK   = 2,
-	EE_SORT_HEAP    = 3,
-	EE_SORT_INTRO   = 4,
-} ArraySortType;
-```
+[//]: # ()
+[//]: # (```c)
 
-### **Functions**:
+[//]: # (typedef struct Array )
 
-??? "EE_INLINE Array ee_array_new(size_t size, size_t elem_size, const Allocator* allocator)"
+[//]: # ({)
 
-    **Description:**
-    
-    Creates a new `Array` structure with the specified number of elements and element size.  
-    If no allocator is provided, the default allocator is used.
-    
-    **Parameters:**
-    
-    | Name      | Type             | Description                               |
-    |-----------|------------------|-------------------------------------------|
-    | size      | size_t           | Number of elements to allocate initially. |
-    | elem_size | size_t           | Size of each element in bytes.            |
-    | allocator | const Allocator* | Custom allocator (can be `NULL`).         |
-    
-    **Example:**
-    
-    ```c
-    Array arr = ee_array_new(32, sizeof(int), NULL);
-    ```
+[//]: # (    size_t top;          // Current used memory offset)
 
-??? "EE_INLINE void ee_array_free(Array* array)"
+[//]: # (    size_t cap;          // Total allocated capacity in bytes)
 
-    **Description:**
-    
-    Frees the memory used by the array and resets its internal structure.  
-    After this call, the array should not be used until reinitialized.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                  |
-    |--------|--------|------------------------------|
-    | array  | Array* | Pointer to the array object. |
-    
-    **Example:**
-    
-    ```c
-    ee_array_free(&arr);
-    ```
+[//]: # (    size_t elem_size;    // Size of each element)
 
-??? "EE_INLINE int ee_array_full(const Array* array)"
+[//]: # (    u8* buffer;          // Pointer to data buffer)
 
-    **Description:**
-    
-    Checks whether the array has reached its maximum capacity.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description              |
-    |--------|--------------|--------------------------|
-    | array  | const Array* | Pointer to the array.    |
-    
-    **Example:**
-    
-    ```c
-    if (ee_array_full(&arr)) 
-    {
-        ee_array_grow(&arr);
-    }
-    ```
+[//]: # (    Allocator allocator; // Memory allocator for dynamic operations)
 
-??? "EE_INLINE int ee_array_empty(const Array* array)"
+[//]: # (} Array;)
 
-    **Description:**
-    
-    Checks whether the array is empty.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description           |
-    |-------|--------------|-----------------------|
-    | array | const Array* | Pointer to the array. |
+[//]: # (```)
 
-    **Example:**
-    
-    ```c
-    if (ee_array_empty(&arr)) 
-    {
-        printf("Array is empty.\n");
-    }
-    ```
+[//]: # ()
+[//]: # (Structure `enum ArraySortType` enumerates available sorting algorithms for internal operations.)
 
-??? "EE_INLINE size_t ee_array_len(const Array* array)"
+[//]: # ()
+[//]: # (```c)
 
-    **Description:**
-    
-    Returns the number of elements currently stored in the array.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description            |
-    |--------|--------------|------------------------|
-    | array  | const Array* | Pointer to the array.  |
-    
-    **Example:**
-    
-    ```c
-    printf("Array length: %zu\n", ee_array_len(&arr));
-    ```
+[//]: # (typedef enum ArraySortType )
 
-??? "EE_INLINE void ee_array_clear(Array* array)"
+[//]: # ({)
 
-    **Description:**
-    
-    Removes all elements from the array but keeps the allocated capacity.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                  |
-    |-------|--------|------------------------------|
-    | array | Array* | Pointer to the array object. |
-    
-    **Example:**
-    
-    ```c
-    ee_array_clear(&arr);
-    ```
+[//]: # (	EE_SORT_DEFAULT = 0,)
 
-??? "EE_INLINE void\* ee_array_push(Array* array)"
+[//]: # (	EE_SORT_INSERT  = 1,)
 
-    **Description:**
-    
-    Adds an uninitialized element to the end of the array and returns its pointer.  
-    Automatically grows the array if necessary.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                  |
-    |--------|--------|------------------------------|
-    | array  | Array* | Pointer to the array object. |
+[//]: # (	EE_SORT_QUICK   = 2,)
 
-    **Example:**
-    
-    ```c
-    int* value = ee_array_push(&arr);
-    *value = 42;
-    ```
+[//]: # (	EE_SORT_HEAP    = 3,)
 
-??? "EE_INLINE void ee_array_pop(Array* array)"
+[//]: # (	EE_SORT_INTRO   = 4,)
 
-    **Description:**
-    
-    Removes the last element from the array.  
-    Does nothing if the array is empty.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                  |
-    |--------|--------|------------------------------|
-    | array  | Array* | Pointer to the array object. |
-    
-    **Example:**
-    
-    ```c
-    ee_array_pop(&arr);
-    ```
+[//]: # (} ArraySortType;)
 
-??? "EE_INLINE void\* ee_array_at(const Array* array, size_t index)"
+[//]: # (```)
 
-    **Description:**
-    
-    Returns a pointer to the element at the given index.
-    
-    **Parameters:**
-    
-    | Name   | Type         | Description                       |
-    |---------|--------------|-----------------------------------|
-    | array   | const Array* | Pointer to the array.             |
-    | index   | size_t       | Index of the desired element.     |
+[//]: # ()
+[//]: # (### **Functions**:)
 
-    **Example:**
-    
-    ```c
-    int* elem = ee_array_at(&arr, 5);
-    printf("%d\n", *elem);
-    ```
+[//]: # ()
+[//]: # (??? "EE_INLINE Array ee_array_new&#40;size_t size, size_t elem_size, const Allocator* allocator&#41;")
 
-??? "EE_INLINE void ee_array_grow(Array* array)"
+[//]: # ()
+[//]: # (    **Description**)
 
-    **Description:**
-    
-    Expands the capacity of the array, typically by doubling it.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                  |
-    |-------|--------|------------------------------|
-    | array | Array* | Pointer to the array object. |
-    
-    **Example:**
-    
-    ```c
-    ee_array_grow(&arr);
-    ```
+[//]: # (    )
+[//]: # (    Initializes a new dynamic array with the specified initial capacity and element size. If `allocator` is `NULL`, the function uses the default memory allocation callbacks.  )
 
-??? "EE_INLINE void ee_array_resize(Array* array, size_t new_size)"
+[//]: # (    )
+[//]: # (    The returned `Array` structure is ready for element insertion and management operations.)
 
-    **Description:**
-    
-    Changes the logical size of the array.  
-    Expands memory if `new_size` exceeds current capacity.
-    
-    **Parameters:**
-    
-    | Name     | Type   | Description                  |
-    |----------|--------|------------------------------|
-    | array    | Array* | Pointer to the array object. |
-    | new_size | size_t | New size of the array.       |
-    
-    **Example:**
-    
-    ```c
-    ee_array_resize(&arr, 128);
-    ```
+[//]: # (    )
+[//]: # (    **Parameters:**)
 
-??? "EE_INLINE void ee_array_swap(Array\* a, Array\* b)"
+[//]: # (    )
+[//]: # (    | Name       | Type             | Description |)
 
-    **Description:**
-    
-    Swaps the contents of two arrays of the same element size.
-    
-    **Parameters:**
-    
-    | Name | Type   | Description                  |
-    |------|--------|------------------------------|
-    | a    | Array* | Pointer to the first array.  |
-    | b    | Array* | Pointer to the second array. |
+[//]: # (    |-------------|------------------|--------------|)
 
-    **Example:**
-    
-    ```c
-    ee_array_swap(&arr1, &arr2);
-    ```
+[//]: # (    | size        | size_t           | Initial number of elements to allocate space for. |)
 
-??? "EE_INLINE void\* ee_array_find(const Array\* array, const void\* value, CompareFn cmp)"
+[//]: # (    | elem_size   | size_t           | Size &#40;in bytes&#41; of a single element. |)
 
-    **Description:**
-    
-    Finds the first element equal to `value` using a custom comparator.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description                               |
-    |-------|--------------|-------------------------------------------|
-    | array | const Array* | Pointer to the array.                     |
-    | value | const void*  | Value to find.                            |
-    | cmp   | CompareFn    | Comparator function (returns 0 if equal). |
-    
-    **Example:**
-    
-    ```c
-    int key = 42;
-    int* found = ee_array_find(&arr, &key, cmp_int);
-    ```
+[//]: # (    | allocator   | const Allocator* | Optional custom allocator. If `NULL`, default allocation functions are used. |)
 
-??? "EE_INLINE void ee_array_erase(Array\* array, size_t index)"
+[//]: # (    )
+[//]: # (    **Example:**)
 
-    **Description:**
-    
-    Removes an element from the array at the specified index.
-    
-    **Parameters:**
-    
-    | Name  | Type   | Description                     |
-    |-------|--------|---------------------------------|
-    | array | Array* | Pointer to the array object.    |
-    | index | size_t | Index of the element to remove. |
-    
-    **Example:**
-    
-    ```c
-    ee_array_erase(&arr, 3);
-    ```
+[//]: # (    )
+[//]: # (    ```c)
 
-??? "EE_INLINE void ee_array_insert(Array\* array, size_t index, const void\* value)"
+[//]: # (    Array arr = ee_array_new&#40;16, sizeof&#40;int&#41;, NULL&#41;;)
 
-    **Description:**
-    
-    Inserts a new element at the specified index, shifting existing elements.
-    
-    **Parameters:**
-    
-    | Name  | Type        | Description                     |
-    |-------|-------------|---------------------------------|
-    | array | Array*      | Pointer to the array object.    |
-    | index | size_t      | Position to insert new element. |
-    | value | const void* | Pointer to the value to insert. |
-    
-    **Example:**
-    
-    ```c
-    int value = 7;
-    ee_array_insert(&arr, 2, &value);
-    ```
+[//]: # (    )
+[//]: # (    int value = 42;)
 
-??? "EE_INLINE void\* ee_array_min_pred(const Array* array, CompareFn cmp)"
+[//]: # (    ee_array_push&#40;&arr, &#40;u8*&#41;&value&#41;;)
 
-    **Description:**
-    
-    Finds the element with the minimal value according to a comparator.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description                            |
-    |-------|--------------|----------------------------------------|
-    | array | const Array* | Pointer to the array.                  |
-    | cmp   | CompareFn    | Comparator function used for ordering. |
-    
-    **Example:**
-    
-    ```c
-    int* min = ee_array_min_pred(&arr, cmp_int);
-    ```
+[//]: # (    ```)
 
-??? "EE_INLINE void\* ee_array_max_pred(const Array* array, CompareFn cmp)"
+[//]: # ()
+[//]: # ()
+[//]: # (??? "EE_INLINE int ee_array_full&#40;const Array* array&#41;")
 
-    **Description:**
-    
-    Finds the element with the maximal value according to a comparator.
-    
-    **Parameters:**
-    
-    | Name  | Type         | Description                            |
-    |-------|--------------|----------------------------------------|
-    | array | const Array* | Pointer to the array.                  |
-    | cmp   | CompareFn    | Comparator function used for ordering. |
-    
-    **Example:**
-    
-    ```c
-    int* max = ee_array_max_pred(&arr, cmp_int);
-    ```
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Checks whether the given array has reached its current capacity.  )
+
+[//]: # (    Returns non-zero &#40;`true`&#41; if the array is full and cannot accommodate more elements without reallocation.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name   | Type         | Description |)
+
+[//]: # (    |--------|--------------|--------------|)
+
+[//]: # (    | array  | const Array* | Pointer to the array to check. Must not be `NULL`. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    if &#40;ee_array_full&#40;&arr&#41;&#41; {)
+
+[//]: # (        ee_array_grow&#40;&arr, 32&#41;;)
+
+[//]: # (    })
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE int ee_array_empty&#40;const Array* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Checks whether the given array is empty.  )
+
+[//]: # (    Returns non-zero &#40;`true`&#41; if the array currently contains no elements.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name   | Type         | Description |)
+
+[//]: # (    |--------|--------------|--------------|)
+
+[//]: # (    | array  | const Array* | Pointer to the array to check. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    if &#40;ee_array_empty&#40;&arr&#41;&#41; {)
+
+[//]: # (        printf&#40;"Array is empty!\n"&#41;;)
+
+[//]: # (    })
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_len&#40;const Array* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Returns the number of elements currently stored in the array.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name   | Type         | Description |)
+
+[//]: # (    |--------|--------------|--------------|)
+
+[//]: # (    | array  | const Array* | Pointer to the array whose element count is queried. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    size_t count = ee_array_len&#40;&arr&#41;;)
+
+[//]: # (    printf&#40;"Array length: %zu\n", count&#41;;)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_size&#40;const Array* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Returns the total number of bytes currently used by the array’s stored elements.  )
+
+[//]: # (    This value equals `top`, which represents the current write position in bytes.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name   | Type         | Description |)
+
+[//]: # (    |--------|--------------|--------------|)
+
+[//]: # (    | array  | const Array* | Pointer to the array to query. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    size_t used_bytes = ee_array_size&#40;&arr&#41;;)
+
+[//]: # (    printf&#40;"Used memory: %zu bytes\n", used_bytes&#41;;)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_free&#40;Array* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Releases all memory used by the given array and resets its fields to zero.  )
+
+[//]: # (    After calling this function, the `Array` structure becomes invalid for further use until reinitialized.  )
+
+[//]: # (    The function uses the array’s internal allocator to free its buffer.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name  | Type   | Description |)
+
+[//]: # (    |--------|--------|--------------|)
+
+[//]: # (    | array  | Array* | Pointer to the array to free. Must not be `NULL`, and its buffer must be allocated. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    Array arr = ee_array_new&#40;32, sizeof&#40;int&#41;, NULL&#41;;)
+
+[//]: # (    ee_array_push&#40;&arr, &#40;u8*&#41;&value&#41;;)
+
+[//]: # (    )
+[//]: # (    ee_array_free&#40;&arr&#41;; // Frees memory and resets the array)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_clear&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Resets the array’s content without freeing its allocated memory.  )
+
+[//]: # (    This function simply sets the internal `top` pointer to zero, effectively marking the array as empty while preserving its capacity.  )
+
+[//]: # (    It is useful when reusing an existing array without reallocating memory.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name  | Type   | Description |)
+
+[//]: # (    |--------|--------|--------------|)
+
+[//]: # (    | array  | Array* | Pointer to the array to clear. Must not be `NULL`, and its buffer must be valid. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    Array arr = ee_array_new&#40;16, sizeof&#40;int&#41;, NULL&#41;;)
+
+[//]: # (    ee_array_push&#40;&arr, &#40;u8*&#41;&value&#41;;)
+
+[//]: # (    )
+[//]: # (    ee_array_clear&#40;&arr&#41;; // Array is now empty but still allocated)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_reserve&#40;Array\* array, size_t size&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Expands the array’s capacity to accommodate at least `size` elements.  )
+
+[//]: # (    The function reallocates the internal buffer using the array’s allocator if the requested capacity exceeds the current one.  )
+
+[//]: # (    It does not modify existing elements or reduce the capacity if `size` is smaller than the current capacity.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name  | Type   | Description |)
+
+[//]: # (    |--------|--------|--------------|)
+
+[//]: # (    | array  | Array* | Pointer to the array whose capacity will be increased. Must not be `NULL`. |)
+
+[//]: # (    | size   | size_t | New desired number of elements. Must be greater than the current capacity &#40;in elements&#41;. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    Array arr = ee_array_new&#40;8, sizeof&#40;int&#41;, NULL&#41;;)
+
+[//]: # (    )
+[//]: # (    // Grow the array to hold at least 32 elements)
+
+[//]: # (    ee_array_reserve&#40;&arr, 32&#41;;)
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_grow&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (    **Description**)
+
+[//]: # (    )
+[//]: # (    Dynamically increases the array’s capacity by 50% &#40;1.5× the current size&#41;.  )
+
+[//]: # (    This function is typically used internally when inserting new elements into a full array.  )
+
+[//]: # (    It preserves all existing data and uses the array’s allocator to reallocate the buffer.)
+
+[//]: # (    )
+[//]: # (    **Parameters:**)
+
+[//]: # (    )
+[//]: # (    | Name  | Type   | Description |)
+
+[//]: # (    |--------|--------|--------------|)
+
+[//]: # (    | array  | Array* | Pointer to the array to grow. Must not be `NULL`, and its buffer must already be allocated. |)
+
+[//]: # (    )
+[//]: # (    **Example:**)
+
+[//]: # (    )
+[//]: # (    ```c)
+
+[//]: # (    Array arr = ee_array_new&#40;8, sizeof&#40;int&#41;, NULL&#41;;)
+
+[//]: # (    while &#40;ee_array_full&#40;&arr&#41;&#41; {)
+
+[//]: # (        ee_array_grow&#40;&arr&#41;; // Increase capacity by 1.5x)
+
+[//]: # (    })
+
+[//]: # (    ```)
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_push&#40;Array\* array, const u8\* val&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_push_zero&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_push_nothing&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE u8\* ee_array_top&#40;const Array\* array&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE u8\* ee_array_at&#40;const Array\* array, size_t i&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_pop&#40;Array\* array, u8\* out_val&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_set&#40;Array\* array, size_t i, const u8\* val&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_find_b&#40;const Array\* array, const u8\* target, size_t low, size_t high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_find_pred_b&#40;const Array\* array, const u8\* target, BinCmp predicate, size_t low, size_t high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_find_pred&#40;const Array\* array, const u8\* target, BinCmp predicate&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_min_pred_b&#40;const Array\* array, BinCmp predicate, size_t low, size_t high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_max_pred_b&#40;const Array\* array, BinCmp predicate, size_t low, size_t high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_min_pred&#40;const Array\* array, BinCmp predicate&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_max_pred&#40;const Array\* array, BinCmp predicate&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_insert&#40;Array\* array, size_t i, const u8\* val&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE size_t ee_array_find&#40;const Array\* array, const u8\* target&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_erase&#40;Array\* array, size_t i&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_swap&#40;Array\* array, size_t i, size_t j&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_insertsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_quicksort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_heapsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_introsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high, i32 max_depth&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_sort&#40;Array\* array, BinCmp cmp, ArraySortType type&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_fill&#40;Array\* array, const u8\* val, size_t a, size_t b&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE Array ee_array_copy&#40;Array\* array, Allocator\* allocator&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_reverse&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_swap_n_pop&#40;Array\* array, size_t i, u8\* out_val&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE void ee_array_reset&#40;Array\* array&#41;")
+
+[//]: # ()
+[//]: # (??? "EE_INLINE u8\* ee_array_emplace&#40;Array\* array&#41;")

@@ -43,7 +43,7 @@ Clone or download the repository and add the `utils/` directory to your include 
 This way you get access to all modules at once:
 
 ```bash
-git clone [https://github.com/eesuck1/eelib.git](https://github.com/eesuck1/eelib.git)
+git clone https://github.com/eesuck1/eelib.git
 ```
 
 Then in your code:

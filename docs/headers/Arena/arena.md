@@ -367,7 +367,7 @@ typedef struct Arena
 
 ## Allocator Functions
 
-These functions are the internal implementations used by the [`Allocator`](../Core/core.md##Structures) struct returned by `ee_arena_allocator()`. End-users typically do not call these functions directly.
+These functions are the internal implementations used by the [`struct Allocator`](../Core/core.md##Structures) returned by `ee_arena_allocator()`. End-users typically do not call these functions directly.
 
 ??? "EE_INLINE void\* eev_arena_alloc_fn(Allocator\* allocator, size_t size)"
 
@@ -415,16 +415,18 @@ These functions are the internal implementations used by the [`Allocator`](../Co
     
     The `realloc_fn` implementation for the arena-backed allocator.
     
-    This function **always returns `NULL`**. Due to their linear nature, arenas do not support reallocating individual memory blocks. The parameters are ignored.
+    This function **always returns `NULL`**. Due to their linear nature, arenas do not support reallocating individual memory blocks.
     
     **Parameters**
     
+    ***Note**: As this operation is not supported by the arena, all parameters are ignored.*
+    
     | Name | Type | Description |
     | :--- | :--- | :--- |
-    | `allocator` | `Allocator*` | (Ignored) |
-    | `buffer` | `void*` | (Ignored) |
-    | `old_size` | `size_t` | (Ignored) |
-    | `new_size` | `size_t` | (Ignored) |
+    | `allocator` | `Allocator*` | — |
+    | `buffer` | `void*` | — |
+    | `old_size` | `size_t` | — |
+    | `new_size` | `size_t` | — |
     
     **Returns**
     
@@ -448,14 +450,16 @@ These functions are the internal implementations used by the [`Allocator`](../Co
     
     The `free_fn` implementation for the arena-backed allocator.
     
-    This function **does nothing**. Arenas do not support freeing individual memory blocks. All memory allocated from an arena is freed simultaneously by calling [`ee_arena_reset()`](#ee_arena_reset), [`ee_arena_rewind()`](#ee_arena_rewind), or [`ee_arena_free()`](#ee_arena_free) on the `Arena` object itself.
+    This function **does nothing** (it is a "no-op"). Arenas do not support freeing individual memory blocks. All memory must be freed at once by resetting or freeing the entire arena.
     
     **Parameters**
     
+    ***Note**: As this operation is not supported by the arena, all parameters are ignored.*
+    
     | Name | Type | Description |
     | :--- | :--- | :--- |
-    | `allocator` | `Allocator*` | (Ignored) |
-    | `buffer` | `void*` | (Ignored) |
+    | `allocator` | `Allocator*` | — |
+    | `buffer` | `void*` | — |
     
     **See Also**
     

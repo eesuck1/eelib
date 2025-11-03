@@ -32,10 +32,11 @@
     border-left-width: 6px !important;
     color: var(--md-default-fg);
     background-color: rgba(245, 245, 245, 0);
-    padding: 15px;
+    padding: 15px !important;
     border-radius: 10px;
     box-shadow: none;
 }
+
 
 .md-typeset .admonition-title {
     background-color: transparent !important;

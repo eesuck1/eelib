@@ -102,7 +102,7 @@ The library supports multiple SIMD optimization levels:
 | `EE_SIMD_LEVEL_SSE`               | 1     | Supports 128-bit vector instructions for ints and floats.    |
 | `EE_SIMD_LEVEL_AVX`<br/>(default) | 2     | Supports 256-bit vector instructions for higher parallelism. |
 
-## **Roadmap**
+### **Roadmap**
 
 Work is currently in progress for:
 

@@ -11,22 +11,22 @@ It includes implementations for arrays, dictionaries, strings, memory management
 The library provides a set of building blocks:
 
 - **Memory management**
-  - Arena allocator (`ee_arena.h`) for fast, linear allocations.
-  - Optional custom allocators via `ee_core.h`.
+    - Arena allocator (`ee_arena.h`) for fast, linear allocations.
+    - Optional custom allocators via `ee_core.h`.
 
 - **Dynamic containers**
-  - Resizable vectors (`ee_array.h`) with automatic growth.
-  - Hash maps (`ee_dict.h`) with open addressing.
-  - Binary heaps (`ee_heap.h`) for priority scheduling.
-  - Sets (`ee_set.h`) with efficient lookup.
-  - 2D grids (`ee_grid.h`) for spatial or game-related logic.
+    - Resizable vectors (`ee_array.h`) with automatic growth.
+    - Hash maps (`ee_dict.h`) with open addressing.
+    - Binary heaps (`ee_heap.h`) for priority scheduling.
+    - Sets (`ee_set.h`) with efficient lookup.
+    - 2D grids (`ee_grid.h`) for spatial or game-related logic.
 
 - **String utilities**
-  - `ee_string.h` provides utilities for dynamic strings, fixed-length buffers, and lightweight string views.
+    - `ee_string.h` provides utilities for dynamic strings, fixed-length buffers, and lightweight string views.
 
 - **System utilities**
-  - `ee_fs.h` for filesystem traversal and file utilities (Windows-only).
-  - `ee_random.h` for uniform and normal random distributions.
+    - `ee_fs.h` for filesystem traversal and file utilities (Windows-only).
+    - `ee_random.h` for uniform and normal random distributions.
 
 ### Platforms and Compilers
 
@@ -43,7 +43,7 @@ Clone or download the repository and add the `utils/` directory to your include 
 This way you get access to all modules at once:
 
 ```bash
-git clone [https://github.com/eesuck1/eelib.git](https://github.com/eesuck1/eelib.git)
+git clone https://github.com/eesuck1/eelib.git
 ```
 
 Then in your code:

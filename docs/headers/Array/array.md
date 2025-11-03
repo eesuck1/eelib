@@ -33,8 +33,9 @@ typedef struct Array
     | buffer    | u8\*      | Pointer to the contiguous memory block holding the elements.                            |
     | allocator | Allocator | The underlying allocator used for `buffer` (e.g., default malloc/free).                 |
 
+### **Enumerations (enum)**:
 
-Structure `enum ArraySortType` enumerates available sorting algorithms for internal operations.
+`enum ArraySortType` lists available sorting algorithms for internal operations.
 
 ```c
 typedef enum ArraySortType
@@ -47,7 +48,7 @@ typedef enum ArraySortType
 } ArraySortType;
 ```
 
-??? "Structure values"
+??? "Enum values"
 
     | Value           | Description                                                                                                              |
     |-----------------|--------------------------------------------------------------------------------------------------------------------------|
@@ -574,127 +575,127 @@ typedef enum ArraySortType
     
     * [`ee_array_at()`](#ee_array_at)
 
-[//]: # (??? "EE_INLINE size_t ee_array_find_b&#40;const Array\* array, const u8\* target, size_t low, size_t high&#41;")
+??? "EE_INLINE size_t ee_array_find_b(const Array\* array, const u8\* target, size_t low, size_t high)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_find_pred_b&#40;const Array\* array, const u8\* target, BinCmp predicate, size_t low, size_t high&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_find_pred&#40;const Array\* array, const u8\* target, BinCmp predicate&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_min_pred_b&#40;const Array\* array, BinCmp predicate, size_t low, size_t high&#41;")
+??? "EE_INLINE size_t ee_array_find_pred_b(const Array\* array, const u8\* target, BinCmp predicate, size_t low, size_t high)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_max_pred_b&#40;const Array\* array, BinCmp predicate, size_t low, size_t high&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_min_pred&#40;const Array\* array, BinCmp predicate&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_max_pred&#40;const Array\* array, BinCmp predicate&#41;")
+??? "EE_INLINE size_t ee_array_find_pred(const Array\* array, const u8\* target, BinCmp predicate)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_insert&#40;Array\* array, size_t i, const u8\* val&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE size_t ee_array_find&#40;const Array\* array, const u8\* target&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_erase&#40;Array\* array, size_t i&#41;")
+??? "EE_INLINE size_t ee_array_min_pred_b(const Array\* array, BinCmp predicate, size_t low, size_t high)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_swap&#40;Array\* array, size_t i, size_t j&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_insertsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_quicksort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
+??? "EE_INLINE size_t ee_array_max_pred_b(const Array\* array, BinCmp predicate, size_t low, size_t high)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_heapsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_introsort&#40;Array\* array, BinCmp cmp, i64 low, i64 high, i32 max_depth&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_sort&#40;Array\* array, BinCmp cmp, ArraySortType type&#41;")
+??? "EE_INLINE size_t ee_array_min_pred(const Array\* array, BinCmp predicate)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_fill&#40;Array\* array, const u8\* val, size_t a, size_t b&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE Array ee_array_copy&#40;Array\* array, Allocator\* allocator&#41;")
 
-[//]: # (    )
-[//]: # (    <span id="ee_array_copy"></span>)
+??? "EE_INLINE size_t ee_array_max_pred(const Array\* array, BinCmp predicate)"
 
-[//]: # ()
-[//]: # (    **Syntax**)
 
-[//]: # (    )
-[//]: # (    ```c)
 
-[//]: # (    Array ee_array_copy&#40;Array* array, Allocator* allocator&#41;;)
+??? "EE_INLINE void ee_array_insert(Array\* array, size_t i, const u8\* val)"
 
-[//]: # (    ```)
 
-[//]: # (    )
-[//]: # (    **Description**)
 
-[//]: # (    )
-[//]: # (    Creates a deep copy of an existing array.)
+??? "EE_INLINE size_t ee_array_find(const Array\* array, const u8\* target)"
 
-[//]: # (    )
-[//]: # (    A new buffer is allocated using the specified `allocator` &#40;or default if `NULL`&#41;, and the *entire capacity* &#40;`cap`&#41; of the source array is copied, regardless of its current `top`.)
 
-[//]: # (    )
-[//]: # (    **Parameters**)
 
-[//]: # (    )
-[//]: # (    | Name | Type | Description |)
+??? "EE_INLINE void ee_array_erase(Array\* array, size_t i)"
 
-[//]: # (    | :--- | :--- | :--- |)
 
-[//]: # (    | `array` | `Array*` | A pointer to the source array to copy. |)
 
-[//]: # (    | `allocator` | `Allocator*` | Optional. The allocator to use for the *new* array. Pass `NULL` for default. |)
+??? "EE_INLINE void ee_array_swap(Array\* array, size_t i, size_t j)"
 
-[//]: # (    )
-[//]: # (    **Returns**)
 
-[//]: # (    )
-[//]: # (    A new `Array` struct containing a copy of the source array's data.)
 
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_reverse&#40;Array\* array&#41;")
+??? "EE_INLINE void ee_array_insertsort(Array\* array, BinCmp cmp, i64 low, i64 high)"
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_swap_n_pop&#40;Array\* array, size_t i, u8\* out_val&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE void ee_array_reset&#40;Array\* array&#41;")
 
-[//]: # ()
-[//]: # ()
-[//]: # (??? "EE_INLINE u8\* ee_array_emplace&#40;Array\* array&#41;")
+??? "EE_INLINE void ee_array_quicksort(Array\* array, BinCmp cmp, i64 low, i64 high)"
+
+
+
+??? "EE_INLINE void ee_array_heapsort(Array\* array, BinCmp cmp, i64 low, i64 high)"
+
+
+
+??? "EE_INLINE void ee_array_introsort(Array\* array, BinCmp cmp, i64 low, i64 high, i32 max_depth)"
+
+
+
+??? "EE_INLINE void ee_array_sort(Array\* array, BinCmp cmp, ArraySortType type)"
+
+
+
+??? "EE_INLINE void ee_array_fill(Array\* array, const u8\* val, size_t a, size_t b)"
+
+
+
+??? "EE_INLINE Array ee_array_copy(Array\* array, Allocator\* allocator)"
+
+    
+    <span id="ee_array_copy"></span>
+
+
+    **Syntax**
+
+    
+    ```c
+
+    Array ee_array_copy(Array* array, Allocator* allocator);
+
+    ```
+
+    
+    **Description**
+
+    
+    Creates a deep copy of an existing array.
+
+    
+    A new buffer is allocated using the specified `allocator` (or default if `NULL`), and the *entire capacity* (`cap`) of the source array is copied, regardless of its current `top`.
+
+    
+    **Parameters**
+
+    
+    | Name | Type | Description |
+
+    | :--- | :--- | :--- |
+
+    | `array` | `Array*` | A pointer to the source array to copy. |
+
+    | `allocator` | `Allocator*` | Optional. The allocator to use for the *new* array. Pass `NULL` for default. |
+
+    
+    **Returns**
+
+    
+    A new `Array` struct containing a copy of the source array's data.
+
+
+??? "EE_INLINE void ee_array_reverse(Array\* array)"
+
+
+
+??? "EE_INLINE void ee_array_swap_n_pop(Array\* array, size_t i, u8\* out_val)"
+
+
+
+??? "EE_INLINE void ee_array_reset(Array\* array)"
+
+
+
+??? "EE_INLINE u8\* ee_array_emplace(Array\* array)"

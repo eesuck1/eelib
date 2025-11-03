@@ -101,3 +101,14 @@ The library supports multiple SIMD optimization levels:
 | `EE_SIMD_LEVEL_NONE`              | 0     | No SIMD instructions; operations are scalar.                 |
 | `EE_SIMD_LEVEL_SSE`               | 1     | Supports 128-bit vector instructions for ints and floats.    |
 | `EE_SIMD_LEVEL_AVX`<br/>(default) | 2     | Supports 256-bit vector instructions for higher parallelism. |
+
+## **Roadmap**
+
+Work is currently in progress for:
+
+* Dynamic Heap (`ee_heap`)
+* File System Utilities (`ee_fs`)
+* Double-Ended Queue (`ee_deq`)
+* ...and more.
+
+These modules will be added to the documentation as soon as they are stable and ready for use.

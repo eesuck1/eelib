@@ -27,11 +27,11 @@ typedef struct Array
 
     | Members    | Type      | Description                                                                             |
     |-----------|-----------|-----------------------------------------------------------------------------------------|
-    | top       | size_t    | The current size (length) of the array in bytes. (`top == ee_array_len() * elem_size`). |
-    | cap       | size_t    | The total allocated capacity of the `buffer` in bytes.                                  |
-    | elem_size | size_t    | The size of a single element in bytes (e.g., `sizeof(int)`).                            |
-    | buffer    | u8\*      | Pointer to the contiguous memory block holding the elements.                            |
-    | allocator | Allocator | The underlying allocator used for `buffer` (e.g., default malloc/free).                 |
+    | `top`       | `size_t`    | The current size (length) of the array in bytes. (`top == ee_array_len() * elem_size`). |
+    | `cap`       | `size_t`    | The total allocated capacity of the `buffer` in bytes.                                  |
+    | `elem_size` | `size_t`    | The size of a single element in bytes (e.g., `sizeof(int)`).                            |
+    | `buffer`    | `u8*`      | Pointer to the contiguous memory block holding the elements.                            |
+    | `allocator` | `Allocator` | The underlying allocator used for `buffer` (e.g., default malloc/free).                 |
 
 ## Enumerations (enum)
 
@@ -52,11 +52,11 @@ typedef enum ArraySortType
 
     | Value           | Description                                                                                                              |
     |-----------------|--------------------------------------------------------------------------------------------------------------------------|
-    | EE_SORT_DEFAULT | Defaults to Introspective Sort (`EE_SORT_INTRO`).                                                                        |
-    | EE_SORT_INSERT  | Insertion Sort. Efficient for small or nearly-sorted arrays.                                                             |
-    | EE_SORT_QUICK   | Quicksort. Fast on average, but with O(n^2^) worst-case.                                                                 |
-    | EE_SORT_HEAP    | Heapsort. Guaranteed O(n log n) performance.                                                                             |
-    | EE_SORT_INTRO   | Introspective Sort. A hybrid that starts with Quicksort and switches to Heapsort to prevent worst-case O(n^2^) behavior. |
+    | `EE_SORT_DEFAULT` | Defaults to Introspective Sort (`EE_SORT_INTRO`).                                                                        |
+    | `EE_SORT_INSERT`  | Insertion Sort. Efficient for small or nearly-sorted arrays.                                                             |
+    | `EE_SORT_QUICK`   | Quicksort. Fast on average, but with O(n^2^) worst-case.                                                                 |
+    | `EE_SORT_HEAP`    | Heapsort. Guaranteed O(n log n) performance.                                                                             |
+    | `EE_SORT_INTRO`   | Introspective Sort. A hybrid that starts with Quicksort and switches to Heapsort to prevent worst-case O(n^2^) behavior. |
 
 
 ## Functions (Lifecycle)

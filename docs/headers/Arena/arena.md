@@ -24,8 +24,20 @@ typedef struct Arena
 
     Allocator allocator; // Custom or default allocator used for base memory
 } Arena;
-
 ```
+
+??? "Structure members"
+
+    | Members       | Type        | Description                                                                                                                          |
+    |---------------|-------------|--------------------------------------------------------------------------------------------------------------------------------------|
+    | `marks`       | `size_t*`   | Pointer to the rewind stack, which stores `offset` values. `NULL` if `marks_depth` is `EE_NO_REWIND`.                                |
+    | `buffer`      | `u8*`       | Pointer to the aligned start of the usable memory buffer where allocations occur.                                                    |
+    | `base`        | `u8*`       | Pointer to the raw, unaligned memory block received from the underlying `allocator`. This is the pointer used for `ee_arena_free()`. |
+    | `size`        | `size_t`    | Total usable capacity of the `buffer` in bytes.                                                                                      |
+    | `offset`      | `size_t`    | The current allocation "watermark". All memory from `buffer` to `buffer + offset` is considered used.                                |
+    | `mark`        | `size_t`    | The current count of active rewind marks on the `marks` stack.                                                                       |
+    | `marks_depth` | `size_t`    | The maximum number of marks that can be stored.                                                                                      |
+    | `allocator`   | `Allocator` | The underlying allocator interface (e.g., default malloc/free) used to acquire the `base` memory block.                              |
 
 ## Functions
 

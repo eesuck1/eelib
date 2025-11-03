@@ -1,4 +1,4 @@
-# **ee_array**
+# **ee_array.h**
 
 `ee_array.h` provides a **type-generic dynamic array** (vector) implementation.
 

@@ -1,4 +1,4 @@
-# ee_arena.h
+# **ee_arena.h**
 
 `ee_arena.h` provides a **linear memory allocator** with optional **rewind support**.
 

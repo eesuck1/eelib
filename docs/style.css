@@ -1,5 +1,36 @@
-.md-sidebar--secondary {
-    display: none !important;
+
+
+/*
+ * Це спрацює для екранів, ширших за 1220px
+ * (стандартна точка зламу 'lg' в MkDocs Material)
+ */
+@media screen and (min-width: 1220px) {
+
+    /* 1. Звужуємо вашу ліву навігаційну панель */
+    /* (За замовчуванням її ширина 20rem) */
+    .md-sidebar.md-sidebar--primary {
+        width: 8rem !important;
+
+    }
+
+    /* 2. Звужуємо праву панель (Table of Contents) */
+    /* (Вона теж має 20rem за замовчуванням) */
+    .md-sidebar.md-sidebar--secondary {
+        width: 8rem !important;
+        margin-left: 10rem !important;
+    }
+
+    /* 3. Компенсуємо це, розширюючи контент */
+    .md-content {
+        width: 10rem !important;
+        /* Зміщуємо лівий відступ, щоб відповідати лівій панелі */
+        /* (За замовчуванням 20rem) */
+        margin-left: 1rem !important;
+
+        /* Зміщуємо правий відступ, щоб відповідати правій панелі */
+        /* (За замовчуванням 20rem) */
+        margin-right: -8rem !important;
+    }
 }
 
 .md-header {

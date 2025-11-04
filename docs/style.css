@@ -169,3 +169,11 @@ body, .md-typeset {
 .md-content:has([id^="glossary-"]) h3 + p {
     margin-left: 40px !important;
 }
+
+#chatbase-bubble-window {
+    /* Встановіть бажану ширину */
+    width: 450px !important;
+
+    /* Встановіть бажану максимальну висоту */
+    max-height: 1000px !important;
+}

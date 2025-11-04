@@ -97,7 +97,6 @@
     color: #3c8c30;
 }
 
-
 details {
     border: 1px solid #9F9F9FFF !important;
     background: var(--md-default-bg-color) !important;
@@ -153,22 +152,20 @@ details > *:not(summary) {
     padding-left: 0em !important;
 }
 
-/* Зміна розміру тексту та відступів між абзацами */
 body, .md-typeset {
-    font-size: 15px; /* базовий розмір тексту на сторінці */
-    line-height: 1.5; /* міжрядковий інтервал */
+    font-size: 15px;
+    line-height: 1.5;
 }
 
 .md-typeset p {
-    margin-top: 0.3em;  /* відступ зверху для абзацу */
-    margin-bottom: 0.5em; /* відступ знизу для абзацу */
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
 }
-/*/* Стилізуємо заголовок 3-го рівня */
+
 .md-content:has([id^="glossary-"]) h3 {
     margin-left: 20px !important;
 }
 
-/* Стилізуємо параграф-визначення */
 .md-content:has([id^="glossary-"]) h3 + p {
     margin-left: 40px !important;
-}*/
+}

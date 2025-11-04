@@ -20,7 +20,7 @@ nav:
 theme:
   name: material
   logo: ee.svg
-  favicon: ee.svg
+  favicon: logo.svg
   features:
     - navigation.expand
     - navigation.path
@@ -44,6 +44,7 @@ theme:
       primary: custom
       accent: custom
       code: dracula
+  custom_dir: overrides
 
 markdown_extensions:
   - admonition

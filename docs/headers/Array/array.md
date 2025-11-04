@@ -4,6 +4,25 @@
 
 It defines the `Array` structure, which manages a contiguous, resizable memory buffer. This module is designed to be type-agnostic; it operates on raw bytes by tracking the `elem_size` (element size). All element manipulation (push, pop, set, at) is done via `memcpy` or direct byte-pointer access.
 
+## Defines
+
+This header provides several helper macros for constants and type-safe element access.
+
+### Constants
+
+| Macro              | Description                                                                                                                                                                                             |
+|:-------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `EE_ARRAY_INVALID` | A sentinel value (`(size_t)-1`) returned by search functions (e.g., [`ee_array_find()`](#ee_array_find)) when no matching element is found.                                                             |
+| `EE_ARRAY_SORT_TH` | The size threshold (typically `16` elements) for [`ee_array_introsort()`](#ee_array_introsort). Sub-arrays smaller than or equal to this size will be sorted using the faster Insertion Sort algorithm. |
+
+### Helper Macros
+
+| Macro                               | Description                                                                                                                                                                                                                          |
+|:------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `EE_ARRAY_RECAST(v_ptr, i, dtype)`  | **(Recommended)** Gets a correctly typed pointer (`dtype*`) to the element at index `i` from an array pointer `v_ptr`. This is the safest way to access elements. <br> **Example:** `int* val = EE_ARRAY_RECAST(&my_array, 0, int);` |
+| `EE_ARRAY_PTR_GET(v_ptr, i, d_ptr)` | Copies the element at index `i` from an array pointer `v_ptr` *into* the destination pointer `d_ptr`. <br> **Example:** `int val; EE_ARRAY_PTR_GET(&my_array, 0, &val);`                                                             |
+| `EE_ARRAY_GET(v, i, d)`             | Copies the element at index `i` from an array struct `v` *into* the destination variable `d`. <br> **Example:** `int val; EE_ARRAY_GET(my_array, 0, val);`                                                                           |
+
 ## Structures
 
 Structure `struct Array` defines the core container for a resizable, contiguous array.
@@ -34,6 +53,8 @@ typedef struct Array
     | `allocator` | `Allocator` | The underlying allocator used for `buffer` (e.g., default malloc/free).                 |
 
 ## Enumerations (enum)
+
+<span id="arraysorttype"></span>
 
 `enum ArraySortType` lists available sorting algorithms for internal operations.
 
@@ -397,8 +418,8 @@ typedef enum ArraySortType
     
     **See Also**
     
-    * `ee_array_set()`
-    * `ee_array_top()`
+    * [`ee_array_set()`](#ee_array_set)
+    * [`ee_array_top()`](#ee_array_top)
 
 ??? "EE_INLINE u8\* ee_array_top(const Array\* array)"
 
@@ -437,8 +458,8 @@ typedef enum ArraySortType
     
     **See Also**
     
-    * `ee_array_at()`
-    * `ee_array_pop()`
+    * [`ee_array_at()`](#ee_array_at)
+    * [`ee_array_pop()`](#ee_array_pop)
 
 ## Functions (Modifiers)
 

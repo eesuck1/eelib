@@ -6,6 +6,12 @@ It defines the primary `Arena` structure, which manages memory allocation from a
 
 The arena can be wrapped as a standard `Allocator` interface using `ee_arena_allocator()` for compatibility with other `ee_lib` components that require an allocator.
 
+## Defines
+
+| Macro          | Description                                                                                                                                                                                                                                                            |
+|:---------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `EE_NO_REWIND` | A constant value (typically `0`) used as the `rewind_depth` parameter in [`ee_arena_new()`](#ee_arena_new) to specify that the arena should not allocate a rewind stack. <br/>This disables the `ee_arena_mark()` and `ee_arena_rewind()` functions for that instance. |
+
 ## Structures
 
 Structure `struct Arena` representing the memory arena. It manages the underlying buffer, tracks the current allocation offset, and maintains the optional rewind stack.

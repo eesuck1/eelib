@@ -16,6 +16,7 @@ nav:
 #      - Set: headers/Set/set.md
       - String: headers/String/string.md
 #      - Thread: headers/Thread/thread.md
+  - Glossary: glossary.md
 theme:
   name: material
   logo: ee.svg
@@ -58,6 +59,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.caret
+  - toc:
+     toc_depth: 2
 
 extra_css:
   - style.css

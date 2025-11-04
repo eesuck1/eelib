@@ -163,3 +163,12 @@ body, .md-typeset {
     margin-top: 0.3em;  /* відступ зверху для абзацу */
     margin-bottom: 0.5em; /* відступ знизу для абзацу */
 }
+/*/* Стилізуємо заголовок 3-го рівня */
+.md-content:has([id^="glossary-"]) h3 {
+    margin-left: 20px !important;
+}
+
+/* Стилізуємо параграф-визначення */
+.md-content:has([id^="glossary-"]) h3 + p {
+    margin-left: 40px !important;
+}*/

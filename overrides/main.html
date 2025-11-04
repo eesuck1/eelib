@@ -9,19 +9,29 @@
 
 <script>
     (function() {
-        const customWidth = "680px";
-        const customMaxHeight = "660px";
+        const initialWidth = "450px";
+        const initialMaxHeight = "600px";
 
-        function overrideChatbaseStyles() {
+        function applyResizableStyles() {
             const chatWindow = document.getElementById("chatbase-bubble-window");
 
             if (chatWindow) {
-                chatWindow.style.setProperty("width", customWidth, "important");
-                chatWindow.style.setProperty("max-height", customMaxHeight, "important");
+
+                chatWindow.style.setProperty("width", initialWidth, "important");
+                chatWindow.style.setProperty("max-height", initialMaxHeight, "important");
+
+
+                chatWindow.style.setProperty("resize", "both", "important");
+
+                chatWindow.style.setProperty("overflow", "auto", "important");
+
+                chatWindow.style.setProperty("min-width", "350px", "important");
+                chatWindow.style.setProperty("min-height", "400px", "important");
+
+                clearInterval(styleInterval);
             }
         }
-
-        setInterval(overrideChatbaseStyles, 500);
+        const styleInterval = setInterval(applyResizableStyles, 500);
     })();
 </script>
 {% endblock %}

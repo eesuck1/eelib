@@ -194,17 +194,30 @@ The effective SIMD level is controlled by defining `EE_SIMD_EFFECTIVE_MAX_LEVEL`
 
 These macros map to the correct intrinsic (e.g., `_mm256_...`, `_mm_...`) or C function (`_ee_...`) based on the compiled SIMD level.
 
-| Macro                                                               | ,Description                                                                      |
-|:--------------------------------------------------------------------|:----------------------------------------------------------------------------------|
-| EE_SIMD_BYTES                                                       | ,"The size of the SIMD register in bytes (e.g., 32 for AVX, 16 for SSE)."         |
-| ee_loadu_si                                                         | ,Loads unaligned data into a ee_simd_i register.                                  |
-| ee_load_si                                                          | ,Loads aligned data into a ee_simd_i register.                                    |
-| ee_store_si                                                         | ,Stores data from a ee_simd_i register to an aligned address.                     |
-| ee_set1_epi8/16/32/64                                               | ,"Broadcasts a single value (8, 16, 32, or 64-bit) to all lanes of the register." |
-| ee_cmpeq_epi8/16/32/64                                              | ,Performs a per-lane comparison for equality.                                     |
-| ee_movemask_epi8                                                    | ,Creates a bitmask from the most significant bit of each 8-bit lane.              |
-| ee_setzero_si                                                       | ,Returns a ee_simd_i register filled with zeros.                                  |
-| ee_or_si / ee_xor_si / ee_and_si                                    | ,"Per-lane bitwise OR, XOR, and AND operations."                                  |
-| ee_srl_epi... / ee_sll_epi...                                       | ,Per-lane bitwise shift right/left.                                               |
-| ee_prefetch                                                         | ,Prefetches data into the cache.                                                  |
-| (...etc.),(The header defines many other standard SIMD operations.) |                                                                                   |    
+[//]: # (| Macro                                                               | Description                                                                      |)
+
+[//]: # (|:--------------------------------------------------------------------|:---------------------------------------------------------------------------------|)
+
+[//]: # (| EE_SIMD_BYTES                                                       | "The size of the SIMD register in bytes &#40;e.g., 32 for AVX, 16 for SSE&#41;."         |)
+
+[//]: # (| ee_loadu_si                                                         | Loads unaligned data into a ee_simd_i register.                                  |)
+
+[//]: # (| ee_load_si                                                          | Loads aligned data into a ee_simd_i register.                                    |)
+
+[//]: # (| ee_store_si                                                         | Stores data from a ee_simd_i register to an aligned address.                     |)
+
+[//]: # (| ee_set1_epi8/16/32/64                                               | "Broadcasts a single value &#40;8, 16, 32, or 64-bit&#41; to all lanes of the register." |)
+
+[//]: # (| ee_cmpeq_epi8/16/32/64                                              | Performs a per-lane comparison for equality.                                     |)
+
+[//]: # (| ee_movemask_epi8                                                    | Creates a bitmask from the most significant bit of each 8-bit lane.              |)
+
+[//]: # (| ee_setzero_si                                                       | Returns a ee_simd_i register filled with zeros.                                  |)
+
+[//]: # (| ee_or_si / ee_xor_si / ee_and_si                                    | "Per-lane bitwise OR, XOR, and AND operations."                                  |)
+
+[//]: # (| ee_srl_epi... / ee_sll_epi...                                       | Per-lane bitwise shift right/left.                                               |)
+
+[//]: # (| ee_prefetch                                                         | Prefetches data into the cache.                                                  |)
+
+[//]: # (| &#40;...etc.&#41;,&#40;The header defines many other standard SIMD operations.&#41; |                                                                                  |    )

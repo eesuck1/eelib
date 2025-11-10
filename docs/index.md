@@ -3,63 +3,65 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-264653)
 ![C Standard](https://img.shields.io/badge/C-C99-F4A261)
 
-**ee** is a header-only C library providing common data structures and utilities.
+**ee** is a header-only C library that provides common data structures and utilities. It is designed to be self-contained and easily integrated into any C99 project, as it has **no external dependencies**.
 
-It includes implementations for arrays, dictionaries, strings, memory management, and other structures. The library is designed to be used directly in C projects without external dependencies.
-
-## Features
-The library provides a set of building blocks:
+### Features
+The library provides the following modules:
 
 - **Memory management**
-    - Arena allocator (`ee_arena.h`) for fast, linear allocations.
-    - Optional custom allocators via `ee_core.h`.
+    - `ee_arena.h`: A fast, linear arena allocator.
+    - `ee_core.h`: Support for optional custom allocators.
 
 - **Dynamic containers**
-    - Resizable vectors (`ee_array.h`) with automatic growth.
-    - Hash maps (`ee_dict.h`) with open addressing.
-    - Binary heaps (`ee_heap.h`) for priority scheduling.
-    - Sets (`ee_set.h`) with efficient lookup.
-    - 2D grids (`ee_grid.h`) for spatial or game-related logic.
+    - `ee_array.h`: Dynamic arrays (also known as resizable vectors).
+    - `ee_dict.h`: Hash maps with open addressing.
+    - `ee_heap.h`: Binary heaps, often used for priority queues.
+    - `ee_set.h`: Hash sets for efficient item lookup.
+    - `ee_grid.h`: 2D grids, useful for spatial data or games.
 
 - **String utilities**
-    - `ee_string.h` provides utilities for dynamic strings, fixed-length buffers, and lightweight string views.
+    - `ee_string.h`: Utilities for dynamic strings, fixed-length buffers, and lightweight string views.
 
 - **System utilities**
-    - `ee_fs.h` for filesystem traversal and file utilities (Windows-only).
-    - `ee_random.h` for uniform and normal random distributions.
+    - `ee_fs.h`: Filesystem traversal and file utilities (Windows-only).
+    - `ee_random.h`: Random number generation (uniform and normal distributions).
 
-## Platforms and Compilers
+### Platforms and Compilers
 
 * **Minimum C Standard:** C99
 * **Tested Compilers:** MSVC, GCC
 
-## Installation
+### Installation
 
-There are two ways to use **ee** in your project:
+As **ee** is a header-only library, you do not need to build it separately. You can use it in your project in two ways.
 
-#### Option 1: Clone the Repository
-
-Clone or download the repository and add the `utils/` directory to your include path.
-This way you get access to all modules at once:
-
-```bash
-git clone https://github.com/eesuck1/eelib.git
-```
-
-Then in your code:
-
-```c
-#include "ee_array.h"
-#include "ee_dict.h"
-#include "ee_string.h"
-#include "ee_arena.h"
-```
-
-#### Option 2: Copy Individual Headers
-
-Since **ee** is header-only, you can also copy a single header (or a subset) into your project.
+#### Option 1: Clone the repository
 
 !!! note "Note"  
+    This method gives you access to all modules.
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/eesuck1/eelib.git
+    ```
+
+2. Add the `utils/` directory to your project's include path.
+
+3. Include the headers you need in your C source files:
+
+    ```c
+    #include "ee_array.h"
+    #include "ee_dict.h"
+    #include "ee_string.h.h"
+    // ...and so on
+    ```
+
+#### Option 2: Copy headers individually
+
+You can also copy individual header files directly into your project.
+
+!!! warning "Important"  
     Some headers depend on others. Make sure you copy all required files.
 
 | Header                                                                          | Description                                                             | Dependencies                                                                                                                                                                                                                                        |
@@ -71,9 +73,15 @@ Since **ee** is header-only, you can also copy a single header (or a subset) int
 | [`ee_random.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_random.h) | Provides PRNG for uniform and normal distributions.                     | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
 | [`ee_string.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_string.h) | Provides dynamic strings, fixed-buffers, and string views.              | Depends on [`ee_core.h`](https://github.com/eesuck1/eelib/blob/master/utils/ee_core.h).                                                                                                                                                             |
 
-## Disabling Assertions (`EE_NO_ASSERT`)
+### **Configuration**
 
-Defining `EE_NO_ASSERT` before including header disables all `EE_ASSERT()` checks at compile time.
+You can configure the library's behavior by defining specific macros before including its headers.
+
+#### **Disabling assertions (`EE_NO_ASSERT`)**
+
+By default, the library uses `EE_ASSERT()` to validate conditions at runtime (e.g., checking for null pointers). You can disable these checks for performance in a release build.
+
+Define `EE_NO_ASSERT` **before** including any `ee` headers to remove all assertion checks at compile time.
 
 | Mode                             | Description                                                 |
 |:---------------------------------|:------------------------------------------------------------|
@@ -83,28 +91,25 @@ Defining `EE_NO_ASSERT` before including header disables all `EE_ASSERT()` check
 **Usage example**:
 
 ```c
+// Disable all assertions for this build
 #define EE_NO_ASSERT
 
 #include "ee_core.h"
+#include "ee_array.h"
 ```
 
-Use this to exclude safety checks in release builds for better performance.
+#### **SIMD support**
 
-## **SIMD Levels**
-
-SIMD levels define the width and type of vector instructions supported by the processor.
-
-The library supports multiple SIMD optimization levels:
+The library includes support for SIMD (Single Instruction, Multiple Data) optimizations. The available levels are:
 
 | Macro                             | Value | Description                                                  |
 |:----------------------------------|:------|:-------------------------------------------------------------|
-| `EE_SIMD_LEVEL_NONE`              | 0     | No SIMD instructions; operations are scalar.                 |
+| `EE_SIMD_LEVEL_NONE`              | 0     | No SIMD instructions; all operations are scalar.             |
 | `EE_SIMD_LEVEL_SSE`               | 1     | Supports 128-bit vector instructions for ints and floats.    |
 | `EE_SIMD_LEVEL_AVX`<br/>(default) | 2     | Supports 256-bit vector instructions for higher parallelism. |
 
-## **Roadmap**
+### **Roadmap**
 
-We are actively developing `ee_lib` and plan to release additional modules in the future.
 Work is currently in progress for:
 
 * Dynamic Heap (`ee_heap`)
@@ -112,4 +117,4 @@ Work is currently in progress for:
 * Double-Ended Queue (`ee_deq`)
 * ...and more.
 
-These modules will be added to the documentation as soon as they are stable and ready for production use.
+These modules will be added to the documentation as they become stable.

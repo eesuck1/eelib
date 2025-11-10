@@ -35,7 +35,7 @@ The library provides the following modules:
 
 As **ee** is a header-only library, you do not need to build it separately. You can use it in your project in two ways.
 
-#### Option 1: Clone the Repository
+#### Option 1: Clone the repository
 
 > [!NOTE]  
 > This method gives you access to all modules.

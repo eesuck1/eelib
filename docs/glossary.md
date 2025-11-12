@@ -1,17 +1,34 @@
-# Glossary
-
-This page defines key terms and concepts used throughout the `ee_lib` library. Use the search bar to find a specific term, or browse by category using the Table of Contents on the right.
-
+---
+hide:
+  - toc
 ---
 
-## Core Concepts
+# Glossary
+
+This page defines key terms and concepts used throughout the `eelib` library. 
+
+To find a specific term, use: 
+
+* the search box on the top panel
+* the category buttons below to filter the list
+
+<div id="glossary-filter-buttons" class="filter-buttons">
+  <button class="filter-btn" data-tag="core">Core Concepts</button>
+  <button class="filter-btn" data-tag="datastructures">Data Structures</button>
+  <button class="filter-btn" data-tag="memory">Memory Management</button>
+  <button class="filter-btn" data-tag="algorithms">Algorithms</button>
+  <button class="filter-btn" data-tag="platform">Platform & SIMD</button>
+</div>
+---
+
+## Core Concepts {: data-tags="core"}
 <span id="glossary-core"></span>
 
 Core ideas and types that are used by all other modules.
 
 ### Allocator (Interface)
 <span id="glossary-allocator"></span>
-The standard `ee_lib` interface (defined in [`ee_core.h`](headers/Core/core.md#allocator-interface)) that provides a generic API for memory operations (`alloc_fn`, `realloc_fn`, `free_fn`).
+The standard `eelib` interface (defined in [`ee_core.h`](headers/Core/core.md#allocator-interface)) that provides a generic API for memory operations (`alloc_fn`, `realloc_fn`, `free_fn`).
 
 ### BinCmp
 <span id="glossary-bincmp"></span>
@@ -19,14 +36,14 @@ A function pointer type (`int (*)(const void* a, const void* b)`) used for gener
 
 ### Type-punning
 <span id="glossary-type-punning"></span>
-An operation (e.g., `*(u64*)ptr`) that reinterprets a block of memory as a different type. `ee_lib` provides safe (`ee_eq_safe_...`) and unsafe (`ee_eq_...`) versions of these operations.
+An operation (e.g., `*(u64*)ptr`) that reinterprets a block of memory as a different type. `eelib` provides safe (`ee_eq_safe_...`) and fast (`ee_eq_...`) versions of these operations.
 
 ---
 
-## Data Structures
+## Data Structures {: data-tags="datastructures"}
 <span id="glossary-datastructures"></span>
 
-The main data structure modules provided by `ee_lib`.
+The main data structure modules provided by `eelib`.
 
 ### Arena
 <span id="glossary-arena"></span>
@@ -38,7 +55,7 @@ A type-generic dynamic array (vector) that manages a contiguous, resizable memor
 
 ---
 
-## Memory Management
+## Memory Management {: data-tags="memory"}
 <span id="glossary-memory"></span>
 
 Terms related to how memory is allocated, aligned, and freed.
@@ -85,10 +102,10 @@ The operation of restoring an **Arena's** allocation **Offset** to the value of 
 
 ---
 
-## Algorithms
+## Algorithms {: data-tags="algorithms"}
 <span id="glossary-algorithms"></span>
 
-Specific algorithms used within `ee_lib` modules.
+Specific algorithms used within `eelib` modules.
 
 ### Introsort
 <span id="glossary-introsort"></span>
@@ -100,7 +117,7 @@ An O(1) (constant time) algorithm for removing an element from an `Array` by ove
 
 ---
 
-## Platform & SIMD
+## Platform & SIMD {: data-tags="platform"}
 <span id="glossary-platform"></span>
 
 Terms related to platform-specific, low-level, or compiler-dependent features.
@@ -112,3 +129,20 @@ Terms related to platform-specific, low-level, or compiler-dependent features.
 ### SSE / AVX
 <span id="glossary-sse-avx"></span>
 (Streaming SIMD Extensions / Advanced Vector Extensions). Specific **SIMD** instruction sets supported by modern x86 CPUs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

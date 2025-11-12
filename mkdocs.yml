@@ -6,15 +6,15 @@ nav:
 #      - headers/headers.md
       - Arena: headers/Arena/arena.md
       - Array: headers/Array/array.md
-      - Core: headers/Core/core.md
+##      - Core: headers/Core/core.md
 #      - Deq (Double-ended queue): headers/Deq (Double-ended queue)/deq.md
-      - Dictionary: headers/Dictionary/dict.md
+##      - Dictionary: headers/Dictionary/dict.md
 #      - FS (File System): headers/FS (File System)/fs.md
 #      - Grid: headers/Grid/grid.md
 #      - Heap: headers/Heap/heap.md
       - Random: headers/Random/random.md
 #      - Set: headers/Set/set.md
-      - String: headers/String/string.md
+##      - String: headers/String/string.md
 #      - Thread: headers/Thread/thread.md
   - Glossary: glossary.md
 theme:
@@ -47,6 +47,7 @@ theme:
   custom_dir: overrides
 
 markdown_extensions:
+  - attr_list
   - admonition
   - pymdownx.details
   - pymdownx.superfences
@@ -65,3 +66,6 @@ markdown_extensions:
 
 extra_css:
   - style.css
+
+extra_javascript:
+  - glossary_filter.js

@@ -44,12 +44,12 @@ typedef struct Array
     !!! warning "Important" 
         Note that `top` and `cap` store the size in bytes, not element count. Use `ee_array_len()` to get the number of elements.
 
-    | Members    | Type      | Description                                                                             |
-    |-----------|-----------|-----------------------------------------------------------------------------------------|
+    | Members     | Type        | Description                                                                             |
+    |:------------|:------------|:----------------------------------------------------------------------------------------|
     | `top`       | `size_t`    | The current size (length) of the array in bytes. (`top == ee_array_len() * elem_size`). |
     | `cap`       | `size_t`    | The total allocated capacity of the `buffer` in bytes.                                  |
     | `elem_size` | `size_t`    | The size of a single element in bytes (e.g., `sizeof(int)`).                            |
-    | `buffer`    | `u8*`      | Pointer to the contiguous memory block holding the elements.                            |
+    | `buffer`    | `u8*`       | Pointer to the contiguous memory block holding the elements.                            |
     | `allocator` | `Allocator` | The underlying allocator used for `buffer` (e.g., default malloc/free).                 |
 
 ## Enumerations (enum)
@@ -104,7 +104,7 @@ typedef enum ArraySortType
     | :--- | :--- | :--- |
     | `size` | `size_t` | The initial **element capacity** (number of elements, not bytes). Must be greater than 0. |
     | `elem_size` | `size_t` | The size of a single element. Use `sizeof(your_type)`. Must be greater than 0. |
-    | `allocator` | `const Allocator*` | Optional. A pointer to a custom [`Allocator`](../Core/core.md#allocator). Pass `NULL` to use the default `ee_lib` allocator. |
+    | `allocator` | `const Allocator*` | Optional. A pointer to a custom [`Allocator`](../Core/core.md#allocator). Pass `NULL` to use the default `eelib` allocator. |
     
     **Returns**
     

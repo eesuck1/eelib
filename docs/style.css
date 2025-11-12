@@ -11,7 +11,7 @@
     /* (Вона теж має 20rem за замовчуванням) */
     .md-sidebar.md-sidebar--secondary {
         width: 8rem !important;
-        margin-left: 10rem !important;
+        margin-left: 5rem !important;
     }
 
     /* 3. Компенсуємо це, розширюючи контент */
@@ -19,11 +19,11 @@
         width: 10rem !important;
         /* Зміщуємо лівий відступ, щоб відповідати лівій панелі */
         /* (За замовчуванням 20rem) */
-        margin-left: 1rem !important;
+        margin-left: 3rem !important;
 
         /* Зміщуємо правий відступ, щоб відповідати правій панелі */
         /* (За замовчуванням 20rem) */
-        margin-right: -8rem !important;
+        margin-right: -1px !important;
     }
 }
 
@@ -35,6 +35,36 @@
     color: #fff !important;
 }
 
+[data-md-color-scheme="slate"] {
+    --md-default-fg-color: #ececec;
+    --md-primary-fg-color: #6579f1;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+    color: #60b7ff;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-code-bg-color: rgba(44, 46, 60, 0.9);
+}
+[data-md-color-scheme="slate"] .md-typeset pre,
+[data-md-color-scheme="slate"] .md-typeset code {
+
+    border: 1px solid rgba(48, 50, 65, 0.9);
+
+    border-radius: 2px;
+}
+
+[data-md-color-scheme="default"] {
+    --md-code-bg-color: rgb(238, 238, 238);
+}
+[data-md-color-scheme="default"] .md-typeset pre,
+[data-md-color-scheme="default"] .md-typeset code {
+
+    border: 1px solid rgb(231, 231, 231);
+
+    border-radius: 2px;
+}
 /*
 .md-typeset blockquote {
     border: 1px solid #5c5c5c;
@@ -168,4 +198,40 @@ body, .md-typeset {
 
 .md-content:has([id^="glossary-"]) h3 + p {
     margin-left: 40px !important;
+}
+
+/********************************************/
+
+/* --- Стилі для кнопок фільтра глосарію --- */
+
+.filter-buttons {
+    margin-bottom: 1.5em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    display: inline-block;
+    padding: 0.5em 1em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    /* Використовуємо змінні з вашої теми mkdocs */
+    border: 1px solid var(--md-default-fg-color--lighter);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--md-default-fg-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: var(--md-default-fg-color--lightest);
+    color: var(--md-default-fg-color);
+}
+
+.filter-btn.active {
+    background-color: var(--md-primary-fg-color);
+    border-color: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
 }

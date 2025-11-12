@@ -20,6 +20,19 @@ typedef struct Array
 	Allocator allocator;
 } Array;
 
+typedef struct Linked_Array
+{
+	size_t top;
+	size_t cap;
+	size_t elem_size;
+	u8* buffer;
+	Allocator allocator;
+
+	size_t seg_size;
+	struct Linked_Array* next;
+	struct Linked_Array* tail;
+} Linked_Array;
+
 typedef enum ArraySortType
 {
 	EE_SORT_DEFAULT = 0,
@@ -831,6 +844,206 @@ EE_INLINE u8* ee_array_emplace(Array* array)
 	array->top += array->elem_size;
 
 	return out;
+}
+
+
+EE_INLINE Linked_Array ee_linked_array_new(size_t size, size_t elem_size, const Allocator* allocator)
+{
+	EE_ASSERT(size > 0, "Invalid arraytor size (%zu)", size);
+	EE_ASSERT(elem_size > 0, "Invalid arraytor elem_size (%zu)", elem_size);
+
+	Linked_Array out = { 0 };
+
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
+	out.top = 0;
+	out.seg_size = ee_next_pow_2(size);
+	out.cap = elem_size * out.seg_size;
+	out.elem_size = elem_size;
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	
+	out.next = NULL;
+	out.tail = NULL;
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Array.buffer", out.cap);
+
+	return out;
+}
+
+EE_INLINE Linked_Array* ee_linked_array_alloc(size_t size, size_t elem_size, const Allocator* allocator)
+{
+	EE_ASSERT(size > 0, "Invalid arraytor size (%zu)", size);
+	EE_ASSERT(elem_size > 0, "Invalid arraytor elem_size (%zu)", elem_size);
+
+	Linked_Array out = { 0 };
+
+	if (allocator == NULL)
+	{
+		out.allocator.alloc_fn = ee_default_alloc;
+		out.allocator.realloc_fn = ee_default_realloc;
+		out.allocator.free_fn = ee_default_free;
+		out.allocator.context = NULL;
+	}
+	else
+	{
+		memcpy(&out.allocator, allocator, sizeof(Allocator));
+	}
+
+	EE_ASSERT(out.allocator.alloc_fn != NULL, "Trying to set NULL alloc callback");
+	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
+	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
+
+	out.top = 0;
+	out.seg_size = ee_next_pow_2(size);
+	out.cap = elem_size * out.seg_size;
+	out.elem_size = elem_size;
+	out.buffer = (u8*)out.allocator.alloc_fn(&out.allocator, out.cap);
+	
+	out.next = NULL;
+	out.tail = NULL;
+
+	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Array.buffer", out.cap);
+
+	Linked_Array* out_ptr = (Linked_Array*)out.allocator.alloc_fn(&out.allocator, sizeof(Linked_Array));
+	
+	EE_ASSERT(out_ptr != NULL, "Unable to allocate (%zu) bytes for bucket array structure", sizeof(Linked_Array));
+
+	memcpy(out_ptr, &out, sizeof(Linked_Array));
+
+	return out_ptr;
+}
+
+EE_INLINE i32 ee_linked_array_full(const Linked_Array* arr)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+
+	return arr->top >= arr->cap;
+}
+
+EE_INLINE i32 ee_linked_array_empty(const Linked_Array* arr)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+
+	return arr->top == 0;
+}
+
+EE_INLINE size_t ee_linked_array_len(const Linked_Array* arr)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+
+	size_t len = 0;
+	const Linked_Array* node = arr;
+
+	while (node != NULL)
+	{
+		len += node->top / node->elem_size;
+		node = node->next;
+	}
+
+	return len;
+}
+
+EE_INLINE size_t ee_linked_array_size(const Linked_Array* arr)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+	size_t len = 0;
+	const Linked_Array* node = arr;
+	while (node != NULL)
+	{
+		len += node->top;
+		node = node->next;
+	}
+	return len;
+}
+
+EE_INLINE void ee_linked_array_push(Linked_Array* arr, const u8* val)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+	EE_ASSERT(val != NULL, "Trying to dereference NULL value");
+
+	Linked_Array* tail = (arr->tail != NULL) ? arr->tail : arr;
+
+	if (ee_linked_array_full(tail))
+	{
+		tail->next = ee_linked_array_alloc(arr->seg_size, arr->elem_size, &arr->allocator);
+		
+		EE_ASSERT(tail->next != NULL, "Failed to allocate new segment");
+		
+		tail = tail->next;
+		arr->tail = tail;
+	}
+
+	memcpy(&tail->buffer[tail->top], val, arr->elem_size);
+	tail->top += arr->elem_size;
+}
+
+EE_INLINE void ee_linked_array_pop(Linked_Array* arr, u8* out_val)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+	EE_ASSERT(!ee_linked_array_empty(arr), "Trying to pop from empty array");
+
+	Linked_Array* tail = (arr->tail != NULL) ? arr->tail : arr;
+
+	if (tail->top == 0)
+	{
+		Linked_Array* node = arr;
+		Linked_Array* last_nonempty = NULL;
+		
+		while (node != NULL)
+		{
+			if (node->top > 0) 
+			{
+				last_nonempty = node;
+			}
+
+			node = node->next;
+		}
+		
+		EE_ASSERT(last_nonempty != NULL, "Trying to pop from empty array");
+		
+		tail = last_nonempty;
+		arr->tail = tail;
+	}
+
+	tail->top -= arr->elem_size;
+
+	if (out_val != NULL)
+	{
+		memcpy(out_val, &tail->buffer[tail->top], arr->elem_size);
+	}
+}
+
+EE_INLINE u8* ee_linked_array_at(Linked_Array* arr, size_t i)
+{
+	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+
+	const Linked_Array* head = arr;
+	i32 bits = ee_first_bit_u64(arr->seg_size);
+	size_t next_arrs = i >> bits;
+
+	for (size_t j = 0; j < next_arrs && arr != NULL; ++j)
+	{
+		arr = arr->next;
+	}
+
+	EE_ASSERT(arr != NULL, "Index (%zu) out of bounds for bucket array with len (%zu)", i, ee_linked_array_len(head));
+
+	size_t index = i & (arr->seg_size - 1);
+	return &arr->buffer[index * arr->elem_size];
 }
 
 EE_EXTERN_C_END

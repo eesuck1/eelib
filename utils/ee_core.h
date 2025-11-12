@@ -47,7 +47,11 @@
 #endif
 
 #ifndef EE_FIND_FIRST_BIT_INVALID
-#define EE_FIND_FIRST_BIT_INVALID    (32)
+#define EE_FIND_FIRST_BIT_INVALID       (32)
+#endif
+
+#ifndef EE_FIND_FIRST_BIT_INVALID_64
+#define EE_FIND_FIRST_BIT_INVALID_64    (64)
 #endif
 
 #ifndef EE_TRUE
@@ -985,6 +989,36 @@ EE_INLINE i32 ee_first_bit_u32(u32 x)
 #endif
 }
 
+EE_INLINE i32 ee_first_bit_u64(u64 x)
+{
+#if defined(__BMI__)
+    return _tzcnt_u64(x);
+#elif defined(__GNUC__) || defined(__clang__)
+    return x ? __builtin_ctzll(x) : EE_FIND_FIRST_BIT_INVALID_64;
+#elif defined(_MSC_VER)
+    unsigned long i;
+
+    if (_BitScanForward64(&i, x))
+    {
+        return (i32)i;
+    }
+    else
+    {
+        return EE_FIND_FIRST_BIT_INVALID_64;
+    }
+#else
+    for (i32 i = 0; i < 64; ++i)
+    {
+        if (x & (1u << i))
+        {
+            return i;
+        }
+    }
+
+    return EE_FIND_FIRST_BIT_INVALID_64;
+#endif
+}
+
 EE_INLINE i32 ee_first_zero_u32(u32 x)
 {
     return ee_first_bit_u32(~x);
@@ -1066,6 +1100,11 @@ EE_INLINE int ee_log2_u32(u32 x)
 EE_INLINE u64 ee_min_u64(u64 a, u64 b)
 {
     return a < b ? a : b;
+}
+
+EE_INLINE u64 ee_max_u64(u64 a, u64 b)
+{
+    return a > b ? a : b;
 }
 
 EE_INLINE size_t ee_round_up_pow2(size_t x, size_t r)

@@ -1,0 +1,237 @@
+@media screen and (min-width: 1220px) {
+
+    /* 1. Звужуємо вашу ліву навігаційну панель */
+    /* (За замовчуванням її ширина 20rem) */
+    .md-sidebar.md-sidebar--primary {
+        width: 8rem !important;
+
+    }
+
+    /* 2. Звужуємо праву панель (Table of Contents) */
+    /* (Вона теж має 20rem за замовчуванням) */
+    .md-sidebar.md-sidebar--secondary {
+        width: 8rem !important;
+        margin-left: 5rem !important;
+    }
+
+    /* 3. Компенсуємо це, розширюючи контент */
+    .md-content {
+        width: 10rem !important;
+        /* Зміщуємо лівий відступ, щоб відповідати лівій панелі */
+        /* (За замовчуванням 20rem) */
+        margin-left: 3rem !important;
+
+        /* Зміщуємо правий відступ, щоб відповідати правій панелі */
+        /* (За замовчуванням 20rem) */
+        margin-right: -1px !important;
+    }
+}
+
+.md-header {
+    background-color: #272a35 !important;
+}
+
+.md-header nav.md-header-nav a {
+    color: #fff !important;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-default-fg-color: #ececec;
+    --md-primary-fg-color: #6579f1;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+    color: #60b7ff;
+}
+
+[data-md-color-scheme="slate"] {
+    --md-code-bg-color: rgba(44, 46, 60, 0.9);
+}
+[data-md-color-scheme="slate"] .md-typeset pre,
+[data-md-color-scheme="slate"] .md-typeset code {
+
+    border: 1px solid rgba(48, 50, 65, 0.9);
+
+    border-radius: 2px;
+}
+
+[data-md-color-scheme="default"] {
+    --md-code-bg-color: rgb(238, 238, 238);
+}
+[data-md-color-scheme="default"] .md-typeset pre,
+[data-md-color-scheme="default"] .md-typeset code {
+
+    border: 1px solid rgb(231, 231, 231);
+
+    border-radius: 2px;
+}
+/*
+.md-typeset blockquote {
+    border: 1px solid #5c5c5c;
+    border-left: 6px solid #5c5c5c !important;
+    color: var(--md-default-fg);
+    background-color: rgba(245, 245, 245, 0);
+    padding: 5px;
+    margin: 1em 0;
+    border-radius: 15px;
+}
+
+.md-typeset blockquote strong:first-child {
+    font-weight: bold;
+    color: var(--md-default-fg);
+}
+*/
+
+.md-typeset .admonition {
+    border: 1px solid;
+    border-left-width: 6px !important;
+    color: var(--md-default-fg);
+    background-color: rgba(245, 245, 245, 0);
+    padding: 15px !important;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+
+.md-typeset .admonition-title {
+    background-color: transparent !important;
+    border-bottom: none;
+
+    font-weight: bold;
+    color: var(--md-default-fg);
+    margin: 0 0 0.6em -43px; /* Верх: 0, Право: 0, Низ: 0.6em, Ліво: 0 */
+    padding: 0;
+}
+
+.md-typeset .admonition.note {
+    border-color: #5c5c5c;
+}
+
+.md-typeset .admonition.warning {
+    border-color: #FFC107;
+    background-color: rgba(255, 193, 7, 0.05);
+    padding: 15px !important;
+}
+
+.md-typeset .admonition.warning .admonition-title {
+    color: #E6A700;
+}
+
+.md-typeset .admonition.info {
+    border-color: #3c8c30;
+    background-color: rgba(48, 255, 7, 0.05);
+    padding: 15px !important;
+}
+
+.md-typeset .admonition.info .admonition-title {
+    color: #3c8c30;
+}
+
+details {
+    border: 1px solid #9F9F9FFF !important;
+    background: var(--md-default-bg-color) !important;
+    border-left: 4px solid rgb(159, 159, 159) !important;
+    border-right: 0px solid rgba(204, 204, 204, 0) !important;
+    margin: 1em 0;
+    padding: 0;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.md-typeset .admonition > .admonition-title::before,
+.md-typeset details > summary::before {
+    content: none !important;
+    background: var(--md-default-bg-color) !important;
+}
+
+details > summary {
+    font-family: "Fira Code", "JetBrains Mono", monospace !important;
+    font-size: 0.58rem;
+    padding: 0.75em 1em;
+    cursor: pointer;
+    font-weight: 500;
+    background: var(--md-default-bg-color) !important;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-left: 0.9em !important;
+}
+
+[data-md-color-scheme="default"] details > summary {
+    color: #4c4c4c !important;
+}
+
+[data-md-color-scheme="slate"] details > summary {
+    color: #adb0b6 !important;
+}
+
+details > summary::after {
+    content: "›";
+    font-size: 1.2em;
+    transition: transform 0.2s ease;
+    color: #c3c3c3 !important;
+}
+
+details[open] > summary::after {
+    transform: rotate(90deg);
+}
+
+details > *:not(summary) {
+    padding-left: 0em !important;
+}
+
+body, .md-typeset {
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.md-typeset p {
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
+}
+
+.md-content:has([id^="glossary-"]) h3 {
+    margin-left: 20px !important;
+}
+
+.md-content:has([id^="glossary-"]) h3 + p {
+    margin-left: 40px !important;
+}
+
+/********************************************/
+
+/* --- Стилі для кнопок фільтра глосарію --- */
+
+.filter-buttons {
+    margin-bottom: 1.5em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.filter-btn {
+    display: inline-block;
+    padding: 0.5em 1em;
+    font-size: 0.85rem;
+    font-weight: 600;
+    /* Використовуємо змінні з вашої теми mkdocs */
+    border: 1px solid var(--md-default-fg-color--lighter);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--md-default-fg-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: var(--md-default-fg-color--lightest);
+    color: var(--md-default-fg-color);
+}
+
+.filter-btn.active {
+    background-color: var(--md-primary-fg-color);
+    border-color: var(--md-primary-fg-color);
+    color: var(--md-primary-bg-color);
+}

@@ -19,16 +19,16 @@ Structure `struct Arena` representing the memory arena. It manages the underlyin
 ```c
 typedef struct Arena
 {
-    size_t* marks;       // Stack of stored memory offsets for rewind points
-    u8* buffer;          // Pointer to the main aligned memory buffer
-    u8* base;            // Pointer to the raw allocated memory block
+    size_t* marks;       
+    u8* buffer;         
+    u8* base;          
 
-    size_t  size;        // Total available arena size in bytes
-    size_t  offset;      // Current allocation offset (used size)
-    size_t  mark;        // Current depth of the mark stack
-    size_t  marks_depth; // Maximum number of mark entries available
+    size_t  size;       
+    size_t  offset;    
+    size_t  mark;        
+    size_t  marks_depth;
 
-    Allocator allocator; // Custom or default allocator used for base memory
+    Allocator allocator;
 } Arena;
 ```
 

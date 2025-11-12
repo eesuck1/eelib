@@ -1,7 +1,7 @@
 [//]: # (# **ee_core.h**)
 
 [//]: # ()
-[//]: # (`ee_core.h` is the foundational header for the `ee_lib` library. It provides essential definitions that are used by all other modules.)
+[//]: # (`ee_core.h` is the foundational header for the `eelib` library. It provides essential definitions that are used by all other modules.)
 
 [//]: # ()
 [//]: # (This header includes:)
@@ -129,7 +129,7 @@
 [//]: # (    **Description**)
 
 [//]: # (    )
-[//]: # (    The primary assertion macro for `ee_lib`. Checks if `cond` is true.)
+[//]: # (    The primary assertion macro for `eelib`. Checks if `cond` is true.)
 
 [//]: # (    )
 [//]: # (    If `cond` is false, this macro will print a formatted error message &#40;`fmt`, ...&#41; to `stderr`, including the file, line number, and function name where the assertion failed. It will then terminate the program by calling `exit&#40;1&#41;`.)

@@ -4,7 +4,7 @@
 
 It defines the primary `Arena` structure, which manages memory allocation from a contiguous buffer. This module is ideal for temporary allocations where memory can be freed all at once or reverted to a previous state efficiently.
 
-The arena can be wrapped as a standard `Allocator` interface using `ee_arena_allocator()` for compatibility with other `ee_lib` components that require an allocator.
+The arena can be wrapped as a standard `Allocator` interface using `ee_arena_allocator()` for compatibility with other `eelib` components that require an allocator.
 
 ## Defines
 

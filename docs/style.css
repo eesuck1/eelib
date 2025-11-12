@@ -36,7 +36,7 @@
 }
 
 [data-md-color-scheme="slate"] {
-    --md-default-fg-color: #ffffff;
+    --md-default-fg-color: #ececec;
     --md-primary-fg-color: #6579f1;
 }
 
@@ -220,7 +220,7 @@ body, .md-typeset {
     border: 1px solid var(--md-default-fg-color--lighter);
     border-radius: 4px;
     background-color: transparent;
-    color: var(--md-default-fg-color--light);
+    color: var(--md-default-fg-color);
     cursor: pointer;
     transition: all 0.2s ease;
 }

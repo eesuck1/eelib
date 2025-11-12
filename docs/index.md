@@ -6,7 +6,7 @@
 **ee** is a header-only C library that provides common data structures and utilities. It is designed to be self-contained and easily integrated into any C99 project, as it has **no external dependencies**.
 
 ### Features
-The library provides the following modules:
+The `eelib` library provides the following modules:
 
 - **Memory management**
     - `ee_arena.h`: A fast, linear arena allocator.

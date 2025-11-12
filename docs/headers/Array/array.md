@@ -104,7 +104,7 @@ typedef enum ArraySortType
     | :--- | :--- | :--- |
     | `size` | `size_t` | The initial **element capacity** (number of elements, not bytes). Must be greater than 0. |
     | `elem_size` | `size_t` | The size of a single element. Use `sizeof(your_type)`. Must be greater than 0. |
-    | `allocator` | `const Allocator*` | Optional. A pointer to a custom [`Allocator`](../Core/core.md#allocator). Pass `NULL` to use the default `ee_lib` allocator. |
+    | `allocator` | `const Allocator*` | Optional. A pointer to a custom [`Allocator`](../Core/core.md#allocator). Pass `NULL` to use the default `eelib` allocator. |
     
     **Returns**
     

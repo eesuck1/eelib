@@ -1,3 +1,8 @@
+---
+hide:
+  - toc
+---
+
 # Glossary
 
 This page defines key terms and concepts used throughout the `ee_lib` library. 

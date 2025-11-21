@@ -1184,6 +1184,65 @@ EE_DEFINE_CPY_FN(64);
 
 EE_EXTERN_C_END
 
+EE_INLINE size_t ee_strnlen(const char* str, size_t max_len)
+{
+    EE_ASSERT(str != NULL, "Trying to get length of NULL string");
+
+    size_t upper = ee_round_down_pow2(max_len, EE_SIMD_BYTES);
+    size_t i = 0;
+
+    ee_simd_i pattern = ee_set1_epi8('\0');
+
+    for (; i < upper; i += EE_SIMD_BYTES)
+    {
+        ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str[i]);
+        ee_simd_i match = ee_cmpeq_epi8(group, pattern);
+
+        i32 mask = ee_movemask_epi8(match);
+
+        if (mask)
+        {
+            size_t found = ee_first_bit_u32(mask);
+
+            return i + found;
+        }
+    }
+
+    for (; i < max_len; ++i)
+    {
+        if (str[i] == '\0')
+        {
+            return i;
+        }
+    }
+
+    return i;
+}
+
+EE_INLINE size_t ee_strlen(const char* str)
+{
+    EE_ASSERT(str != NULL, "Trying to get length of NULL string");
+
+    ee_simd_i pattern = ee_set1_epi8('\0');
+
+    for (size_t i = 0;; i += EE_SIMD_BYTES)
+    {
+        ee_simd_i group = ee_loadu_si((const ee_simd_i*)&str[i]);
+        ee_simd_i match = ee_cmpeq_epi8(group, pattern);
+
+        i32 mask = ee_movemask_epi8(match);
+
+        if (mask)
+        {
+            size_t found = ee_first_bit_u32(mask);
+
+            return i + found;
+        }
+    }
+
+    return (size_t)-1;
+}
+
 //
 // End
 //

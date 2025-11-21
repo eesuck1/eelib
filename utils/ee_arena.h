@@ -487,6 +487,78 @@ EE_INLINE void ee_linked_arena_free(Linked_Arena* head)
     memset(head, 0, sizeof(*head));
 }
 
+EE_INLINE void* ee_linked_arena_alloc_fn(Allocator* allocator, size_t size)
+{
+    EE_ASSERT(allocator != NULL, "Trying to alloc with NULL allocator");
+    EE_ASSERT(allocator->context != NULL, "Trying to alloc with NULL allocator context");
+
+    Linked_Arena* arena = (Linked_Arena*)allocator->context;
+
+    return ee_linked_arena_alloc(arena, size);
+}
+
+EE_INLINE void* ee_linked_arena_realloc_fn(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
+{
+    EE_ASSERT(allocator != NULL, "Trying to alloc with NULL allocator");
+    EE_ASSERT(allocator->context != NULL, "Trying to alloc with NULL allocator context");
+
+    Linked_Arena* head = (Linked_Arena*)allocator->context;
+
+    if (buffer == NULL)
+    {
+        return ee_linked_arena_alloc(head, new_size);
+    }
+
+    
+    if (new_size <= old_size)
+    {
+        return buffer;
+    }
+
+    Linked_Arena* current = head->tail == NULL ? head : head->tail;
+
+    u8* buffer_end = (u8*)buffer + old_size;
+    u8* arena_top = current->buffer + current->offset;
+
+    if (buffer_end == arena_top)
+    {
+        size_t diff = new_size - old_size;
+
+        if (current->offset + diff <= current->size)
+        {
+            current->offset += diff;
+            return buffer;
+        }
+    }
+
+    void* new_buffer = ee_linked_arena_alloc(head, new_size);
+
+    if (new_buffer != NULL)
+    {
+        memcpy(new_buffer, buffer, old_size);
+    }
+
+    return new_buffer;
+}
+
+EE_INLINE void  ee_linked_arena_free_fn(Allocator* allocator, void* buffer)
+{
+    (void)allocator;
+    (void)buffer;
+}
+
+EE_INLINE Allocator ee_linked_arena_allocator(Linked_Arena* arena)
+{
+    Allocator out = { 0 };
+
+    out.alloc_fn = ee_linked_arena_alloc_fn;
+    out.realloc_fn = ee_linked_arena_realloc_fn;
+    out.free_fn = ee_linked_arena_free_fn;
+    out.context = arena;
+
+    return out;
+}
+
 EE_EXTERN_C_END
 
 #endif // EE_ARENA_H

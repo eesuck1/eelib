@@ -136,8 +136,10 @@
     <ClInclude Include="utils\ee_core.h" />
     <ClInclude Include="utils\ee_deq.h" />
     <ClInclude Include="utils\ee_dict.h" />
+    <ClInclude Include="utils\ee_fs.h" />
     <ClInclude Include="utils\ee_grid.h" />
     <ClInclude Include="utils\ee_heap.h" />
+    <ClInclude Include="utils\ee_profiler.h" />
     <ClInclude Include="utils\ee_random.h" />
     <ClInclude Include="utils\ee_set.h" />
     <ClInclude Include="utils\ee_string.h" />

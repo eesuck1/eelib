@@ -56,5 +56,11 @@
     <ClInclude Include="utils\ee_deq.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="utils\ee_profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\ee_fs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -369,6 +369,27 @@ EE_INLINE u64 ee_hash_safe(const u8* key, size_t len)
 	return hash_out;
 }
 
+EE_INLINE u64 ee_hash_cstr_fast(const u8* key, size_t len)
+{
+	EE_UNUSED(len);
+
+	const char* str = *(const char**)key;
+	size_t str_len = ee_strlen(str);
+
+	return ee_hash_fast((const u8*)str, str_len);
+}
+
+EE_INLINE u64 ee_hash_cstr_safe(const u8* key, size_t len)
+{
+	EE_UNUSED(len);
+
+	const char* str;
+	memcpy(&str, key, sizeof(u8*));
+	size_t str_len = ee_strlen(str);
+
+	return ee_hash_safe((const u8*)str, str_len);
+}
+
 //#define EE_HASH_SAFETY_TYPE EE_HASH_FAST
 //#define EE_HASH_COMP_TYPE EE_HASH_SIMPLE
 

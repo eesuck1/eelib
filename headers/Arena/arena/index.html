@@ -1,0 +1,1335 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../..">
+      
+      
+        <link rel="next" href="../../Array/array/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Arena -  </title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../style.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ee_arenah" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title=" " class="md-header__button md-logo" aria-label=" " data-md-component="logo">
+      
+  <img src="../../../ee.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+             
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Arena
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/eesuck1/eelib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title=" " class="md-nav__button md-logo" aria-label=" " data-md-component="logo">
+      
+  <img src="../../../ee.svg" alt="logo">
+
+    </a>
+     
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/eesuck1/eelib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Headers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arena
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arena
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structures
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocator-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allocator Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Array/array/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Array
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Random/random/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Random
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structures
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#allocator-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allocator Functions
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="./" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Headers
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ee_arenah"><strong>ee_arena.h</strong></h1>
+<p><code>ee_arena.h</code> provides a <strong>linear memory allocator</strong> with optional <strong>rewind support</strong>.</p>
+<p>It defines the primary <code>Arena</code> structure, which manages memory allocation from a contiguous buffer. This module is ideal for temporary allocations where memory can be freed all at once or reverted to a previous state efficiently.</p>
+<p>The arena can be wrapped as a standard <code>Allocator</code> interface using <code>ee_arena_allocator()</code> for compatibility with other <code>eelib</code> components that require an allocator.</p>
+<h2 id="defines">Defines</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Macro</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>EE_NO_REWIND</code></td>
+<td style="text-align: left;">A constant value (typically <code>0</code>) used as the <code>rewind_depth</code> parameter in <a href="#ee_arena_new"><code>ee_arena_new()</code></a> to specify that the arena should not allocate a rewind stack. <br/>This disables the <code>ee_arena_mark()</code> and <code>ee_arena_rewind()</code> functions for that instance.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="structures">Structures</h2>
+<p>Structure <code>struct Arena</code> representing the memory arena. It manages the underlying buffer, tracks the current allocation offset, and maintains the optional rewind stack.</p>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Arena</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="o">*</span><span class="w"> </span><span class="n">marks</span><span class="p">;</span><span class="w">       </span>
+<span class="w">    </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">buffer</span><span class="p">;</span><span class="w">         </span>
+<span class="w">    </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">base</span><span class="p">;</span><span class="w">          </span>
+
+<span class="w">    </span><span class="kt">size_t</span><span class="w">  </span><span class="n">size</span><span class="p">;</span><span class="w">       </span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w">  </span><span class="n">offset</span><span class="p">;</span><span class="w">    </span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w">  </span><span class="n">mark</span><span class="p">;</span><span class="w">        </span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w">  </span><span class="n">marks_depth</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">Allocator</span><span class="w"> </span><span class="n">allocator</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">Arena</span><span class="p">;</span>
+</code></pre></div>
+<details>
+<summary>Structure members</summary>
+<table>
+<thead>
+<tr>
+<th>Members</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>marks</code></td>
+<td><code>size_t*</code></td>
+<td>Pointer to the rewind stack, which stores <code>offset</code> values. <code>NULL</code> if <code>marks_depth</code> is <code>EE_NO_REWIND</code>.</td>
+</tr>
+<tr>
+<td><code>buffer</code></td>
+<td><code>u8*</code></td>
+<td>Pointer to the aligned start of the usable memory buffer where allocations occur.</td>
+</tr>
+<tr>
+<td><code>base</code></td>
+<td><code>u8*</code></td>
+<td>Pointer to the raw, unaligned memory block received from the underlying <code>allocator</code>. This is the pointer used for <code>ee_arena_free()</code>.</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td><code>size_t</code></td>
+<td>Total usable capacity of the <code>buffer</code> in bytes.</td>
+</tr>
+<tr>
+<td><code>offset</code></td>
+<td><code>size_t</code></td>
+<td>The current allocation "watermark". All memory from <code>buffer</code> to <code>buffer + offset</code> is considered used.</td>
+</tr>
+<tr>
+<td><code>mark</code></td>
+<td><code>size_t</code></td>
+<td>The current count of active rewind marks on the <code>marks</code> stack.</td>
+</tr>
+<tr>
+<td><code>marks_depth</code></td>
+<td><code>size_t</code></td>
+<td>The maximum number of marks that can be stored.</td>
+</tr>
+<tr>
+<td><code>allocator</code></td>
+<td><code>Allocator</code></td>
+<td>The underlying allocator interface (e.g., default malloc/free) used to acquire the <code>base</code> memory block.</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h2 id="functions">Functions</h2>
+<details>
+<summary>EE_INLINE Arena ee_arena_new(size_t size, size_t rewind_depth, Allocator* allocator)</summary>
+<p><span id="ee_arena_new"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">Arena</span><span class="w"> </span><span class="nf">ee_arena_new</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">rewind_depth</span><span class="p">,</span><span class="w"> </span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Initializes and allocates the memory for a new <code>Arena</code> object.</p>
+<p>This function reserves a contiguous block of memory from the specified <code>allocator</code> (or the default if <code>NULL</code>). It also reserves space for the rewind stack if <code>rewind_depth</code> is not <code>EE_NO_REWIND</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>size</code></td>
+<td><code>size_t</code></td>
+<td>Total capacity of the arena buffer in bytes.</td>
+</tr>
+<tr>
+<td><code>rewind_depth</code></td>
+<td><code>size_t</code></td>
+<td>Number of marks that can be stored for rewinding. Use <code>EE_NO_REWIND</code> to disable this feature.</td>
+</tr>
+<tr>
+<td><code>allocator</code></td>
+<td><code>Allocator*</code></td>
+<td>Optional custom allocator.<br/> <strong>Note</strong>: Pass <code>NULL</code> to use the default allocator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>An initialized <code>Arena</code> structure. On allocation failure, this function will assert (if <code>EE_ASSERT</code> is enabled).</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Create a 1MB arena with 16 rewind levels</span>
+<span class="n">Arena</span><span class="w"> </span><span class="n">arena</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_arena_new</span><span class="p">(</span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+
+<span class="c1">// ... use the arena ...</span>
+
+<span class="c1">// Always free the arena when done</span>
+<span class="n">ee_arena_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details>
+<summary>EE_INLINE void ee_arena_clear(Arena* arena)</summary>
+<p><span id="ee_arena_clear"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_arena_clear</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Clears the entire arena buffer by setting its contents to zero using <code>memset</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>This function <strong>does not</strong> reset the <code>offset</code> or <code>mark</code> counters. To "free" all memory and restart allocation, use <code>ee_arena_reset()</code>.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object to clear.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_reset"><code>ee_arena_reset()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void* ee_arena_alloc(Arena* arena, size_t size)</summary>
+<p><span id="ee_arena_alloc"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="nf">ee_arena_alloc</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Allocates a block of memory from the arena with default alignment (defined by <code>EE_MAX_ALIGN</code>). This is the primary, general-purpose allocation function.</p>
+<p>Allocations are linear and advance the arena's internal offset.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The number of bytes to allocate.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A pointer to the allocated block, or <code>NULL</code> if the arena does not have enough remaining space.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">MyStruct</span><span class="o">*</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_arena_alloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">s</span><span class="p">));</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="c1">// ... initialize and use s ...</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_alloc_al"><code>ee_arena_alloc_al()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void* ee_arena_alloc_al(Arena* arena, size_t size, size_t align)</summary>
+<p><span id="ee_arena_alloc_al"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="nf">ee_arena_alloc_al</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">align</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Allocates a block of memory from the arena with a <strong>custom alignment</strong>.</p>
+<p>The <code>align</code> parameter must be a power of two. If <code>align</code> is 1, no alignment padding is added beyond the natural offset.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The number of bytes to allocate.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>align</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The required alignment for the returned pointer (must be a power of two).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A pointer to the allocated block with the specified alignment, or <code>NULL</code> if the arena does not have enough remaining space.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Allocate 64 bytes aligned to a 16-byte boundary</span>
+<span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">aligned_mem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_arena_alloc_al</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+</code></pre></div>
+</details>
+<details>
+<summary>EE_INLINE void ee_arena_mark(Arena* arena)</summary>
+<p><span id="ee_arena_mark"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_arena_mark</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Saves the current allocation offset (<code>arena-&gt;offset</code>) onto the rewind stack. This creates a "save point" that can be returned to using <code>ee_arena_rewind()</code>.</p>
+<p>This function will assert if the arena was created with <code>EE_NO_REWIND</code> or if the mark stack is full.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_rewind"><code>ee_arena_rewind()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_arena_rewind(Arena* arena)</summary>
+<p><span id="ee_arena_rewind"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_arena_rewind</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Restores the arena's allocation offset to the last saved mark from the rewind stack. This effectively "frees" all memory allocated since that mark was saved.</p>
+<p>This function will assert if the mark stack is empty (a "stack underflow").</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Save state</span>
+<span class="n">ee_arena_mark</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">);</span>
+
+<span class="c1">// Perform temporary allocations</span>
+<span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">temp_obj_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_arena_alloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">);</span>
+<span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">temp_obj_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_arena_alloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">,</span><span class="w"> </span><span class="mi">64</span><span class="p">);</span>
+
+<span class="c1">// ... use temp objects ...</span>
+
+<span class="c1">// Free all memory back to the mark</span>
+<span class="n">ee_arena_rewind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arena</span><span class="p">);</span><span class="w"> </span>
+</code></pre></div>
+</details>
+<details>
+<summary>EE_INLINE void ee_arena_reset(Arena* arena)</summary>
+<p><span id="ee_arena_reset"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_arena_reset</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Resets the arena to its initial state by setting the allocation offset and mark count to zero. This is the fastest way to free <strong>all</strong> memory in the arena for reuse.</p>
+<p>This function does <strong>not</strong> zero the memory content.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_clear"><code>ee_arena_clear()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_arena_free(Arena* arena)</summary>
+<p><span id="ee_arena_free"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_arena_free</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Frees the <strong>entire</strong> memory block used by the arena, including the buffer and mark stack. This calls the <code>free_fn</code> of the underlying allocator on the <code>base</code> pointer.</p>
+<p>After this call, the <code>Arena</code> struct is zeroed and must not be used again unless re-initialized with <code>ee_arena_new()</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the arena object to be destroyed.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_new"><code>ee_arena_new()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE Allocator ee_arena_allocator(Arena* arena)</summary>
+<p><span id="ee_arena_allocator"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">Allocator</span><span class="w"> </span><span class="nf">ee_arena_allocator</span><span class="p">(</span><span class="n">Arena</span><span class="o">*</span><span class="w"> </span><span class="n">arena</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Wraps an existing <code>Arena</code> instance in a standard <code>Allocator</code> interface.</p>
+<p>This allows the arena to be passed to other functions or systems that require a generic <code>Allocator</code> object (e.g., data structures like lists or hash maps). The <code>arena</code> pointer is stored in the <code>Allocator.context</code> field.</p>
+<div class="admonition info">
+<p class="admonition-title">Interface Behavior</p>
+<p>The returned allocator has specific behaviors tied to the arena's linear nature:</p>
+<ul>
+<li><code>alloc_fn</code>: Calls <a href="#eev_arena_alloc_fn"><code>eev_arena_alloc_fn()</code></a>, which allocates memory from the arena.</li>
+<li><code>realloc_fn</code>: Calls <a href="#eev_arena_realloc_fn"><code>eev_arena_realloc_fn()</code></a>, which <strong>always returns <code>NULL</code></strong>. Arenas do not support reallocation.</li>
+<li><code>free_fn</code>: Calls <a href="#eev_arena_free_fn"><code>eev_arena_free_fn()</code></a>, which <strong>does nothing</strong>. Arenas do not support freeing individual blocks.</li>
+</ul>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>arena</code></td>
+<td style="text-align: left;"><code>Arena*</code></td>
+<td style="text-align: left;">A pointer to the initialized arena object to be wrapped.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>An <code>Allocator</code> struct configured to use the provided <code>arena</code> for allocations.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_new"><code>ee_arena_new()</code></a></li>
+<li><a href="#ee_arena_alloc"><code>ee_arena_alloc()</code></a></li>
+<li><a href="#eev_arena_alloc_fn"><code>eev_arena_alloc_fn()</code></a></li>
+<li><a href="#eev_arena_realloc_fn"><code>eev_arena_realloc_fn()</code></a></li>
+<li><a href="#eev_arena_free_fn"><code>eev_arena_free_fn()</code></a></li>
+<li><a href="../../Core/core/##Structures"><code>struct Allocator</code></a></li>
+</ul>
+</details>
+<h2 id="allocator-functions">Allocator Functions</h2>
+<p>These functions are the internal implementations used by the <a href="../../Core/core/##Structures"><code>struct Allocator</code></a> returned by <code>ee_arena_allocator()</code>. End-users typically do not call these functions directly.</p>
+<details>
+<summary>EE_INLINE void* eev_arena_alloc_fn(Allocator* allocator, size_t size)</summary>
+<p><span id="eev_arena_alloc_fn"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="nf">eev_arena_alloc_fn</span><span class="p">(</span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>The <code>alloc_fn</code> implementation for the arena-backed allocator.</p>
+<p>It retrieves the <code>Arena</code> pointer from <code>allocator-&gt;context</code> and calls <a href="#ee_arena_alloc"><code>ee_arena_alloc()</code></a> to perform a linear allocation.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>Allocator*</code></td>
+<td style="text-align: left;">The allocator interface, which must have its <code>context</code> set to a valid <code>Arena*</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The number of bytes to allocate.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A pointer to the allocated memory, or <code>NULL</code> if the arena is full.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_allocator"><code>ee_arena_allocator()</code></a></li>
+<li><a href="#ee_arena_alloc"><code>ee_arena_alloc()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void* eev_arena_realloc_fn(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)</summary>
+<p><span id="eev_arena_realloc_fn"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="nf">eev_arena_realloc_fn</span><span class="p">(</span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">old_size</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">new_size</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>The <code>realloc_fn</code> implementation for the arena-backed allocator.</p>
+<p>This function <strong>always returns <code>NULL</code></strong>. Due to their linear nature, arenas do not support reallocating individual memory blocks.</p>
+<p><strong>Parameters</strong></p>
+<p><em><strong>Note</strong>: As this operation is not supported by the arena, all parameters are ignored.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>Allocator*</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>buffer</code></td>
+<td style="text-align: left;"><code>void*</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>old_size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>new_size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>Always <code>NULL</code>.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_allocator"><code>ee_arena_allocator()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void eev_arena_free_fn(Allocator* allocator, void* buffer)</summary>
+<p><span id="eev_arena_free_fn"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">eev_arena_free_fn</span><span class="p">(</span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">,</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">buffer</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>The <code>free_fn</code> implementation for the arena-backed allocator.</p>
+<p>This function <strong>does nothing</strong> (it is a "no-op"). Arenas do not support freeing individual memory blocks. All memory must be freed at once by resetting or freeing the entire arena.</p>
+<p><strong>Parameters</strong></p>
+<p><em><strong>Note</strong>: As this operation is not supported by the arena, all parameters are ignored.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>Allocator*</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>buffer</code></td>
+<td style="text-align: left;"><code>void*</code></td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_arena_allocator"><code>ee_arena_allocator()</code></a></li>
+<li><a href="#ee_arena_reset"><code>ee_arena_reset()</code></a></li>
+<li><a href="#ee_arena_free"><code>ee_arena_free()</code></a></li>
+</ul>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+
+      <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../../glossary_filter.js"></script>
+      
+    
+
+<script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="kWzEymCnxuibAUXyfkWdB";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+
+<script>
+    (function() {
+        const customWidth = "700px";
+        const customMaxHeight = "700px";
+
+        function overrideChatbaseStyles() {
+            const chatWindow = document.getElementById("chatbase-bubble-window");
+
+            if (chatWindow) {
+                chatWindow.style.setProperty("width", customWidth, "important");
+                chatWindow.style.setProperty("max-height", customMaxHeight, "important");
+            }
+        }
+
+        setInterval(overrideChatbaseStyles, 500);
+    })();
+</script>
+
+  </body>
+</html>

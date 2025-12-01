@@ -1,0 +1,2754 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../Arena/arena/">
+      
+      
+        <link rel="next" href="../../Random/random/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../logo.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Array -  </title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../style.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ee_arrayh" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title=" " class="md-header__button md-logo" aria-label=" " data-md-component="logo">
+      
+  <img src="../../../ee.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+             
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Array
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/eesuck1/eelib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title=" " class="md-nav__button md-logo" aria-label=" " data-md-component="logo">
+      
+  <img src="../../../ee.svg" alt="logo">
+
+    </a>
+     
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/eesuck1/eelib" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Headers
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Headers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Arena/arena/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arena
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Array
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Array
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structures
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enumerations-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enumerations (enum)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Lifecycle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-capacity-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Capacity &amp; Size)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-element-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Element Access)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-modifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Modifiers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Search)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Sorting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#internal-sort-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Sort Implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Random/random/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Random
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#defines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Defines
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structures
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enumerations-enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enumerations (enum)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Lifecycle)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-capacity-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Capacity &amp; Size)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-element-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Element Access)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-modifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Modifiers)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Search)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#functions-sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Functions (Sorting)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#internal-sort-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Internal Sort Implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../Arena/arena/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Headers
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ee_arrayh"><strong>ee_array.h</strong></h1>
+<p><code>ee_array.h</code> provides a <strong>type-generic dynamic array</strong> (vector) implementation.</p>
+<p>It defines the <code>Array</code> structure, which manages a contiguous, resizable memory buffer. This module is designed to be type-agnostic; it operates on raw bytes by tracking the <code>elem_size</code> (element size). All element manipulation (push, pop, set, at) is done via <code>memcpy</code> or direct byte-pointer access.</p>
+<h2 id="defines">Defines</h2>
+<p>This header provides several helper macros for constants and type-safe element access.</p>
+<h3 id="constants">Constants</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Macro</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>EE_ARRAY_INVALID</code></td>
+<td style="text-align: left;">A sentinel value (<code>(size_t)-1</code>) returned by search functions (e.g., <a href="#ee_array_find"><code>ee_array_find()</code></a>) when no matching element is found.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EE_ARRAY_SORT_TH</code></td>
+<td style="text-align: left;">The size threshold (typically <code>16</code> elements) for <a href="#ee_array_introsort"><code>ee_array_introsort()</code></a>. Sub-arrays smaller than or equal to this size will be sorted using the faster Insertion Sort algorithm.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="helper-macros">Helper Macros</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Macro</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>EE_ARRAY_RECAST(v_ptr, i, dtype)</code></td>
+<td style="text-align: left;"><strong>(Recommended)</strong> Gets a correctly typed pointer (<code>dtype*</code>) to the element at index <code>i</code> from an array pointer <code>v_ptr</code>. This is the safest way to access elements. <br> <strong>Example:</strong> <code>int* val = EE_ARRAY_RECAST(&amp;my_array, 0, int);</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EE_ARRAY_PTR_GET(v_ptr, i, d_ptr)</code></td>
+<td style="text-align: left;">Copies the element at index <code>i</code> from an array pointer <code>v_ptr</code> <em>into</em> the destination pointer <code>d_ptr</code>. <br> <strong>Example:</strong> <code>int val; EE_ARRAY_PTR_GET(&amp;my_array, 0, &amp;val);</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>EE_ARRAY_GET(v, i, d)</code></td>
+<td style="text-align: left;">Copies the element at index <code>i</code> from an array struct <code>v</code> <em>into</em> the destination variable <code>d</code>. <br> <strong>Example:</strong> <code>int val; EE_ARRAY_GET(my_array, 0, val);</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="structures">Structures</h2>
+<p>Structure <code>struct Array</code> defines the core container for a resizable, contiguous array.
+All array operations depend on these fields to manage allocation and indexing.</p>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Array</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">top</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">cap</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">elem_size</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">buffer</span><span class="p">;</span><span class="w"> </span>
+<span class="w">    </span><span class="n">Allocator</span><span class="w"> </span><span class="n">allocator</span><span class="p">;</span><span class="w"> </span>
+<span class="p">}</span><span class="w"> </span><span class="n">Array</span><span class="p">;</span>
+</code></pre></div>
+<details>
+<summary>Structure members</summary>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>Note that <code>top</code> and <code>cap</code> store the size in bytes, not element count. Use <code>ee_array_len()</code> to get the number of elements.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Members</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>top</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The current size (length) of the array in bytes. (<code>top == ee_array_len() * elem_size</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cap</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The total allocated capacity of the <code>buffer</code> in bytes.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>elem_size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The size of a single element in bytes (e.g., <code>sizeof(int)</code>).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>buffer</code></td>
+<td style="text-align: left;"><code>u8*</code></td>
+<td style="text-align: left;">Pointer to the contiguous memory block holding the elements.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>Allocator</code></td>
+<td style="text-align: left;">The underlying allocator used for <code>buffer</code> (e.g., default malloc/free).</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h2 id="enumerations-enum">Enumerations (enum)</h2>
+<p><span id="arraysorttype"></span></p>
+<p><code>enum ArraySortType</code> lists available sorting algorithms for internal operations.</p>
+<div class="highlight"><pre><span></span><code><span class="k">typedef</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="n">ArraySortType</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">EE_SORT_DEFAULT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">EE_SORT_INSERT</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="n">EE_SORT_QUICK</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">EE_SORT_HEAP</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="n">EE_SORT_INTRO</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span><span class="w"> </span><span class="n">ArraySortType</span><span class="p">;</span>
+</code></pre></div>
+<details>
+<summary>Enum values</summary>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EE_SORT_DEFAULT</code></td>
+<td>Defaults to Introspective Sort (<code>EE_SORT_INTRO</code>).</td>
+</tr>
+<tr>
+<td><code>EE_SORT_INSERT</code></td>
+<td>Insertion Sort. Efficient for small or nearly-sorted arrays.</td>
+</tr>
+<tr>
+<td><code>EE_SORT_QUICK</code></td>
+<td>Quicksort. Fast on average, but with O(n<sup>2</sup>) worst-case.</td>
+</tr>
+<tr>
+<td><code>EE_SORT_HEAP</code></td>
+<td>Heapsort. Guaranteed O(n log n) performance.</td>
+</tr>
+<tr>
+<td><code>EE_SORT_INTRO</code></td>
+<td>Introspective Sort. A hybrid that starts with Quicksort and switches to Heapsort to prevent worst-case O(n<sup>2</sup>) behavior.</td>
+</tr>
+</tbody>
+</table>
+</details>
+<h2 id="functions-lifecycle">Functions (Lifecycle)</h2>
+<details>
+<summary>EE_INLINE Array ee_array_new(size_t size, size_t elem_size, const Allocator* allocator)</summary>
+<p><span id="ee_array_new"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">Array</span><span class="w"> </span><span class="nf">ee_array_new</span><span class="p">(</span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">elem_size</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Initializes and allocates memory for a new <code>Array</code> object.</p>
+<p>This function allocates an initial buffer large enough to hold <code>size</code> elements. The <code>Array.top</code> is initialized to <code>0</code>, and <code>Array.cap</code> is set to <code>size * elem_size</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The initial <strong>element capacity</strong> (number of elements, not bytes). Must be greater than 0.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>elem_size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The size of a single element. Use <code>sizeof(your_type)</code>. Must be greater than 0.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>const Allocator*</code></td>
+<td style="text-align: left;">Optional. A pointer to a custom <a href="../../Core/core/#allocator"><code>Allocator</code></a>. Pass <code>NULL</code> to use the default <code>eelib</code> allocator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>An initialized <code>Array</code> structure.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Create an array to hold 16 integers</span>
+<span class="n">Array</span><span class="w"> </span><span class="n">int_array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_array_new</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+
+<span class="c1">// ... use the array ...</span>
+
+<span class="n">ee_array_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_free"><code>ee_array_free()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE Array ee_array_copy(Array* array, Allocator* allocator)</summary>
+<p><span id="ee_array_copy"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">Array</span><span class="w"> </span><span class="nf">ee_array_copy</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">Allocator</span><span class="o">*</span><span class="w"> </span><span class="n">allocator</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Creates a <strong>deep copy</strong> of an existing array.</p>
+<p>A new <code>Array</code> struct is created, and a new memory buffer is allocated for it using the specified <code>allocator</code> (or the default if <code>NULL</code>).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function copies the <strong>entire capacity (<code>cap</code>)</strong> of the source array's buffer, not just the currently used portion (<code>top</code>). The <code>top</code> value of the new array is set to match the source array's <code>top</code>.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <em>source</em> <code>Array</code> to be copied.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allocator</code></td>
+<td style="text-align: left;"><code>Allocator*</code></td>
+<td style="text-align: left;"><strong>Optional.</strong> The allocator to be used for the <em>new</em> array's buffer. Pass <code>NULL</code> to use the default allocator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A new <code>Array</code> struct containing a deep copy of the source array's data.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Create an original array</span>
+<span class="n">Array</span><span class="w"> </span><span class="n">arr_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_array_new</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="n">ee_array_push</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arr_a</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span><span class="w"> </span><span class="c1">// arr_a has [5]</span>
+
+<span class="c1">// Create a copy</span>
+<span class="n">Array</span><span class="w"> </span><span class="n">arr_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_array_copy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arr_a</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+
+<span class="c1">// Now, arr_a and arr_b are independent.</span>
+<span class="c1">// Let&#39;s modify arr_b.</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="n">ee_array_push</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arr_b</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="w"> </span><span class="c1">// arr_b has [5, 10]</span>
+
+<span class="c1">// arr_a is unchanged (still has [5])</span>
+
+<span class="c1">// They have different memory buffers</span>
+<span class="c1">// EE_ASSERT(arr_a.buffer != arr_b.buffer);</span>
+
+<span class="c1">// Clean up both arrays</span>
+<span class="n">ee_array_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arr_a</span><span class="p">);</span>
+<span class="n">ee_array_free</span><span class="p">(</span><span class="o">&amp;</span><span class="n">arr_b</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_new"><code>ee_array_new()</code></a></li>
+<li><a href="#ee_array_free"><code>ee_array_free()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_free(Array* array)</summary>
+<p><span id="ee_array_free"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_free</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Frees the internal buffer of the array using its allocator and zeroes the <code>Array</code> struct. After this call, the array is no longer valid and must not be used.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be freed and destroyed.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_new"><code>ee_array_new()</code></a></li>
+</ul>
+</details>
+<h2 id="functions-capacity-size">Functions (Capacity &amp; Size)</h2>
+<details>
+<summary>EE_INLINE int ee_array_full(const Array* array)</summary>
+<p><span id="ee_array_full"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">ee_array_full</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Checks if the array's used size in bytes (<code>top</code>) has reached its total capacity (<code>cap</code>).</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to check for fullness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p><code>1</code> (true) if the array is full (<code>array-&gt;top &gt;= array-&gt;cap</code>), <code>0</code> (false) otherwise.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_grow"><code>ee_array_grow()</code></a></li>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE int ee_array_empty(const Array* array)</summary>
+<p><span id="ee_array_empty"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="nf">ee_array_empty</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Checks if the array contains any elements.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to check for emptiness.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p><code>1</code> (true) if the array is empty (<code>array-&gt;top == 0</code>), <code>0</code> (false) otherwise</p>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_len(const Array* array)</summary>
+<p><span id="ee_array_len"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_len</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Gets the number of <strong>elements</strong> currently stored in the array.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to query for its element count.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The element count (i.e., <code>array-&gt;top / array-&gt;elem_size</code>).</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_size"><code>ee_array_size()</code></a> (for byte size)</li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_size(const Array* array)</summary>
+<p><span id="ee_array_size"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_size</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Gets the total number of <strong>bytes</strong> currently used by the stored elements. This is equivalent to <code>array-&gt;top</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to query for its used byte size.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The used size in bytes (i.e., <code>array-&gt;top</code>).</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_len"><code>ee_array_len()</code></a> (for element count)</li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_reserve(Array* array, size_t size)</summary>
+<p><span id="ee_array_reserve"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_reserve</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Reallocates the array's buffer to ensure it can hold at least <code>size</code> elements.</p>
+<p>This function asserts if the new <code>size</code> (in elements) is not larger than the current capacity.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Based on the code's assertion (<code>size * array-&gt;elem_size &gt; array-&gt;cap</code>), this function can only be used to <em>increase</em> the capacity. It cannot be used to shrink the array.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be resized.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>size</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The desired new minimum <strong>element capacity</strong> (not bytes).</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_grow(Array* array)</summary>
+<p><span id="ee_array_grow"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_grow</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Grows the array's capacity by a factor of 1.5x (i.e., <code>new_cap = cap + (cap &gt;&gt; 1)</code>).</p>
+<p>This function is called automatically by <code>ee_array_push</code> and other modifiers when the array is full.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be grown.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a></li>
+<li><a href="#ee_array_full"><code>ee_array_full()</code></a></li>
+</ul>
+</details>
+<h2 id="functions-element-access">Functions (Element Access)</h2>
+<details>
+<summary>EE_INLINE u8* ee_array_at(const Array* array, size_t i)</summary>
+<p><span id="ee_array_at"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="nf">ee_array_at</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Gets a direct, raw pointer to the element at the specified <strong>element index</strong> <code>i</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>The returned pointer is a <code>u8*</code>. It is the user's responsibility to cast this pointer to the correct type. Use the <code>EE_ARRAY_RECAST</code> macro for a safer and cleaner way to do this.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to access.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> (not byte offset) to access. Asserts if out of bounds.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A <code>u8*</code> pointer to the first byte of the element at index <code>i</code>.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Using the macro (Recommended)</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EE_ARRAY_RECAST</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="p">);</span>
+<span class="o">*</span><span class="n">my_int_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w"> </span><span class="c1">// Modify the value in-place</span>
+
+<span class="c1">// Using raw access (Manual casting)</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">raw_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">ee_array_at</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Value: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">raw_ptr</span><span class="p">);</span><span class="w"> </span><span class="c1">// Prints 100</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_set"><code>ee_array_set()</code></a></li>
+<li><a href="#ee_array_top"><code>ee_array_top()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE u8* ee_array_top(const Array* array)</summary>
+<p><span id="ee_array_top"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="nf">ee_array_top</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Gets a direct, raw pointer to the <strong>last</strong> valid element in the array.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to get the top element from.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A <code>u8*</code> pointer to the last element, or <code>NULL</code> if the array is empty.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Assumes &#39;int_array&#39; is not empty</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">last_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">ee_array_top</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">last_val</span><span class="p">)</span><span class="w"> </span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Last element: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">last_val</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_at"><code>ee_array_at()</code></a></li>
+<li><a href="#ee_array_pop"><code>ee_array_pop()</code></a></li>
+</ul>
+</details>
+<h2 id="functions-modifiers">Functions (Modifiers)</h2>
+<details>
+<summary>EE_INLINE void ee_array_push(Array* array, const u8* val)</summary>
+<p><span id="ee_array_push"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_push</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Appends a new element to the end of the array by copying the data from <code>val</code>.</p>
+<p>If the array is full (<code>ee_array_full()</code> is <code>true</code>), this function will automatically call <code>ee_array_grow()</code> to expand the capacity before pushing the new element.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to push onto.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>val</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the element data to be copied <em>into</em> the array.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Assumes &#39;int_array&#39; is an Array with elem_size = sizeof(int)</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span>
+<span class="n">ee_array_push</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">x</span><span class="p">);</span>
+
+<span class="c1">// Assumes &#39;struct_array&#39; is an Array with elem_size = sizeof(MyStruct)</span>
+<span class="n">MyStruct</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">};</span>
+<span class="n">ee_array_push</span><span class="p">(</span><span class="o">&amp;</span><span class="n">struct_array</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_grow"><code>ee_array_grow()</code></a></li>
+<li><a href="#ee_array_push_zero"><code>ee_array_push_zero()</code></a></li>
+<li><a href="#ee_array_emplace"><code>ee_array_emplace()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_push_zero(Array* array)</summary>
+<p><span id="ee_array_push_zero"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_push_zero</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Appends a new, <strong>zero-initialized</strong> element to the end of the array.</p>
+<p>Calls <code>ee_array_grow()</code> if the array is full. This is useful for reserving an element and ensuring it has a clean default state.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to push onto.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a></li>
+<li><a href="#ee_array_emplace"><code>ee_array_emplace()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_push_nothing(Array* array)</summary>
+<p><span id="ee_array_push_nothing"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_push_nothing</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Advances the array's <code>top</code> pointer by one <code>elem_size</code>, effectively reserving space for a new element without initializing its memory.</p>
+<p>Calls <code>ee_array_grow()</code> if the array is full.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is generally discouraged. Prefer <a href="#ee_array_emplace"><code>ee_array_emplace()</code></a>, which does the same thing but also returns a pointer to the newly reserved space.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to advance its <code>top</code> pointer.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_emplace"><code>ee_array_emplace()</code></a></li>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE u8* ee_array_emplace(Array* array)</summary>
+<p><span id="ee_array_emplace"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="nf">ee_array_emplace</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Appends space for one new element and returns a direct pointer to that new slot.</p>
+<p>This is the <strong>preferred</strong> way to add a new element if you want to initialize it in-place without a separate <code>memcpy</code> (which <a href="#ee_array_push"><code>ee_array_push()</code></a> does).</p>
+<p>Calls <code>ee_array_grow()</code> if the array is full.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function returns a pointer <strong>to</strong> the <em>beginning</em> of the new element's slot; the memory at that location is <strong>uninitialized</strong>.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to emplace into.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>A <code>u8*</code> pointer to the newly reserved (but uninitialized) element slot.</p>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Emplace a new int and initialize it</span>
+<span class="kt">int</span><span class="o">*</span><span class="w"> </span><span class="n">new_int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">ee_array_emplace</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">);</span>
+<span class="o">*</span><span class="n">new_int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="p">;</span>
+
+<span class="c1">// Emplace a new struct and initialize it</span>
+<span class="n">MyStruct</span><span class="o">*</span><span class="w"> </span><span class="n">new_s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">MyStruct</span><span class="o">*</span><span class="p">)</span><span class="n">ee_array_emplace</span><span class="p">(</span><span class="o">&amp;</span><span class="n">struct_array</span><span class="p">);</span>
+<span class="n">new_s</span><span class="o">-&gt;</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Example&quot;</span><span class="p">;</span>
+<span class="n">new_s</span><span class="o">-&gt;</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span>
+
+<span class="c1">// Array now contains the fully initialized struct</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a> (alternative that takes a pointer to data)</li>
+<li><a href="#ee_array_push_nothing"><code>ee_array_push_nothing()</code></a> (discouraged alternative)</li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_pop(Array* array, u8* out_val)</summary>
+<p><span id="ee_array_pop"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_pop</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">out_val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Removes the last element from the array by decrementing the <code>top</code> pointer.</p>
+<p>If <code>out_val</code> is not <code>NULL</code>, the element's data is copied into <code>out_val</code> <em>before</em> it is "removed" (i.e., before <code>top</code> is moved).</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to pop from. Asserts if empty.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>out_val</code></td>
+<td style="text-align: left;"><code>u8*</code></td>
+<td style="text-align: left;"><strong>Optional.</strong> A pointer to a destination buffer to copy the popped element into. Pass <code>NULL</code> to discard the element.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">last_val</span><span class="p">;</span>
+<span class="c1">// Pop the last int and store it in last_val</span>
+<span class="n">ee_array_pop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">last_val</span><span class="p">);</span>
+
+<span class="c1">// Pop the last element and discard it</span>
+<span class="n">ee_array_pop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a></li>
+<li><a href="#ee_array_top"><code>ee_array_top()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_set(Array* array, size_t i, const u8* val)</summary>
+<p><span id="ee_array_set"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_set</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Overwrites the element at the specified index <code>i</code> by copying new data from <code>val</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to modify.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> to modify. Asserts if out of bounds.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>val</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the new element data to be copied <em>into</em> the array.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">new_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">777</span><span class="p">;</span>
+<span class="c1">// Set the element at index 3 to 777</span>
+<span class="n">ee_array_set</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">EE_RECAST_U8</span><span class="p">)</span><span class="n">new_val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_at"><code>ee_array_at()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_insert(Array* array, size_t i, const u8* val)</summary>
+<p><span id="ee_array_insert"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_insert</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Inserts an element at index <code>i</code>, shifting all subsequent elements one position to the right.</p>
+<p>If the array is full, it will be grown via <code>ee_array_grow()</code> <em>before</em> the insertion.</p>
+<div class="admonition warning">
+<p class="admonition-title">Performance</p>
+<p>This is an O(n) operation (slow for large arrays) because it uses <code>memmove</code> to shift all elements after index <code>i</code>.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to insert into.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> at which to insert. Asserts if <code>i &gt; ee_array_len()</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>val</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the new element data to be copied <em>into</em> the array.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_push"><code>ee_array_push()</code></a> (for O(1) insertion at the end)</li>
+<li><a href="#ee_array_erase"><code>ee_array_erase()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_erase(Array* array, size_t i)</summary>
+<p><span id="ee_array_erase"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_erase</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Removes the element at index <code>i</code>, shifting all subsequent elements one position to the left to fill the gap.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>This is an O(n) operation (slow for large arrays) because it uses <code>memmove</code> to shift all elements after index <code>i</code>.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Fast Unordered Erase</p>
+<p>If you need to remove an element and <strong>do not</strong> care about preserving the order of the array, use <a href="#ee_array_swap_n_pop"><code>ee_array_swap_n_pop()</code></a> instead. It runs in O(1) time.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to erase from.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> to remove. Asserts if out of bounds.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_swap_n_pop"><code>ee_array_swap_n_pop()</code></a> (Fast O(1) alternative)</li>
+<li><a href="#ee_array_pop"><code>ee_array_pop()</code></a></li>
+<li><a href="#ee_array_clear"><code>ee_array_clear()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_swap(Array* array, size_t i, size_t j)</summary>
+<p><span id="ee_array_swap"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_swap</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">j</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Swaps the elements at index <code>i</code> and index <code>j</code> in-place.</p>
+<p>This function uses <code>EE_ALLOCA</code> to allocate a temporary buffer on the stack for the swap.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to modify.</td>
+</tr>
+<tr>
+<td style="text-align: left;">* <code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> of the first element.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>j</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> of the second element.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_swap_n_pop(Array* array, size_t i, u8* out_val)</summary>
+<p><span id="ee_array_swap_n_pop"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_swap_n_pop</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">out_val</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Removes the element at index <code>i</code> by overwriting it with the <strong>last</strong> element in the array, and then decrementing the <code>top</code> pointer.</p>
+<p>This is an extremely fast <strong>O(1)</strong> removal operation.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>This function <strong>will break the order</strong> of your array if the removed element is not the last element. Use <a href="#ee_array_erase"><code>ee_array_erase()</code></a> if you need to preserve the order of other elements (which is a slow O(n) operation).</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to modify.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>i</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The <strong>element index</strong> to remove. Asserts if out of bounds.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>out_val</code></td>
+<td style="text-align: left;"><code>u8*</code></td>
+<td style="text-align: left;"><strong>Optional.</strong> A pointer to a destination buffer to copy the <em>original</em> element at index <code>i</code> before it is overwritten. Pass <code>NULL</code> to discard.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Array content: [10, 20, 30, 40, 50]</span>
+<span class="c1">// We want to remove index 1 (value 20)</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">removed_val</span><span class="p">;</span>
+<span class="n">ee_array_swap_n_pop</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">removed_val</span><span class="p">);</span>
+
+<span class="c1">// removed_val is now 20</span>
+<span class="c1">// Array content is now: [10, 50, 30, 40]</span>
+<span class="c1">// (Note that 50 moved to index 1, and 20 is gone)</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_erase"><code>ee_array_erase()</code></a> (Slow, order-preserving alternative)</li>
+<li><a href="#ee_array_pop"><code>ee_array_pop()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_fill(Array* array, const u8* val, size_t a, size_t b)</summary>
+<p><span id="ee_array_fill"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_fill</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Fills a range of the array <code>[a, b)</code> with copies of the element data from <code>val</code>.</p>
+<p>This function iterates from the <strong>element index</strong> <code>a</code> up to (but not including) <code>b</code>, copying the data from <code>val</code> into each slot.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function operates within the array's <em>capacity</em> (<code>cap</code>). If the fill range <code>b</code> extends beyond the current array size <code>top</code>, <code>top</code> will be updated to <code>b * elem_size</code>. This allows <code>ee_array_fill</code> to be used to initialize portions of the array's reserved capacity.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be filled.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>val</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the element data that will be copied <em>into</em> each slot in the range.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>a</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The starting <strong>element index</strong> (inclusive) of the range to fill.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>b</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The ending <strong>element index</strong> (exclusive) of the range to fill. Asserts if <code>a &gt;= b</code> or range is outside the <em>capacity</em>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Create an array with capacity for 10 ints, but size 0</span>
+<span class="n">Array</span><span class="w"> </span><span class="n">int_array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_array_new</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">val_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="p">;</span>
+<span class="c1">// Fill the first 5 elements with &#39;7&#39;.</span>
+<span class="c1">// This also sets ee_array_len() to 5.</span>
+<span class="n">ee_array_fill</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">val_a</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">);</span>
+
+<span class="c1">// ee_array_len(&amp;int_array) is now 5</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">val_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<span class="c1">// Overwrite elements at index 2 and 3 with &#39;-1&#39;</span>
+<span class="n">ee_array_fill</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">u8</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">val_b</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+
+<span class="c1">// Array content: [7, 7, -1, -1, 7]</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_set"><code>ee_array_set()</code></a></li>
+<li><a href="#ee_array_clear"><code>ee_array_clear()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_reverse(Array* array)</summary>
+<p><span id="ee_array_reverse"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_reverse</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Reverses the order of all elements in the array in-place.</p>
+<p>It works by iterating from the start to the middle of the array (<code>len / 2</code>) and swapping each element <code>i</code> with its counterpart <code>len - 1 - i</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be reversed.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Array content: [10, 20, 30, 40]</span>
+<span class="n">ee_array_reverse</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">);</span>
+<span class="c1">// Array content is now: [40, 30, 20, 10]</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_swap"><code>ee_array_swap()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_clear(Array* array)</summary>
+<p><span id="ee_array_clear"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_clear</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Removes all elements from the array by setting its <code>top</code> (byte count) to <code>0</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>This function does <strong>not</strong> free or zero the underlying memory buffer. It only resets the element count, allowing the buffer to be reused.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be cleared.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_reset"><code>ee_array_reset()</code></a></li>
+<li><a href="#ee_array_free"><code>ee_array_free()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_reset(Array* array)</summary>
+<p><span id="ee_array_reset"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_reset</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Resets the array's element count to zero by setting <code>top = 0</code>. This is identical in function to <a href="#ee_array_clear"><code>ee_array_clear()</code></a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Important</p>
+<p>This function does <strong>not</strong> free or zero the underlying memory buffer. It only resets the element count, allowing the buffer to be reused.</p>
+</div>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be reset.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_clear"><code>ee_array_clear()</code></a></li>
+<li><a href="#ee_array_free"><code>ee_array_free()</code></a></li>
+</ul>
+</details>
+<h2 id="functions-search">Functions (Search)</h2>
+<details>
+<summary>EE_INLINE size_t ee_array_find(const Array* array, const u8* target)</summary>
+<p><span id="ee_array_find"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_find</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">target</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the first occurrence of <code>target</code> in the <strong>entire</strong> array.</p>
+<p>This is a convenience wrapper for <a href="#ee_array_find_b"><code>ee_array_find_b(array, target, 0, ee_array_len(array))</code></a>. It benefits from the same SIMD optimizations as <code>ee_array_find_b</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>target</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the element data to search for.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the first matching element, or <a href="#defines"><code>EE_ARRAY_INVALID</code></a> if not found.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_find_b"><code>ee_array_find_b()</code></a></li>
+<li><a href="#ee_array_find_pred"><code>ee_array_find_pred()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_find_b(const Array* array, const u8* target, size_t low, size_t high)</summary>
+<p><span id="ee_array_find_b"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_find_b</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the first occurrence of <code>target</code> within the <strong>element index</strong> range <code>[low, high)</code>.</p>
+<p>This function is heavily optimized using SIMD instructions for element sizes of 1, 2, 4, and 8 bytes. It performs the search in three phases:</p>
+<ol>
+<li><strong>Head:</strong> Linearly checks unaligned elements from <code>low</code> up to the first SIMD-aligned boundary.</li>
+<li><strong>Body:</strong> Scans the main, aligned portion of the array in large (e.g., 16/32-byte) SIMD chunks.</li>
+<li><strong>Tail:</strong> Linearly checks any remaining elements after the last aligned chunk up to <code>high</code>.</li>
+</ol>
+<p>For all other <code>elem_size</code> values, it falls back to a standard <code>memcmp</code> loop.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>target</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the element data to search for.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The starting <strong>element index</strong> (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The ending <strong>element index</strong> (exclusive). Asserts if <code>low &gt;= high</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the first matching element, or <a href="#defines"><code>EE_ARRAY_INVALID</code></a> if not found.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_find"><code>ee_array_find()</code></a> (wrapper for this function)</li>
+<li><a href="#ee_array_find_pred_b"><code>ee_array_find_pred_b()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_find_pred(const Array* array, const u8* target, BinCmp predicate)</summary>
+<p><span id="ee_array_find_pred"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_find_pred</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the first element in the <strong>entire</strong> array that matches <code>target</code> according to a custom <code>predicate</code> function.</p>
+<p>This is a convenience wrapper for <a href="#ee_array_find_pred_b"><code>ee_array_find_pred_b(array, target, predicate, 0, ee_array_len(array))</code></a>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>target</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the data to compare against. This is passed as the <strong>first</strong> argument to <code>predicate</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">A function pointer (<code>int (*)(const void*, const void*)</code>). The function should return <code>0</code> for a match.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the first matching element, or <a href="#defines"><code>EE_ARRAY_INVALID</code></a> if not found.</p>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_find_pred_b(const Array* array, const u8* target, BinCmp predicate, size_t low, size_t high)</summary>
+<p><span id="ee_array_find_pred_b"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_find_pred_b</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">u8</span><span class="o">*</span><span class="w"> </span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the first element in the index range <code>[low, high)</code> that matches <code>target</code> according to a custom <code>predicate</code> function.</p>
+<p>The search stops at the first element where <code>predicate(target, element)</code> returns <code>0</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>target</code></td>
+<td style="text-align: left;"><code>const u8*</code></td>
+<td style="text-align: left;">A pointer to the data to compare against. This is passed as the <strong>first</strong> argument to <code>predicate</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">A function pointer (<code>int (*)(const void*, const void*)</code>). The function should return <code>0</code> for a match.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The starting <strong>element index</strong> (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The ending <strong>element index</strong> (exclusive). Asserts if <code>low &gt;= high</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the first matching element, or <a href="#defines"><code>EE_ARRAY_INVALID</code></a> if not found.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_find_pred"><code>ee_array_find_pred()</code></a></li>
+<li><a href="#ee_array_find_b"><code>ee_array_find_b()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_min_pred(const Array* array, BinCmp predicate)</summary>
+<p><span id="ee_array_min_pred"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_min_pred</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the index of the <strong>minimum</strong> element in the <strong>entire</strong> array, according to a <code>predicate</code>.</p>
+<p>This is a convenience wrapper for <a href="#ee_array_min_pred_b"><code>ee_array_min_pred_b(array, predicate, 0, ee_array_len(array))</code></a>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. It should return <code>&lt; 0</code> if the first argument is "less than" the second.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the minimum element.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_min_pred_b"><code>ee_array_min_pred_b()</code></a></li>
+<li><a href="#ee_array_max_pred"><code>ee_array_max_pred()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_min_pred_b(const Array* array, BinCmp predicate, size_t low, size_t high)</summary>
+<p><span id="ee_array_min_pred_b"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_min_pred_b</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the index of the <strong>minimum</strong> element within the index range <code>[low, high)</code>.</p>
+<p>The comparison is performed by the <code>predicate</code> function. An element <code>i</code> is considered the new minimum if <code>predicate(element_i, current_min)</code> returns <code>&lt; 0</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. It should return <code>&lt; 0</code> if the first argument is "less than" the second.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The starting <strong>element index</strong> (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The ending <strong>element index</strong> (exclusive). Asserts if <code>low &gt;= high</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the minimum element found in the range. (Returns <code>low</code> if the range contains only one element).</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_max_pred_b"><code>ee_array_max_pred_b()</code></a></li>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_max_pred(const Array* array, BinCmp predicate)</summary>
+<p><span id="ee_array_max_pred"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_max_pred</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the index of the <strong>maximum</strong> element in the <strong>entire</strong> array, according to a <code>predicate</code>.</p>
+<p>This is a convenience wrapper for <a href="#ee_array_max_pred_b"><code>ee_array_max_pred_b(array, predicate, 0, ee_array_len(array))</code></a>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. It should return <code>&gt; 0</code> if the first argument is "greater than" the second.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the maximum element.</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_max_pred_b"><code>ee_array_max_pred_b()</code></a></li>
+<li><a href="#ee_array_min_pred"><code>ee_array_min_pred()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE size_t ee_array_max_pred_b(const Array* array, BinCmp predicate, size_t low, size_t high)</summary>
+<p><span id="ee_array_max_pred_b"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">size_t</span><span class="w"> </span><span class="nf">ee_array_max_pred_b</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">predicate</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Finds the index of the <strong>maximum</strong> element within the index range <code>[low, high)</code>.</p>
+<p>The comparison is performed by the <code>predicate</code> function. An element <code>i</code> is considered the new maximum if <code>predicate(element_i, current_max)</code> returns <code>&gt; 0</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>const Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be searched.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>predicate</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. It should return <code>&gt; 0</code> if the first argument is "greater than" the second.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The starting <strong>element index</strong> (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>size_t</code></td>
+<td style="text-align: left;">The ending <strong>element index</strong> (exclusive). Asserts if <code>low &gt;= high</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns</strong></p>
+<p>The <strong>index</strong> of the maximum element found in the range. (Returns <code>low</code> if the range contains only one element).</p>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_min_pred_b"><code>ee_array_min_pred_b()</code></a></li>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+</ul>
+</details>
+<h2 id="functions-sorting">Functions (Sorting)</h2>
+<details>
+<summary>EE_INLINE void ee_array_sort(Array* array, BinCmp cmp, ArraySortType type)</summary>
+<p><span id="ee_array_sort"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_sort</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">cmp</span><span class="p">,</span><span class="w"> </span><span class="n">ArraySortType</span><span class="w"> </span><span class="n">type</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Sorts the <strong>entire</strong> array in-place using the specified algorithm and comparison function.</p>
+<p>This is the main, user-facing sort function. It acts as a wrapper that calls the appropriate low-level sorting implementation (e.g., <a href="#ee_array_introsort"><code>ee_array_introsort()</code></a>), handling the conversion from element indices to the byte offsets required by the internal functions.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be sorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cmp</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function <code>int (*)(const void* a, const void* b)</code>. It must return: <br>• <strong><code>&lt; 0</code></strong> if <code>a &lt; b</code> <br>• <strong><code>0</code></strong> if <code>a == b</code> <br>• <strong><code>&gt; 0</code></strong> if <code>a &gt; b</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>type</code></td>
+<td style="text-align: left;"><code>ArraySortType</code></td>
+<td style="text-align: left;">The sorting algorithm to use. <a href="#arraysorttype"><code>EE_SORT_DEFAULT</code></a> (Introsort) is highly recommended for most cases.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 1. Define an Array of integers</span>
+<span class="n">Array</span><span class="w"> </span><span class="n">int_array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ee_array_new</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">),</span><span class="w"> </span><span class="nb">NULL</span><span class="p">);</span>
+<span class="c1">// ... (push some integers into the array) ...</span>
+
+<span class="c1">// 2. Define a comparison function (BinCmp) for integers</span>
+<span class="kt">int</span><span class="w"> </span><span class="nf">compare_ints</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">void</span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">val_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">a</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">val_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">b</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Return (a &gt; b) - (a &lt; b) for a simple, fast comparison</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">val_a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">val_b</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">val_a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">val_b</span><span class="p">);</span>
+
+<span class="w">    </span><span class="cm">/* // A more verbose but equivalent way:</span>
+<span class="cm">    if (val_a &lt; val_b) return -1;</span>
+<span class="cm">    if (val_a &gt; val_b) return 1;</span>
+<span class="cm">    return 0;</span>
+<span class="cm">    */</span>
+<span class="p">}</span>
+
+<span class="c1">// 3. Call the sort function</span>
+<span class="n">ee_array_sort</span><span class="p">(</span><span class="o">&amp;</span><span class="n">int_array</span><span class="p">,</span><span class="w"> </span><span class="n">compare_ints</span><span class="p">,</span><span class="w"> </span><span class="n">EE_SORT_DEFAULT</span><span class="p">);</span>
+
+<span class="c1">// ... int_array is now sorted ...</span>
+</code></pre></div>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#arraysorttype"><code>ArraySortType</code></a> (enum)</li>
+<li><a href="#ee_array_introsort"><code>ee_array_introsort()</code></a></li>
+<li><a href="#ee_array_heapsort"><code>ee_array_heapsort()</code></a></li>
+<li><a href="#ee_array_quicksort"><code>ee_array_quicksort()</code></a></li>
+<li><a href="#ee_array_insertsort"><code>ee_array_insertsort()</code></a></li>
+</ul>
+</details>
+<h2 id="internal-sort-implementations">Internal Sort Implementations</h2>
+<p>These functions are low-level helpers called by <a href="#ee_array_sort"><code>ee_array_sort()</code></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For most use cases, calling the main <a href="#ee_array_sort"><code>ee_array_sort()</code></a> function is <strong>highly recommended</strong>, as it operates on element indices.</p>
+<p>The functions in this section are low-level helpers. They expect their <code>low</code> and <code>high</code> range parameters as <strong>byte offsets</strong>, which can be less intuitive and error-prone if used directly.</p>
+</div>
+<details>
+<summary>EE_INLINE void ee_array_insertsort(Array* array, BinCmp cmp, i64 low, i64 high)</summary>
+<p><span id="ee_array_insertsort"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_insertsort</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">cmp</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Sorts a sub-section of the array using the <strong>Insertion Sort</strong> algorithm.</p>
+<p>Insertion sort iterates through the array, taking one element at a time and inserting it into its correct position within the already-sorted portion of the array.</p>
+<p>This algorithm is O(n<sup>2</sup>) but is very efficient for small arrays (see <code>EE_ARRAY_SORT_TH</code>) or for arrays that are already mostly sorted. It is used as the final step in <code>ee_array_introsort</code>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be sorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cmp</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. Must return <code>&lt; 0</code> if <code>a &lt; b</code>, <code>0</code> if <code>a == b</code>, or <code>&gt; 0</code> if <code>a &gt; b</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>first</em> element in the range (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>last</em> element in the range (inclusive).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+<li><a href="#ee_array_introsort"><code>ee_array_introsort()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_quicksort(Array* array, BinCmp cmp, i64 low, i64 high)</summary>
+<p><span id="ee_array_quicksort"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_quicksort</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">cmp</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Sorts a sub-section of the array using the <strong>Quicksort</strong> algorithm.</p>
+<p>Quicksort is a divide-and-conquer algorithm. This implementation works as follows:
+1.  Selects the middle element as the "pivot".
+2.  Partitions the array (using a Hoare-like scheme) so that all elements smaller than the pivot are to its left, and all elements larger are to its right.
+3.  Recursively calls itself on the two sub-arrays (partitions).</p>
+<p>This algorithm has an average-case performance of O(n log n), but a worst-case performance of O(n<sup>2</sup>), which <code>ee_array_introsort</code> is designed to prevent.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be sorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cmp</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. Must return <code>&lt; 0</code> if <code>a &lt; b</code>, <code>0</code> if <code>a == b</code>, or <code>&gt; 0</code> if <code>a &gt; b</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>first</em> element in the range (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>last</em> element in the range (inclusive).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+<li><a href="#ee_array_introsort"><code>ee_array_introsort()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_heapsort(Array* array, BinCmp cmp, i64 low, i64 high)</summary>
+<p><span id="ee_array_heapsort"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_heapsort</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">cmp</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">high</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Sorts a sub-section of the array using the <strong>Heapsort</strong> algorithm.</p>
+<p>Heapsort is an in-place, comparison-based algorithm that works in two phases:
+1.  <strong>Build Max-Heap:</strong> It first rearranges the array into a "max-heap", which is a binary tree structure (represented linearly in the array) where every parent node is larger than or equal to its children.</p>
+<ol>
+<li><strong>Sortdown:</strong> It repeatedly swaps the root element (the largest item) with the last element in the heap, reduces the heap's size by one, and "sifts down" the new root to maintain the max-heap property.</li>
+</ol>
+<p>This algorithm has a guaranteed worst-case and average-case performance of O(n log n). It is used by <code>ee_array_introsort</code> to avoid the O(n<sup>2</sup>) worst-case of Quicksort when the recursion depth becomes too large.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be sorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cmp</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. Must return <code>&lt; 0</code> if <code>a &lt; b</code>, <code>0</code> if <code>a == b</code>, or <code>&gt; 0</code> if <code>a &gt; b</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>first</em> element in the range (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>last</em> element in the range (inclusive).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+<li><a href="#ee_array_introsort"><code>ee_array_introsort()</code></a></li>
+</ul>
+</details>
+<details>
+<summary>EE_INLINE void ee_array_introsort(Array* array, BinCmp cmp, i64 low, i64 high, i32 max_depth)</summary>
+<p><span id="ee_array_introsort"></span></p>
+<p><strong>Syntax</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kt">void</span><span class="w"> </span><span class="nf">ee_array_introsort</span><span class="p">(</span><span class="n">Array</span><span class="o">*</span><span class="w"> </span><span class="n">array</span><span class="p">,</span><span class="w"> </span><span class="n">BinCmp</span><span class="w"> </span><span class="n">cmp</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">low</span><span class="p">,</span><span class="w"> </span><span class="n">i64</span><span class="w"> </span><span class="n">high</span><span class="p">,</span><span class="w"> </span><span class="n">i32</span><span class="w"> </span><span class="n">max_depth</span><span class="p">);</span>
+</code></pre></div>
+<p><strong>Description</strong></p>
+<p>Sorts a sub-section of the array using the <strong>Introspective Sort</strong> (Introsort) algorithm.</p>
+<p>Introsort is a hybrid algorithm that combines the speed of Quicksort with the guaranteed worst-case O(n log n) performance of Heapsort.</p>
+<p>This implementation's behavior depends on the partition size and recursion depth:</p>
+<ol>
+<li><strong>Quicksort (Default):</strong> It begins by performing a standard Quicksort partition.</li>
+<li><strong>Heapsort (Fallback):</strong> If the recursion <code>max_depth</code> (used to detect bad pivot choices) reaches zero, it switches to <a href="#ee_array_heapsort"><code>ee_array_heapsort()</code></a> to prevent Quicksort's O(n<sup>2</sup>) worst-case.</li>
+<li><strong>Insertion Sort (Base Case):</strong> If a partition's size (<code>len</code>) becomes smaller than or equal to <a href="#defines"><code>EE_ARRAY_SORT_TH</code></a>, it switches to <a href="#ee_array_insertsort"><code>ee_array_insertsort()</code></a>, which is more efficient for small arrays.</li>
+</ol>
+<p>This hybrid approach provides a fast average-case sort while completely avoiding quadratic performance. It is the default algorithm used by <a href="#ee_array_sort"><code>ee_array_sort()</code></a>.</p>
+<p><strong>Parameters</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>array</code></td>
+<td style="text-align: left;"><code>Array*</code></td>
+<td style="text-align: left;">Pointer to the <code>Array</code> to be sorted.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>cmp</code></td>
+<td style="text-align: left;"><code>BinCmp</code></td>
+<td style="text-align: left;">The comparison function. Must return <code>&lt; 0</code> if <code>a &lt; b</code>, <code>0</code> if <code>a == b</code>, or <code>&gt; 0</code> if <code>a &gt; b</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>low</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>first</em> element in the range (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>high</code></td>
+<td style="text-align: left;"><code>i64</code></td>
+<td style="text-align: left;">The <strong>byte offset</strong> of the <em>last</em> element in the range (inclusive).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>max_depth</code></td>
+<td style="text-align: left;"><code>i32</code></td>
+<td style="text-align: left;">The recursion depth limit. When this hits <code>0</code>, the algorithm switches to Heapsort.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>See Also</strong></p>
+<ul>
+<li><a href="#ee_array_sort"><code>ee_array_sort()</code></a></li>
+<li><a href="#ee_array_quicksort"><code>ee_array_quicksort()</code></a></li>
+<li><a href="#ee_array_heapsort"><code>ee_array_heapsort()</code></a></li>
+<li><a href="#ee_array_insertsort"><code>ee_array_insertsort()</code></a></li>
+</ul>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.expand", "navigation.path", "navigation.top", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+
+      <script src="../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../../glossary_filter.js"></script>
+      
+    
+
+<script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="kWzEymCnxuibAUXyfkWdB";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+</script>
+
+<script>
+    (function() {
+        const customWidth = "700px";
+        const customMaxHeight = "700px";
+
+        function overrideChatbaseStyles() {
+            const chatWindow = document.getElementById("chatbase-bubble-window");
+
+            if (chatWindow) {
+                chatWindow.style.setProperty("width", customWidth, "important");
+                chatWindow.style.setProperty("max-height", customMaxHeight, "important");
+            }
+        }
+
+        setInterval(overrideChatbaseStyles, 500);
+    })();
+</script>
+
+  </body>
+</html>

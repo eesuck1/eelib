@@ -1030,6 +1030,7 @@ EE_INLINE void ee_linked_array_pop(Linked_Array* arr, u8* out_val)
 EE_INLINE u8* ee_linked_array_at(Linked_Array* arr, size_t i)
 {
 	EE_ASSERT(arr != NULL, "Trying to dereference NULL array");
+	EE_ASSERT(i < ee_linked_array_len(arr), "Invalid index (%zu) for linked array with length (%zu)", i, ee_linked_array_len(arr));
 
 	const Linked_Array* head = arr;
 	i32 bits = ee_first_bit_u64(arr->seg_size);

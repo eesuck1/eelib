@@ -688,11 +688,15 @@ EE_INLINE Str ee_str_copy(const Str* str, Allocator* allocator)
 	EE_ASSERT(out.allocator.realloc_fn != NULL, "Trying to set NULL realloc callback");
 	EE_ASSERT(out.allocator.free_fn != NULL, "Trying to set NULL free callback");
 
+	out.cap = str->top > 0 ? str->top : 1;
 	out.buffer = (char*)out.allocator.alloc_fn(&out.allocator, out.cap);
 
 	EE_ASSERT(out.buffer != NULL, "Unable to allocate (%zu) bytes for Str.buffer copy", out.cap);
 
-	memcpy(out.buffer, str->buffer, out.cap);
+	if (str->top > 0)
+	{
+		memcpy(out.buffer, str->buffer, str->top);
+	}
 
 	return out;
 }
@@ -738,6 +742,22 @@ EE_INLINE void ee_str_push_bytes(Str* str, const char* bytes, size_t len)
 
 	memcpy(&str->buffer[str->top], bytes, len);
 	str->top += len;
+}
+
+EE_INLINE void ee_str_clone_bytes(Str* dest, const Str* src)
+{
+	EE_ASSERT(src != NULL, "Trying to copy from NULL Array");
+	EE_ASSERT(src->buffer != NULL, "Trying to copy from NULL Array.buffer");
+
+	EE_ASSERT(dest != NULL, "Trying to copy into NULL Array");
+	EE_ASSERT(dest->buffer != NULL, "Trying to copy into NULL Array.buffer");
+
+	dest->top = 0;
+
+	if (src->top > 0)
+	{
+		ee_str_push_bytes(dest, src->buffer, src->top);
+	}
 }
 
 EE_INLINE void ee_str_fill_free(Str* str, char val)

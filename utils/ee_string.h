@@ -778,6 +778,7 @@ EE_INLINE void ee_str_clear_zero(Str* str)
 
 	memset(str->buffer, 0, str->cap);
 }
+
 EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const char* bytes, size_t len)
 {
 	EE_ASSERT(str != NULL, "Trying to insert bytes into NULL string");
@@ -808,6 +809,27 @@ EE_INLINE void ee_str_insert_bytes(Str* str, size_t i, const char* bytes, size_t
 	memcpy(&str->buffer[i], bytes, len);
 
 	str->top += len;
+}
+
+EE_INLINE void ee_str_erase_bytes(Str* str, size_t i, size_t len)
+{
+	EE_ASSERT(str != NULL, "Trying to erase bytes from NULL string");
+	EE_ASSERT(i <= str->top, "Invalid position (%zu) for string with top (%zu)", i, str->top);
+	EE_ASSERT(i + len <= str->top, "Erase length (%zu) at position (%zu) exceeds string top (%zu)", len, i, str->top);
+
+	if (len == 0)
+	{
+		return;
+	}
+
+	size_t tail_len = str->top - (i + len);
+
+	if (tail_len > 0)
+	{
+		memmove(&str->buffer[i], &str->buffer[i + len], tail_len);
+	}
+
+	str->top -= len;
 }
 
 EE_INLINE void ee_str_set_bytes(Str* str, size_t i, const char* bytes, size_t len)

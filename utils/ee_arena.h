@@ -193,12 +193,46 @@ EE_INLINE void* eev_arena_alloc_fn(Allocator* allocator, size_t size)
 
 EE_INLINE void* eev_arena_realloc_fn(Allocator* allocator, void* buffer, size_t old_size, size_t new_size)
 {
-    (void)allocator;
-    (void)buffer;
-    (void)old_size;
-    (void)new_size;
+    EE_ASSERT(allocator != NULL, "Trying to realloc with NULL allocator");
+    EE_ASSERT(allocator->context != NULL, "Trying to realloc with NULL allocator context");
 
-    return NULL;
+    Arena* arena = (Arena*)allocator->context;
+
+    if (buffer == NULL)
+    {
+        return ee_arena_alloc(arena, new_size);
+    }
+
+    if (new_size <= old_size)
+    {
+        return buffer;
+    }
+
+    u8* buffer_end = (u8*)buffer + old_size;
+    u8* arena_top  = arena->buffer + arena->offset;
+
+    if (buffer_end == arena_top)
+    {
+        size_t diff = new_size - old_size;
+
+        EE_ASSERT(arena->offset + diff <= arena->size, "Arena realloc overflow"); 
+        
+        if (arena->offset + diff <= arena->size)
+        {
+            arena->offset += diff;
+
+            return buffer;
+        }
+    }
+
+    void* new_buffer = ee_arena_alloc(arena, new_size);
+
+    if (new_buffer != NULL)
+    {
+        memcpy(new_buffer, buffer, old_size);
+    }
+
+    return new_buffer;
 }
 
 EE_INLINE void eev_arena_free_fn(Allocator* allocator, void* buffer)

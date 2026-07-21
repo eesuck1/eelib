@@ -208,4 +208,34 @@ EE_INLINE void ee_deq_clear(Deq* deq, u8 val)
 	memset(deq->buffer, val, deq->cap);
 }
 
+EE_INLINE u8* ee_deq_at_from_head(const Deq* deq, size_t offset)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+	EE_ASSERT(offset < ee_deq_len(deq), "Offset (%zu) out of bounds (%zu)", offset, ee_deq_len(deq));
+
+	size_t bytes_back = (offset + 1) * deq->elem_size;
+	size_t index = (deq->head - bytes_back) & deq->mask;
+
+	return &deq->buffer[index];
+}
+
+EE_INLINE u8* ee_deq_at_from_tail(const Deq* deq, size_t offset)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+	EE_ASSERT(offset < ee_deq_len(deq), "Offset (%zu) out of bounds (%zu)", offset, ee_deq_len(deq));
+
+	size_t bytes_forward = offset * deq->elem_size;
+	size_t index = (deq->tail + bytes_forward) & deq->mask;
+
+	return &deq->buffer[index];
+}
+
+EE_INLINE void ee_deq_drop_head(Deq* deq, size_t count)
+{
+	EE_ASSERT(deq != NULL, "Trying to dereference NULL deq");
+	EE_ASSERT(count <= ee_deq_len(deq), "Trying to drop more elements (%zu) than exist (%zu)", count, ee_deq_len(deq));
+
+	deq->head -= (count * deq->elem_size);
+}
+
 #endif // EE_DEQ_H
